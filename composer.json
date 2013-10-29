@@ -18,5 +18,8 @@
 	"zendframework/zend-http": "2.*",
 	"zendframework/zend-eventmanager": "2.*",
         "zendframework/zendoauth": "2.*"
+    },
+    "autoload": {
+        "psr-0": {"EvaOAuth": "src/"}
     }
 }
