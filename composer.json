@@ -15,9 +15,9 @@
 	"zendframework/zend-config": "2.*",
 	"zendframework/zend-session": "2.*",
 	"zendframework/zend-json": "2.*",
-	"zendframework/zend-http": "2.*",
+	"zendframework/zend-http": "2.2.3",
 	"zendframework/zend-eventmanager": "2.*",
-        "zendframework/zendoauth": "2.*"
+        "zendframework/zendoauth": "2.0.1"
     },
     "autoload": {
         "psr-0": {"EvaOAuth": "src/"}
