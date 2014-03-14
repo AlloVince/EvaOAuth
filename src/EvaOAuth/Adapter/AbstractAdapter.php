@@ -163,7 +163,16 @@ abstract class AbstractAdapter implements AdapterInterface
         if($this->accessToken){
             return $this->accessToken;
         }
-        return $this->accessToken = $this->getConsumer()->getAccessToken($queryData, $token, $httpMethod, $request);
+
+        if(!$token) {
+            throw new Exception\InvalidArgumentException('No RequestToken input for request AccessToken');
+        }
+
+        $accessToken = $this->getConsumer()->getAccessToken($queryData, $token, $httpMethod, $request);
+        if(!$accessToken->getToken()) {
+            throw new Exception\RuntimeException(sprintf('AccessToken not get correct by server return %s', $accessToken->getResponse()->getBody()));
+        }
+        return $this->accessToken = $accessToken;
     }
 
 

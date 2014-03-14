@@ -52,10 +52,13 @@ class Consumer extends ZendConsumer
 
     public function getAccessToken(
         $queryData,
-        \ZendOAuth\Token\Request $token,
+        \ZendOAuth\Token\Request $token = null,
         $httpMethod = null,
         \ZendOAuth\Http\AccessToken $request = null
     ) {
+        if(!$token) {
+            throw new Exception\InvalidArgumentException('No AccessToken input');
+        }
         $authorizedToken = new Token\AuthorizedRequest($queryData);
         if (!$authorizedToken->isValid()) {
             throw new Exception\InvalidArgumentException(

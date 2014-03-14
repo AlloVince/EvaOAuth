@@ -102,8 +102,13 @@ abstract class AbstractToken extends \ZendOAuth\Token\AbstractToken
             case 'pair':
             $parts = explode('&', $body);
             foreach ($parts as $kvpair) {
+                if(!$kvpair) {
+                    continue;
+                }
                 $pair = explode('=', $kvpair);
-                $params[rawurldecode($pair[0])] = rawurldecode($pair[1]);
+                if(isset($pair[1])) {
+                    $params[rawurldecode($pair[0])] = rawurldecode($pair[1]);
+                }
             }
             break;
             default:
