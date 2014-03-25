@@ -218,8 +218,10 @@ class Service
      public function initAdapter($adapterName, $oauthVersion)
      {
          $options = $this->getOptions();
+         
+         $version = strtolower($oauthVersion) == 'oauth1' ? 'OAuth1' : 'OAuth2';
 
-         $adapterClass = 'EvaOAuth\Adapter\\' . ucfirst(strtolower($oauthVersion)) . '\\' . ucfirst(strtolower($adapterName));
+         $adapterClass = 'EvaOAuth\Adapter\\' . $version . '\\' . ucfirst(strtolower($adapterName));
 
          if(false === class_exists($adapterClass)){
              throw new Exception\InvalidArgumentException(sprintf('Undefined oauth adapter %s by oauth version %s', $adapterName, $oauthVersion));
