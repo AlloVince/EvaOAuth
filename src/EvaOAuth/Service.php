@@ -12,6 +12,7 @@ namespace EvaOAuth;
 
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use ZendOAuth\OAuth;
 
 /**
  * @category   Zend
@@ -39,6 +40,11 @@ class Service
     protected $oauthVersion = 'OAuth2';
 
     protected $options;
+
+    public static function setHttpClientOptions(array $options)
+    {
+        $client = OAuth::getHttpClient()->setOptions($options);
+    }
 
 
     /**
