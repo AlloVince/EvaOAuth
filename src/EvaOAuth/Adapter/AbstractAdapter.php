@@ -32,6 +32,8 @@ abstract class AbstractAdapter implements AdapterInterface
 
     protected $httpClientOptions = array();
 
+    protected $rawProfile;
+
     public function getWebsiteName()
     {
         return $this->websiteName;
@@ -175,6 +177,34 @@ abstract class AbstractAdapter implements AdapterInterface
         return $this->accessToken = $accessToken;
     }
 
+    public function getRemoteUserName()
+    {
+    }
+
+    public function getEmail()
+    {
+    }
+
+    public function getImageUrl()
+    {
+    }
+
+    public function getLocation()
+    {
+    }
+
+    public function getRawProfile()
+    {
+    }
+
+    public function getRawProfileString()
+    {
+        $rawProfile = $this->getRawProfile();
+        if(!$rawProfile) {
+            return null;
+        }
+        return json_encode($rawProfile);
+    }
 
     protected function parseJsonResponse(Response $response)
     {

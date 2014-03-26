@@ -23,6 +23,8 @@ class Tencent extends AbstractAdapter
         $token = parent::accessTokenToArray($accessToken);
         if(!isset($token['remoteUserId']) || !$token['remoteUserId']){
             $token['remoteUserId'] = $this->getRemoteUserId();
+            $token['remoteUserName'] = $this->getRemoteUserName();
+            $token['remoteExtra'] = $this->getRawProfileString();
         }
         return $token;
     }
@@ -35,5 +37,26 @@ class Tencent extends AbstractAdapter
 
         $data = $this->parseJsonpResponse($response);
         return isset($data['client_id']) ? $data['client_id'] : null;
+    }
+
+    public function getRemoteUserName()
+    {
+        $data = $this->getRawProfile();
+        return isset($data['nickname']) ? $data['nickname'] : null;
+    }
+
+    public function getRawProfile()
+    {
+        if($this->rawProfile || false === $this->rawProfile) {
+            return $this->rawProfile;
+        }
+
+        $client = $this->getHttpClient();
+        $client->setUri('https://graph.qq.com/user/get_user_info');
+        $response = $client->send();
+        if($response->getStatusCode() >= 300) {
+            return false;
+        }
+        return $this->rawProfile = $this->parseJsonResponse($response);
     }
 }

@@ -36,11 +36,19 @@ class Facebook extends AbstractAdapter
 
     public function getRemoteUserId()
     {
+        $data = $this->getRawProfile();
+        return isset($data['id']) ? $data['id'] : null;
+    }
+
+    public function getRawProfile()
+    {
+        if($this->rawProfile) {
+            return $this->rawProfile;
+        }
         $client = $this->getHttpClient();
         $client->setUri('https://graph.facebook.com/me');
         $response = $client->send();
-        $data = $this->parseJsonResponse($response);
-        return isset($data['id']) ? $data['id'] : null;
+        return $this->rawProfile = $this->parseJsonResponse($response);
     }
 
 }

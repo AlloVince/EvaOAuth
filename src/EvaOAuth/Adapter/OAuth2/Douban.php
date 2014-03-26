@@ -39,6 +39,35 @@ class Douban extends AbstractAdapter
     {
         $token = parent::accessTokenToArray($accessToken);
         $token['remoteUserId'] = $accessToken->getParam('douban_user_id');
+        $token['remoteUserName'] = $this->getRemoteUserName();
         return $token;
+    }
+
+    public function getRemoteUserName()
+    {
+        $data = $this->getRawProfile();
+        return isset($data['uid']) ? $data['uid'] : null;
+    }
+
+    public function getImageUrl()
+    {
+        $data = $this->getRawProfile();
+        return isset($data['avatar']) ? $data['avatar'] : null;
+    }
+
+
+    public function getRawProfile()
+    {
+        if($this->rawProfile || false === $this->rawProfile) {
+            return $this->rawProfile;
+        }
+
+        $client = $this->getHttpClient();
+        $client->setUri('https://api.douban.com/v2/user/~me');
+        $response = $client->send();
+        if($response->getStatusCode() >= 300) {
+            return $this->rawProfile = false;
+        }
+        return $this->rawProfile = $this->parseJsonResponse($response);
     }
 }
