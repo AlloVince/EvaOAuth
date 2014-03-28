@@ -15,9 +15,9 @@ class Renren extends AbstractAdapter
         $token = parent::accessTokenToArray($accessToken);
         $user = $accessToken->getParam('user');
         if($user) {
-            $user = (array) $user;
-            $token['remoteUserId'] = $user['id'];
-            $token['remoteUserName'] = $user['name'];
+            $token['remoteUserId'] = $user->id;
+            $token['remoteNickName'] = $user->name;
+            $token['remoteImageUrl'] = $user->avatar[3]->url;
             $token['remoteExtra'] = \Zend\Json\Json::encode($user);
         }
         return $token;

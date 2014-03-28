@@ -20,6 +20,8 @@ class Weibo extends AbstractAdapter
         $token['remoteUserId'] = $accessToken->getParam('uid');
         $token['remoteUserName'] = $this->getRemoteUserName();
         $token['remoteExtra'] = $this->getRawProfileString();
+        $token['remoteNickName'] = $this->getRemoteNickName();
+        $token['remoteImageUrl'] = $this->getImageUrl();
         return $token;
     }
 
@@ -32,13 +34,22 @@ class Weibo extends AbstractAdapter
         return $data['name'];
     }
 
+    public function getRemoteNickName()
+    {
+        $data = $this->getRawProfile();
+        if(!isset($data['screen_name'])) {
+            return null;
+        }
+        return $data['screen_name'];
+    }
+
     public function getImageUrl()
     {
         $data = $this->getRawProfile();
-        if(!isset($data['profile_image_url'])) {
+        if(!isset($data['avatar_large'])) {
             return null;
         }
-        return $data['profile_image_url'];
+        return $data['avatar_large'];
     }
 
     public function getRawProfile()
@@ -48,6 +59,9 @@ class Weibo extends AbstractAdapter
         }
         $client = $this->getHttpClient();
         $client->setUri('https://api.weibo.com/2/users/show.json');
+        $client->setParameterGet(array(
+            'uid' => $this->getAccessToken()->uid
+        ));
         $response = $client->send();
         if($response->getStatusCode() >= 300) {
             return;

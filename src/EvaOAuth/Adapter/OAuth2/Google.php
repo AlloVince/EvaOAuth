@@ -13,7 +13,7 @@ class Google extends AbstractAdapter
 
     protected $defaultOptions = array(
         'requestScheme' => OAuth::REQUEST_SCHEME_POSTBODY,
-        'scope' => 'https://www.googleapis.com/auth/userinfo.profile',
+        'scope' => 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
     );
 
     protected $httpClientOptions = array(
@@ -37,16 +37,49 @@ class Google extends AbstractAdapter
         $token = parent::accessTokenToArray($accessToken);
         if(!isset($token['remoteUserId']) || !$token['remoteUserId']){
             $token['remoteUserId'] = $this->getRemoteUserId();
+            $token['remoteEmail'] = $this->getEmail();
+            $token['remoteNickName'] = $this->getRemoteNickName();
+            $token['remoteImageUrl'] = $this->getImageUrl();
+            $token['remoteExtra'] = $this->getRawProfileString();
         }
         return $token;
     }
 
     public function getRemoteUserId()
     {
+        $data = $this->getRawProfile();
+        return isset($data['id']) ? $data['id'] : null;
+    }
+
+    public function getEmail()
+    {
+        $data = $this->getRawProfile();
+        return isset($data['email']) ? $data['email'] : null;
+    }
+
+    public function getRemoteNickName()
+    {
+        $data = $this->getRawProfile();
+        return isset($data['name']) ? $data['name'] : null;
+    }
+
+    public function getImageUrl()
+    {
+        $data = $this->getRawProfile();
+        return isset($data['picture']) ? $data['picture'] : null;
+    }
+
+    public function getRawProfile()
+    {
+        if($this->rawProfile) {
+            return $this->rawProfile;
+        }
         $client = $this->getHttpClient();
         $client->setUri('https://www.googleapis.com/oauth2/v2/userinfo');
         $response = $client->send();
-        $data = $this->parseJsonResponse($response);
-        return isset($data['id']) ? $data['id'] : null;
+        if($response->getStatusCode() >= 300) {
+            return;
+        }
+        return $this->rawProfile = $this->parseJsonResponse($response);
     }
 }
