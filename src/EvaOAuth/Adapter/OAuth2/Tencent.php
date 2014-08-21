@@ -34,7 +34,7 @@ class Tencent extends AbstractAdapter
     public function getRemoteUserId()
     {
         $data = $this->getOpenId();
-        return isset($data['client_id']) ? $data['client_id'] : null;
+        return isset($data['openid']) ? $data['openid'] : null;
     }
 
     public function getRemoteToken()
