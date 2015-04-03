@@ -7,6 +7,7 @@
 
 namespace Eva\EvaOAuth\OAuth2;
 
+use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\Storage\StorageInterface;
 use Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;
 
@@ -111,10 +112,15 @@ class Client
 
     }
 
+    public function getGrantStrategyName()
+    {
+        return $this->grantStrategyName;
+    }
+
     public function changeGrantStrategy($grantStrategyName)
     {
         if (false === array_key_exists($grantStrategyName, self::$grantStrategyMapping)) {
-            throw new \Exception(sprintf("Input grant strategy %s not exist", $grantStrategyName));
+            throw new InvalidArgumentException(sprintf("Input grant strategy %s not exist", $grantStrategyName));
         }
 
         $this->grantStrategyName = $grantStrategyName;
@@ -123,8 +129,8 @@ class Client
 
     public static function registerGrantStrategy($strategyName, $strategyClass)
     {
-        if (!in_array('Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;', class_implements($strategyClass))) {
-            throw new \Exception('Register grant strategy failed by unrecognized interface');
+        if (!class_exists($strategyClass) || !in_array('Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;', class_implements($strategyClass))) {
+            throw new InvalidArgumentException('Register grant strategy failed by unrecognized interface');
         }
 
         self::$grantStrategyMapping[(string) $strategyName] = $strategyClass;
@@ -150,7 +156,7 @@ class Client
     /**
      * @return GrantStrategyInterface
      */
-    protected function getGrantStrategy()
+    public function getGrantStrategy()
     {
         if ($this->grantStrategy) {
             return $this->grantStrategy;
@@ -188,11 +194,16 @@ class Client
 
     public function __construct(array $options)
     {
-        $this->options = array_merge([
+        $options = array_merge([
             'client_id' => '',
             'client_secret' => '',
             'redirect_uri' => '',
             'scope' => '',
         ], $options);
+
+        if (!$options['client_id'] || !$options['client_secret'] || !$options['redirect_uri']) {
+            throw new InvalidArgumentException(sprintf("Empty client id or secret or redirect uri"));
+        }
+        $this->options = $options;
     }
 }

@@ -1,0 +1,19 @@
+<phpunit bootstrap="./tests/Bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="EvaOAuth Unit Test">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory>lib/</directory>
+            <exclude>
+                <directory>src/</directory>
+                <directory>vendor/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="tmp/clover.xml"/>
+    </logging>
+</phpunit>

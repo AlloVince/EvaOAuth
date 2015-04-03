@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /opt/htdocs/EvaOAuth/src</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/nv.d3.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
+  <!--[if lt IE 9]>
+  <script src="../js/html5shiv.min.js"></script>
+  <script src="../js/respond.min.js"></script>
+  <![endif]-->
+ </head>
+ <body>
+  <header>
+   <div class="container">
+    <div class="row">
+     <div class="col-md-12">
+      <ol class="breadcrumb">
+        <li><a href="../index.html">/opt/htdocs/EvaOAuth</a></li>
+        <li><a href="index.html">src</a></li>
+        <li class="active">(Dashboard)</li>
+
+      </ol>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#25">Client</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#25">OAuth2Config</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#21">Consumer</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#21">Service</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#9">Tencent</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Netease.php.html#8">Netease</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Renren.php.html#8">Renren</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#23">AccessToken</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/RequestToken.php.html#22">RequestToken</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Request.php.html#17">Request</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#21">Session</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#19">AuthorizedRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#22">Access</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#19">Utility</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#21">AbstractToken</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Msn.php.html#9">Msn</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Kaixin.php.html#8">Kaixin</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Sohu.php.html#9">Sohu</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Tianya.php.html#9">Tianya</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#9">Weibo</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Linkedin.php.html#9">Linkedin</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Flickr.php.html#9">Flickr</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#11">Douban</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Dropbox.php.html#9">Dropbox</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Yahoo.php.html#9">Yahoo</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Baidu.php.html#9">Baidu</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#9">Google</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Hundsun.php.html#9">Hundsun</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Github.php.html#9">Github</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Foursquare.php.html#8">Foursquare</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Disqus.php.html#8">Disqus</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#8">Facebook</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#12">AbstractAdapter</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="EvaOAuth/Service.php.html#21">Service</a></td><td class="text-right">992</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#25">Client</a></td><td class="text-right">930</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#19">Utility</a></td><td class="text-right">420</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#12">AbstractAdapter</a></td><td class="text-right">380</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#9">Tencent</a></td><td class="text-right">306</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#23">AccessToken</a></td><td class="text-right">306</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#21">AbstractToken</a></td><td class="text-right">306</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#25">OAuth2Config</a></td><td class="text-right">272</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#9">Google</a></td><td class="text-right">272</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#21">Session</a></td><td class="text-right">240</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#21">Consumer</a></td><td class="text-right">210</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#22">Access</a></td><td class="text-right">182</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Msn.php.html#9">Msn</a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#11">Douban</a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#19">AuthorizedRequest</a></td><td class="text-right">132</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#9">Weibo</a></td><td class="text-right">110</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#8">Facebook</a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Baidu.php.html#9">Baidu</a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Foursquare.php.html#8">Foursquare</a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Github.php.html#9">Github</a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Kaixin.php.html#8">Kaixin</a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Hundsun.php.html#9">Hundsun</a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Renren.php.html#8">Renren</a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/RequestToken.php.html#22">RequestToken</a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#43"><abbr title="Consumer::getRedirectUrl">getRedirectUrl</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#53"><abbr title="Consumer::getAccessToken">getAccessToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#87"><abbr title="Consumer::__construct">__construct</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#23"><abbr title="Consumer::getRequestToken">getRequestToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#114"><abbr title="OAuth2Config::setOptions">setOptions</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#60"><abbr title="OAuth2Config::getAccessTokenFormat">getAccessTokenFormat</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#65"><abbr title="OAuth2Config::setAccessTokenFormat">setAccessTokenFormat</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#32"><abbr title="AccessToken::execute">execute</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#54"><abbr title="AccessToken::getRequestSchemePostBodyClient">getRequestSchemePostBodyClient</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#30"><abbr title="Utility::assembleParams">assembleParams</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#57"><abbr title="Utility::toEncodedQueryString">toEncodedQueryString</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#83"><abbr title="Utility::toAuthorizationHeader">toAuthorizationHeader</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/RequestToken.php.html#29"><abbr title="RequestToken::execute">execute</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#120"><abbr title="AccessToken::_assessRequestAttempt">_assessRequestAttempt</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#66"><abbr title="AccessToken::startRequestCycle">startRequestCycle</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#95"><abbr title="AccessToken::_cleanParamsOfIllegalCustomParameters">_cleanParamsOfIllegalCustomParameters</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#54"><abbr title="OAuth2Config::setResponseType">setResponseType</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#49"><abbr title="OAuth2Config::getResponseType">getResponseType</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#105"><abbr title="Client::setStreamingRequest">setStreamingRequest</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#115"><abbr title="Client::getStreamingRequest">getStreamingRequest</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#129"><abbr title="Client::_prepareBody">_prepareBody</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#89"><abbr title="Client::setAdapter">setAdapter</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#78"><abbr title="Client::getAdapter">getAdapter</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#294"><abbr title="Service::setStorage">setStorage</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#61"><abbr title="Client::__construct">__construct</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#144"><abbr title="Client::resetParameters">resetParameters</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#161"><abbr title="Client::setRawDataStream">setRawDataStream</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#288"><abbr title="Client::__call">__call</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#38"><abbr title="OAuth2Config::getScope">getScope</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#43"><abbr title="OAuth2Config::setScope">setScope</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#264"><abbr title="Client::_getSignableParameters">_getSignableParameters</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#216"><abbr title="Client::prepareOAuth">prepareOAuth</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#176"><abbr title="Client::setMethod">setMethod</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#200"><abbr title="Client::send">send</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#113"><abbr title="Utility::sign">sign</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#136"><abbr title="Utility::parseQueryString">parseQueryString</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#77"><abbr title="Session::getNamespace">getNamespace</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#87"><abbr title="Session::getMember">getMember</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#97"><abbr title="Session::isEmpty">isEmpty</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#61"><abbr title="Session::__construct">__construct</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Request.php.html#19"><abbr title="Request::toArray">toArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#64"><abbr title="AuthorizedRequest::isValid">isValid</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#79"><abbr title="AuthorizedRequest::_parseData">_parseData</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#107"><abbr title="Session::read">read</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#118"><abbr title="Session::write">write</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#151"><abbr title="Session::saveAccessToken">saveAccessToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#157"><abbr title="Session::getAccessToken">getAccessToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#163"><abbr title="Session::clearAccessToken">clearAccessToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#145"><abbr title="Session::clearRequestToken">clearRequestToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#139"><abbr title="Session::getRequestToken">getRequestToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#128"><abbr title="Session::clear">clear</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#133"><abbr title="Session::saveRequestToken">saveRequestToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#54"><abbr title="AuthorizedRequest::getData">getData</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#33"><abbr title="AuthorizedRequest::__construct">__construct</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#39"><abbr title="AbstractToken::getTokenFormat">getTokenFormat</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#44"><abbr title="AbstractToken::__construct">__construct</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#76"><abbr title="AbstractToken::setParam">setParam</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#33"><abbr title="AbstractToken::setTokenFormat">setTokenFormat</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#179"><abbr title="Utility::urlEncode">urlEncode</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#158"><abbr title="Utility::generateNonce">generateNonce</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#168"><abbr title="Utility::generateTimestamp">generateTimestamp</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#86"><abbr title="AbstractToken::_parseParameters">_parseParameters</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#34"><abbr title="Access::setToken">setToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#97"><abbr title="Access::toQueryString">toQueryString</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#120"><abbr title="Access::getHttpClient">getHttpClient</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#73"><abbr title="Access::toHeader">toHeader</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#58"><abbr title="Access::getRefreshToken">getRefreshToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#45"><abbr title="Access::getToken">getToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#50"><abbr title="Access::getExpiredTime">getExpiredTime</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#279"><abbr title="Service::getStorage">getStorage</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#266"><abbr title="Service::setAdapter">setAdapter</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Yahoo.php.html#21"><abbr title="Yahoo::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Baidu.php.html#18"><abbr title="Baidu::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Baidu.php.html#27"><abbr title="Baidu::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#55"><abbr title="Weibo::getRawProfile">getRawProfile</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#46"><abbr title="Weibo::getImageUrl">getImageUrl</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#28"><abbr title="Weibo::getRemoteUserName">getRemoteUserName</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#37"><abbr title="Weibo::getRemoteNickName">getRemoteNickName</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Disqus.php.html#13"><abbr title="Disqus::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#18"><abbr title="Facebook::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Foursquare.php.html#25"><abbr title="Foursquare::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Github.php.html#21"><abbr title="Github::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Github.php.html#30"><abbr title="Github::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Foursquare.php.html#15"><abbr title="Foursquare::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#43"><abbr title="Facebook::getRawProfile">getRawProfile</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#31"><abbr title="Facebook::refreshAccessToken">refreshAccessToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#37"><abbr title="Facebook::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#17"><abbr title="Weibo::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Tianya.php.html#21"><abbr title="Tianya::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#99"><abbr title="AbstractAdapter::getHttpClient">getHttpClient</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#113"><abbr title="AbstractAdapter::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#124"><abbr title="AbstractAdapter::arrayToAccessToken">arrayToAccessToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#95"><abbr title="AbstractAdapter::refreshAccessToken">refreshAccessToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#81"><abbr title="AbstractAdapter::getConsumer">getConsumer</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#28"><abbr title="AbstractAdapter::setAccessTokenFormat">setAccessTokenFormat</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#45"><abbr title="AbstractAdapter::setOptions">setOptions</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#26"><abbr title="Douban::getAccessTokenClient">getAccessTokenClient</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#38"><abbr title="Douban::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Flickr.php.html#22"><abbr title="Flickr::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Linkedin.php.html#21"><abbr title="Linkedin::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Sohu.php.html#21"><abbr title="Sohu::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth1/Dropbox.php.html#21"><abbr title="Dropbox::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#59"><abbr title="Douban::getRawProfile">getRawProfile</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#46"><abbr title="Douban::getRemoteUserName">getRemoteUserName</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#52"><abbr title="Douban::getImageUrl">getImageUrl</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#23"><abbr title="Google::getAccessTokenClient">getAccessTokenClient</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#35"><abbr title="Google::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#44"><abbr title="Service::setHttpClientOptions">setHttpClientOptions</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#54"><abbr title="Service::factory">factory</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#112"><abbr title="Service::initByAccessToken">initByAccessToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#73"><abbr title="Tencent::getRawProfile">getRawProfile</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#58"><abbr title="Tencent::getOpenId">getOpenId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#46"><abbr title="Tencent::getImageUrl">getImageUrl</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#52"><abbr title="Tencent::getRemoteUserName">getRemoteUserName</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#180"><abbr title="Service::setServiceLocator">setServiceLocator</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#191"><abbr title="Service::getServiceLocator">getServiceLocator</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#224"><abbr title="Service::initAdapter">initAdapter</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#239"><abbr title="Service::initStorage">initStorage</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#255"><abbr title="Service::getAdapter">getAdapter</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#212"><abbr title="Service::setOauthVersion">setOauthVersion</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#207"><abbr title="Service::getOauthVersion">getOauthVersion</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#196"><abbr title="Service::getOptions">getOptions</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#201"><abbr title="Service::setOptions">setOptions</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#40"><abbr title="Tencent::getRemoteToken">getRemoteToken</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#34"><abbr title="Tencent::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#72"><abbr title="Google::getRawProfile">getRawProfile</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Hundsun.php.html#18"><abbr title="Hundsun::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Hundsun.php.html#24"><abbr title="Hundsun::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#66"><abbr title="Google::getImageUrl">getImageUrl</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#60"><abbr title="Google::getRemoteNickName">getRemoteNickName</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#48"><abbr title="Google::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#54"><abbr title="Google::getEmail">getEmail</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Kaixin.php.html#14"><abbr title="Kaixin::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Kaixin.php.html#23"><abbr title="Kaixin::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Renren.php.html#13"><abbr title="Renren::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#23"><abbr title="Tencent::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Netease.php.html#14"><abbr title="Netease::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Msn.php.html#59"><abbr title="Msn::decodeChunkedBody">decodeChunkedBody</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Msn.php.html#20"><abbr title="Msn::accessTokenToArray">accessTokenToArray</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Msn.php.html#29"><abbr title="Msn::getRemoteUserId">getRemoteUserId</a></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#23"><abbr title="AbstractAdapter::getAccessTokenFormat">getAccessTokenFormat</a></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#66"><abbr title="AccessToken::startRequestCycle">startRequestCycle</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#112"><abbr title="Service::initByAccessToken">initByAccessToken</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#86"><abbr title="AbstractToken::_parseParameters">_parseParameters</abbr></a></td><td class="text-right">72</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#176"><abbr title="Client::setMethod">setMethod</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#53"><abbr title="Consumer::getAccessToken">getAccessToken</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#114"><abbr title="OAuth2Config::setOptions">setOptions</abbr></a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#28"><abbr title="AbstractAdapter::setAccessTokenFormat">setAccessTokenFormat</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#44"><abbr title="AbstractToken::__construct">__construct</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Config/OAuth2Config.php.html#65"><abbr title="OAuth2Config::setAccessTokenFormat">setAccessTokenFormat</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Msn.php.html#29"><abbr title="Msn::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#216"><abbr title="Client::prepareOAuth">prepareOAuth</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#57"><abbr title="Utility::toEncodedQueryString">toEncodedQueryString</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#58"><abbr title="Tencent::getOpenId">getOpenId</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#59"><abbr title="Douban::getRawProfile">getRawProfile</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#23"><abbr title="Consumer::getRequestToken">getRequestToken</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#120"><abbr title="AccessToken::_assessRequestAttempt">_assessRequestAttempt</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#33"><abbr title="AuthorizedRequest::__construct">__construct</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#73"><abbr title="Tencent::getRawProfile">getRawProfile</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#83"><abbr title="Utility::toAuthorizationHeader">toAuthorizationHeader</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#54"><abbr title="Service::factory">factory</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#18"><abbr title="Facebook::accessTokenToArray">accessTokenToArray</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#45"><abbr title="AbstractAdapter::setOptions">setOptions</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Msn.php.html#59"><abbr title="Msn::decodeChunkedBody">decodeChunkedBody</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#224"><abbr title="Service::initAdapter">initAdapter</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Msn.php.html#20"><abbr title="Msn::accessTokenToArray">accessTokenToArray</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#64"><abbr title="AuthorizedRequest::isValid">isValid</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AuthorizedRequest.php.html#79"><abbr title="AuthorizedRequest::_parseData">_parseData</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Consumer.php.html#87"><abbr title="Consumer::__construct">__construct</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Storage/Session.php.html#61"><abbr title="Session::__construct">__construct</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#99"><abbr title="AbstractAdapter::getHttpClient">getHttpClient</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#212"><abbr title="Service::setOauthVersion">setOauthVersion</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#72"><abbr title="Google::getRawProfile">getRawProfile</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Foursquare.php.html#15"><abbr title="Foursquare::accessTokenToArray">accessTokenToArray</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Github.php.html#21"><abbr title="Github::accessTokenToArray">accessTokenToArray</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#136"><abbr title="Utility::parseQueryString">parseQueryString</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#73"><abbr title="Access::toHeader">toHeader</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Baidu.php.html#18"><abbr title="Baidu::accessTokenToArray">accessTokenToArray</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#50"><abbr title="Access::getExpiredTime">getExpiredTime</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#264"><abbr title="Client::_getSignableParameters">_getSignableParameters</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#35"><abbr title="Google::accessTokenToArray">accessTokenToArray</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#55"><abbr title="Weibo::getRawProfile">getRawProfile</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/Access.php.html#97"><abbr title="Access::toQueryString">toQueryString</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/AccessToken.php.html#95"><abbr title="AccessToken::_cleanParamsOfIllegalCustomParameters">_cleanParamsOfIllegalCustomParameters</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#61"><abbr title="Client::__construct">__construct</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#30"><abbr title="Utility::assembleParams">assembleParams</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Kaixin.php.html#14"><abbr title="Kaixin::accessTokenToArray">accessTokenToArray</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/RequestToken.php.html#29"><abbr title="RequestToken::execute">execute</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Token/AbstractToken.php.html#76"><abbr title="AbstractToken::setParam">setParam</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Http/Utility.php.html#113"><abbr title="Utility::sign">sign</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#129"><abbr title="Client::_prepareBody">_prepareBody</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#288"><abbr title="Client::__call">__call</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#52"><abbr title="Tencent::getRemoteUserName">getRemoteUserName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Baidu.php.html#27"><abbr title="Baidu::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#46"><abbr title="Weibo::getImageUrl">getImageUrl</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#37"><abbr title="Facebook::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Facebook.php.html#43"><abbr title="Facebook::getRawProfile">getRawProfile</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Github.php.html#30"><abbr title="Github::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Foursquare.php.html#25"><abbr title="Foursquare::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#37"><abbr title="Weibo::getRemoteNickName">getRemoteNickName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Weibo.php.html#28"><abbr title="Weibo::getRemoteUserName">getRemoteUserName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#124"><abbr title="AbstractAdapter::arrayToAccessToken">arrayToAccessToken</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/AbstractAdapter.php.html#81"><abbr title="AbstractAdapter::getConsumer">getConsumer</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#26"><abbr title="Douban::getAccessTokenClient">getAccessTokenClient</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#46"><abbr title="Douban::getRemoteUserName">getRemoteUserName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Douban.php.html#52"><abbr title="Douban::getImageUrl">getImageUrl</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#23"><abbr title="Google::getAccessTokenClient">getAccessTokenClient</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#48"><abbr title="Google::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#46"><abbr title="Tencent::getImageUrl">getImageUrl</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#40"><abbr title="Tencent::getRemoteToken">getRemoteToken</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#239"><abbr title="Service::initStorage">initStorage</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service.php.html#279"><abbr title="Service::getStorage">getStorage</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#89"><abbr title="Client::setAdapter">setAdapter</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Tencent.php.html#34"><abbr title="Tencent::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Renren.php.html#13"><abbr title="Renren::accessTokenToArray">accessTokenToArray</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#60"><abbr title="Google::getRemoteNickName">getRemoteNickName</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#54"><abbr title="Google::getEmail">getEmail</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Google.php.html#66"><abbr title="Google::getImageUrl">getImageUrl</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Hundsun.php.html#24"><abbr title="Hundsun::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Adapter/OAuth2/Kaixin.php.html#23"><abbr title="Kaixin::getRemoteUserId">getRemoteUserId</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="EvaOAuth/Service/Client.php.html#115"><abbr title="Client::getStreamingRequest">getStreamingRequest</abbr></a></td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="http://github.com/sebastianbergmann/php-code-coverage" target="_top">PHP_CodeCoverage 2.0.15</a> using <a href="http://php.net/" target="_top">PHP 5.6.5</a> and <a href="http://phpunit.de/">PHPUnit 4.4.5-9-g5fbd35c</a> at Fri Apr 3 21:58:21 CST 2015.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../js/jquery.min.js" type="text/javascript"></script>
+  <script src="../js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="../js/holder.js" type="text/javascript"></script>
+  <script src="../js/d3.min.js" type="text/javascript"></script>
+  <script src="../js/nv.d3.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([33,0,0,0,0,0,0,0,0,0,0,5], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([141,0,0,0,0,0,0,0,0,0,0,0], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.scatter.onlyCircles(false);
+    chart.tooltipContent(function(key, y, e, graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[0,19,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#12\">AbstractAdapter<\/a>"],[0,11,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Douban.php.html#11\">Douban<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Dropbox.php.html#9\">Dropbox<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Flickr.php.html#9\">Flickr<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Linkedin.php.html#9\">Linkedin<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Sohu.php.html#9\">Sohu<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Tianya.php.html#9\">Tianya<\/a>"],[100,0,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Twitter.php.html#8\">Twitter<\/a>"],[0,10,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Weibo.php.html#9\">Weibo<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Yahoo.php.html#9\">Yahoo<\/a>"],[0,5,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Baidu.php.html#9\">Baidu<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Disqus.php.html#8\">Disqus<\/a>"],[0,9,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Facebook.php.html#8\">Facebook<\/a>"],[0,5,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Foursquare.php.html#8\">Foursquare<\/a>"],[0,5,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Github.php.html#9\">Github<\/a>"],[0,16,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Google.php.html#9\">Google<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Hundsun.php.html#9\">Hundsun<\/a>"],[0,5,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Kaixin.php.html#8\">Kaixin<\/a>"],[0,11,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Msn.php.html#9\">Msn<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Netease.php.html#8\">Netease<\/a>"],[100,0,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Qihoo.php.html#7\">Qihoo<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Renren.php.html#8\">Renren<\/a>"],[0,17,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Tencent.php.html#9\">Tencent<\/a>"],[100,0,"<a href=\"EvaOAuth\/Exception\/BadMethodCallException.php.html#33\">BadMethodCallException<\/a>"],[100,0,"<a href=\"EvaOAuth\/Exception\/InvalidArgumentException.php.html#33\">InvalidArgumentException<\/a>"],[100,0,"<a href=\"EvaOAuth\/Exception\/RuntimeException.php.html#4\">RuntimeException<\/a>"],[0,31,"<a href=\"EvaOAuth\/Service.php.html#21\">Service<\/a>"],[0,30,"<a href=\"EvaOAuth\/Service\/Client.php.html#25\">Client<\/a>"],[0,16,"<a href=\"EvaOAuth\/Service\/Config\/OAuth2Config.php.html#25\">OAuth2Config<\/a>"],[0,14,"<a href=\"EvaOAuth\/Service\/Consumer.php.html#21\">Consumer<\/a>"],[0,17,"<a href=\"EvaOAuth\/Service\/Http\/AccessToken.php.html#23\">AccessToken<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service\/Http\/RequestToken.php.html#22\">RequestToken<\/a>"],[0,20,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#19\">Utility<\/a>"],[0,17,"<a href=\"EvaOAuth\/Service\/Token\/AbstractToken.php.html#21\">AbstractToken<\/a>"],[0,13,"<a href=\"EvaOAuth\/Service\/Token\/Access.php.html#22\">Access<\/a>"],[0,11,"<a href=\"EvaOAuth\/Service\/Token\/AuthorizedRequest.php.html#19\">AuthorizedRequest<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/Request.php.html#17\">Request<\/a>"],[0,15,"<a href=\"EvaOAuth\/Storage\/Session.php.html#21\">Session<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.scatter.onlyCircles(false);
+    chart.tooltipContent(function(key, y, e, graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#23\">AbstractAdapter::getAccessTokenFormat<\/a>"],[0,5,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#28\">AbstractAdapter::setAccessTokenFormat<\/a>"],[0,4,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#45\">AbstractAdapter::setOptions<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#81\">AbstractAdapter::getConsumer<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#95\">AbstractAdapter::refreshAccessToken<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#99\">AbstractAdapter::getHttpClient<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#113\">AbstractAdapter::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/AbstractAdapter.php.html#124\">AbstractAdapter::arrayToAccessToken<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Douban.php.html#26\">Douban::getAccessTokenClient<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Douban.php.html#38\">Douban::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Douban.php.html#46\">Douban::getRemoteUserName<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Douban.php.html#52\">Douban::getImageUrl<\/a>"],[0,4,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Douban.php.html#59\">Douban::getRawProfile<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Dropbox.php.html#21\">Dropbox::accessTokenToArray<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Flickr.php.html#22\">Flickr::accessTokenToArray<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Linkedin.php.html#21\">Linkedin::accessTokenToArray<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Sohu.php.html#21\">Sohu::accessTokenToArray<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Tianya.php.html#21\">Tianya::accessTokenToArray<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Weibo.php.html#17\">Weibo::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Weibo.php.html#28\">Weibo::getRemoteUserName<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Weibo.php.html#37\">Weibo::getRemoteNickName<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Weibo.php.html#46\">Weibo::getImageUrl<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Weibo.php.html#55\">Weibo::getRawProfile<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth1\/Yahoo.php.html#21\">Yahoo::accessTokenToArray<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Baidu.php.html#18\">Baidu::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Baidu.php.html#27\">Baidu::getRemoteUserId<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Disqus.php.html#13\">Disqus::accessTokenToArray<\/a>"],[0,4,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Facebook.php.html#18\">Facebook::accessTokenToArray<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Facebook.php.html#31\">Facebook::refreshAccessToken<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Facebook.php.html#37\">Facebook::getRemoteUserId<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Facebook.php.html#43\">Facebook::getRawProfile<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Foursquare.php.html#15\">Foursquare::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Foursquare.php.html#25\">Foursquare::getRemoteUserId<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Github.php.html#21\">Github::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Github.php.html#30\">Github::getRemoteUserId<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Google.php.html#23\">Google::getAccessTokenClient<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Google.php.html#35\">Google::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Google.php.html#48\">Google::getRemoteUserId<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Google.php.html#54\">Google::getEmail<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Google.php.html#60\">Google::getRemoteNickName<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Google.php.html#66\">Google::getImageUrl<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Google.php.html#72\">Google::getRawProfile<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Hundsun.php.html#18\">Hundsun::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Hundsun.php.html#24\">Hundsun::getRemoteUserId<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Kaixin.php.html#14\">Kaixin::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Kaixin.php.html#23\">Kaixin::getRemoteUserId<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Msn.php.html#20\">Msn::accessTokenToArray<\/a>"],[0,5,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Msn.php.html#29\">Msn::getRemoteUserId<\/a>"],[0,3,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Msn.php.html#59\">Msn::decodeChunkedBody<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Netease.php.html#14\">Netease::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Renren.php.html#13\">Renren::accessTokenToArray<\/a>"],[0,1,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Tencent.php.html#23\">Tencent::accessTokenToArray<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Tencent.php.html#34\">Tencent::getRemoteUserId<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Tencent.php.html#40\">Tencent::getRemoteToken<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Tencent.php.html#46\">Tencent::getImageUrl<\/a>"],[0,2,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Tencent.php.html#52\">Tencent::getRemoteUserName<\/a>"],[0,4,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Tencent.php.html#58\">Tencent::getOpenId<\/a>"],[0,4,"<a href=\"EvaOAuth\/Adapter\/OAuth2\/Tencent.php.html#73\">Tencent::getRawProfile<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#44\">Service::setHttpClientOptions<\/a>"],[0,4,"<a href=\"EvaOAuth\/Service.php.html#54\">Service::factory<\/a>"],[0,8,"<a href=\"EvaOAuth\/Service.php.html#112\">Service::initByAccessToken<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#180\">Service::setServiceLocator<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#191\">Service::getServiceLocator<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#196\">Service::getOptions<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#201\">Service::setOptions<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#207\">Service::getOauthVersion<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service.php.html#212\">Service::setOauthVersion<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service.php.html#224\">Service::initAdapter<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service.php.html#239\">Service::initStorage<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#255\">Service::getAdapter<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#266\">Service::setAdapter<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service.php.html#279\">Service::getStorage<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service.php.html#294\">Service::setStorage<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Client.php.html#61\">Client::__construct<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Client.php.html#78\">Client::getAdapter<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service\/Client.php.html#89\">Client::setAdapter<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Client.php.html#105\">Client::setStreamingRequest<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service\/Client.php.html#115\">Client::getStreamingRequest<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service\/Client.php.html#129\">Client::_prepareBody<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Client.php.html#144\">Client::resetParameters<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Client.php.html#161\">Client::setRawDataStream<\/a>"],[0,6,"<a href=\"EvaOAuth\/Service\/Client.php.html#176\">Client::setMethod<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Client.php.html#200\">Client::send<\/a>"],[0,5,"<a href=\"EvaOAuth\/Service\/Client.php.html#216\">Client::prepareOAuth<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Client.php.html#264\">Client::_getSignableParameters<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service\/Client.php.html#288\">Client::__call<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Config\/OAuth2Config.php.html#38\">OAuth2Config::getScope<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Config\/OAuth2Config.php.html#43\">OAuth2Config::setScope<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Config\/OAuth2Config.php.html#49\">OAuth2Config::getResponseType<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Config\/OAuth2Config.php.html#54\">OAuth2Config::setResponseType<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Config\/OAuth2Config.php.html#60\">OAuth2Config::getAccessTokenFormat<\/a>"],[0,5,"<a href=\"EvaOAuth\/Service\/Config\/OAuth2Config.php.html#65\">OAuth2Config::setAccessTokenFormat<\/a>"],[0,6,"<a href=\"EvaOAuth\/Service\/Config\/OAuth2Config.php.html#114\">OAuth2Config::setOptions<\/a>"],[0,4,"<a href=\"EvaOAuth\/Service\/Consumer.php.html#23\">Consumer::getRequestToken<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Consumer.php.html#43\">Consumer::getRedirectUrl<\/a>"],[0,6,"<a href=\"EvaOAuth\/Service\/Consumer.php.html#53\">Consumer::getAccessToken<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Consumer.php.html#87\">Consumer::__construct<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Http\/AccessToken.php.html#32\">AccessToken::execute<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Http\/AccessToken.php.html#54\">AccessToken::getRequestSchemePostBodyClient<\/a>"],[0,8,"<a href=\"EvaOAuth\/Service\/Http\/AccessToken.php.html#66\">AccessToken::startRequestCycle<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Http\/AccessToken.php.html#95\">AccessToken::_cleanParamsOfIllegalCustomParameters<\/a>"],[0,4,"<a href=\"EvaOAuth\/Service\/Http\/AccessToken.php.html#120\">AccessToken::_assessRequestAttempt<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service\/Http\/RequestToken.php.html#29\">RequestToken::execute<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#30\">Utility::assembleParams<\/a>"],[0,5,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#57\">Utility::toEncodedQueryString<\/a>"],[0,4,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#83\">Utility::toAuthorizationHeader<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#113\">Utility::sign<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#136\">Utility::parseQueryString<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#158\">Utility::generateNonce<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#168\">Utility::generateTimestamp<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Http\/Utility.php.html#179\">Utility::urlEncode<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/AbstractToken.php.html#33\">AbstractToken::setTokenFormat<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/AbstractToken.php.html#39\">AbstractToken::getTokenFormat<\/a>"],[0,5,"<a href=\"EvaOAuth\/Service\/Token\/AbstractToken.php.html#44\">AbstractToken::__construct<\/a>"],[0,2,"<a href=\"EvaOAuth\/Service\/Token\/AbstractToken.php.html#76\">AbstractToken::setParam<\/a>"],[0,8,"<a href=\"EvaOAuth\/Service\/Token\/AbstractToken.php.html#86\">AbstractToken::_parseParameters<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/Access.php.html#34\">Access::setToken<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/Access.php.html#45\">Access::getToken<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Token\/Access.php.html#50\">Access::getExpiredTime<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/Access.php.html#58\">Access::getRefreshToken<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Token\/Access.php.html#73\">Access::toHeader<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Token\/Access.php.html#97\">Access::toQueryString<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/Access.php.html#120\">Access::getHttpClient<\/a>"],[0,4,"<a href=\"EvaOAuth\/Service\/Token\/AuthorizedRequest.php.html#33\">AuthorizedRequest::__construct<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/AuthorizedRequest.php.html#54\">AuthorizedRequest::getData<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Token\/AuthorizedRequest.php.html#64\">AuthorizedRequest::isValid<\/a>"],[0,3,"<a href=\"EvaOAuth\/Service\/Token\/AuthorizedRequest.php.html#79\">AuthorizedRequest::_parseData<\/a>"],[0,1,"<a href=\"EvaOAuth\/Service\/Token\/Request.php.html#19\">Request::toArray<\/a>"],[0,3,"<a href=\"EvaOAuth\/Storage\/Session.php.html#61\">Session::__construct<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#77\">Session::getNamespace<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#87\">Session::getMember<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#97\">Session::isEmpty<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#107\">Session::read<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#118\">Session::write<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#128\">Session::clear<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#133\">Session::saveRequestToken<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#139\">Session::getRequestToken<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#145\">Session::clearRequestToken<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#151\">Session::saveAccessToken<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#157\">Session::getAccessToken<\/a>"],[0,1,"<a href=\"EvaOAuth\/Storage\/Session.php.html#163\">Session::clearAccessToken<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>

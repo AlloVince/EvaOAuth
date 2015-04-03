@@ -58,12 +58,10 @@ class AuthorizationCode implements GrantStrategyInterface
         $httpClient = $this->httpClient;
 
         $method = $resourceServer->getAccessTokenMethod();
-        $httpClientOptions = $method == ResourceServerInterface::METHOD_GET ?
+        $httpClientOptions = ($method == ResourceServerInterface::METHOD_GET) ?
             ['query' => $parameters] :
-            [
-                'debug' => 1,
-                'body' => $parameters
-            ];
+            ['debug' => 1, 'body' => $parameters];
+
         $request = $httpClient->createRequest(
             $method,
             $resourceServer->getAccessTokenUrl(),
@@ -84,7 +82,7 @@ class AuthorizationCode implements GrantStrategyInterface
         }
     }
 
-    public function __construct(Client $httpClient, $options)
+    public function __construct(Client $httpClient, array $options)
     {
         $this->httpClient = $httpClient;
         $this->options = $options;
