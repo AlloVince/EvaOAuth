@@ -5,44 +5,92 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-use GuzzleHttp\Client as HttpClient;
-
 namespace Eva\EvaOAuth\OAuth2;
 
+use Eva\EvaOAuth\Storage\StorageInterface;
+use Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;
+
+/**
+ * OAuth2 Client
+ * @package Eva\EvaOAuth\OAuth2
+ */
 class Client
 {
 
+    /**
+     * Authorization Code Grant
+     * http://tools.ietf.org/html/rfc6749#section-4.1
+     */
     const GRANT_AUTHORIZATION_CODE = 'authorization_code';
 
     /**
+     * Implicit Grant
+     * http://tools.ietf.org/html/rfc6749#section-4.2
      * NOTICE: implicit type will skip authorize step.
      */
     const GRANT_IMPLICIT = 'implicit';
 
+    /**
+     * Resource Owner Password Credentials Grant
+     * http://tools.ietf.org/html/rfc6749#section-4.3
+     */
     const GRANT_PASSWORD = 'password';
 
+    /**
+     * Client Credentials Grant
+     * http://tools.ietf.org/html/rfc6749#section-4.4
+     */
     const GRANT_CLIENT_CREDENTIALS = 'client_credentials';
 
+    /**
+     * @var \GuzzleHttp\Client
+     */
     protected static $httpClient;
 
+    /**
+     * @var array
+     */
     protected static $httpClientDefaultOptions = [];
 
-    protected $options;
+    /**
+     * @var array
+     */
+    protected $options = [];
 
-    protected $grantType = self::GRANT_AUTHORIZATION_CODE;
+    /**
+     * @var string
+     */
+    protected $grantStrategyName = self::GRANT_AUTHORIZATION_CODE;
 
+    /**
+     * @var GrantStrategyInterface
+     */
+    protected $grantStrategy;
+
+    /**
+     * @var array
+     */
+    protected static $grantStrategyMapping = [];
+
+    /**
+     * @return array
+     */
     public function getOptions()
     {
         return $this->options;
     }
 
-    public static function setHttpClientDefaultOptions($options)
+    /**
+     * @param array $options
+     */
+    public static function setHttpClientDefaultOptions(array $options)
     {
         self::$httpClientDefaultOptions = $options;
     }
 
+
     /**
-     * @return HttpClient
+     * @return \GuzzleHttp\Client
      */
     public static function getHttpClient()
     {
@@ -50,51 +98,92 @@ class Client
             return self::$httpClient;
         }
 
-        return self::$httpClient = new HttpClient();
+        return self::$httpClient = new \GuzzleHttp\Client();
     }
 
-    public function setGrantType($grantType)
+    public static function getStorage()
     {
-        /*
-        if (false === in_array($grantType, [
-                self::GRANT_AUTHORIZATION_CODE,
-                self::GRANT_CLIENT_CREDENTIALS,
-                self::GRANT_IMPLICIT,
-                self::GRANT_PASSWORD
-            ])
-        ) {
 
+    }
+
+    public static function setStorage(StorageInterface $storage)
+    {
+
+    }
+
+    public function changeGrantStrategy($grantStrategyName)
+    {
+        if (false === array_key_exists($grantStrategyName, self::$grantStrategyMapping)) {
+            throw new \Exception(sprintf("Input grant strategy %s not exist", $grantStrategyName));
         }
-        */
-        $this->grantType = $grantType;
+
+        $this->grantStrategyName = $grantStrategyName;
         return $this;
     }
 
+    public static function registerGrantStrategy($strategyName, $strategyClass)
+    {
+        if (!in_array('Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;', class_implements($strategyClass))) {
+            throw new \Exception('Register grant strategy failed by unrecognized interface');
+        }
+
+        self::$grantStrategyMapping[(string) $strategyName] = $strategyClass;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getGrantStrategyMapping()
+    {
+        if (self::$grantStrategyMapping) {
+            return self::$grantStrategyMapping;
+        }
+
+        return self::$grantStrategyMapping = [
+            self::GRANT_AUTHORIZATION_CODE => 'Eva\EvaOAuth\OAuth2\GrantStrategy\AuthorizationCode',
+            self::GRANT_IMPLICIT => 'Eva\EvaOAuth\OAuth2\GrantStrategy\Implicit',
+            self::GRANT_PASSWORD => 'Eva\EvaOAuth\OAuth2\GrantStrategy\Password',
+            self::GRANT_CLIENT_CREDENTIALS => 'Eva\EvaOAuth\OAuth2\GrantStrategy\ClientCredentials',
+        ];
+    }
+
+    /**
+     * @return GrantStrategyInterface
+     */
+    protected function getGrantStrategy()
+    {
+        if ($this->grantStrategy) {
+            return $this->grantStrategy;
+        }
+
+        $grantStrategyClass = self::getGrantStrategyMapping()[$this->grantStrategyName];
+        return $this->grantStrategy = new $grantStrategyClass(self::getHttpClient(), $this->options);
+    }
+
+    /**
+     * @param AuthorizationServerInterface $authServer
+     * @return string
+     */
     public function getAuthorizeUrl(AuthorizationServerInterface $authServer)
     {
-        $options = $this->options;
-        $authorizeQuery = [
-            'response_type' => 'code',
-            'code' => substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10),
-            'client_id' => $options['client_id'],
-            'client_secret' => $options['client_secret'],
-            'redirect_uri' => $options['redirect_uri'],
-        ];
-        return $authServer->getAuthorizeUrl() . '?' . http_build_query($authorizeQuery);
+        return $this->getGrantStrategy()->getAuthorizeUrl($authServer);
     }
 
+    /**
+     * @param AuthorizationServerInterface $authServer
+     */
     public function authorize(AuthorizationServerInterface $authServer)
     {
-        header('Location:' . $this->getAuthorizeUrl($authServer));
+        return $this->getGrantStrategy()->authorize($authServer);
     }
 
+    /**
+     * @param ResourceServerInterface $resourceServer
+     * @return mixed
+     */
     public function getAccessToken(ResourceServerInterface $resourceServer)
     {
-        $httpClient = self::getHttpClient();
-        $httpClient->createRequest(
-            $resourceServer->getAccessTokenMethod(),
-            $resourceServer->getAccessTokenUrl()
-        );
+        return $this->getGrantStrategy()->getAccessToken($resourceServer);
     }
 
     public function __construct(array $options)
@@ -103,6 +192,7 @@ class Client
             'client_id' => '',
             'client_secret' => '',
             'redirect_uri' => '',
+            'scope' => '',
         ], $options);
     }
 }

@@ -7,30 +7,9 @@
 
 namespace Eva\EvaOAuth\OAuth2\Providers;
 
-use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
-use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
-
-class Hundsun implements AuthorizationServerInterface, ResourceServerInterface
+class Hundsun extends AbstractProvider
 {
-
     protected $authorizeUrl = 'https://open.hs.net/oauth2/oauth2/authorize';
 
     protected $accessTokenUrl = 'https://open.hs.net/oauth2/oauth2/token';
-
-    protected $accessTokenMethod = ResourceServerInterface::METHOD_POST;
-
-    public function getAuthorizeUrl()
-    {
-        return $this->authorizeUrl;
-    }
-
-    public function getAccessTokenUrl()
-    {
-        return $this->accessTokenUrl;
-    }
-
-    public function getAccessTokenMethod()
-    {
-        return $this->accessTokenMethod;
-    }
 }

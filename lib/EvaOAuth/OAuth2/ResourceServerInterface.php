@@ -13,6 +13,16 @@ interface ResourceServerInterface
 
     const METHOD_POST = 'POST';
 
+    const FORMAT_HTML = 'html';
+
+    const FORMAT_XML = 'xml';
+
+    const FORMAT_JSON = 'json';
+
+    const FORMAT_JSONP = 'jsonp';
+
+    public function getAccessTokenFormat();
+
     public function getAccessTokenMethod();
 
     public function getAccessTokenUrl();
