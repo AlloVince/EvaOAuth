@@ -21,9 +21,27 @@ interface ResourceServerInterface
 
     const FORMAT_JSONP = 'jsonp';
 
+    /**
+     * Access Token格式，可能是JSON或XML
+     * @return string
+     */
     public function getAccessTokenFormat();
 
+    /**
+     * Access Token请求方法，一般是POST
+     * @return string
+     */
     public function getAccessTokenMethod();
 
+    /**
+     * Access Token Url
+     * @return string
+     */
     public function getAccessTokenUrl();
+
+    /**
+     * Server返回Access Token与自定义Access Token的映射关系
+     * @return array
+     */
+    //public function getAccessTokenFields();
 }

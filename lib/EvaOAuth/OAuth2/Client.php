@@ -178,9 +178,9 @@ class Client
     /**
      * @param AuthorizationServerInterface $authServer
      */
-    public function authorize(AuthorizationServerInterface $authServer)
+    public function requestAuthorize(AuthorizationServerInterface $authServer)
     {
-        return $this->getGrantStrategy()->authorize($authServer);
+        return $this->getGrantStrategy()->requestAuthorize($authServer);
     }
 
     /**

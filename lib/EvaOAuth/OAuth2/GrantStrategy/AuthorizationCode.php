@@ -10,6 +10,8 @@ namespace Eva\EvaOAuth\OAuth2\GrantStrategy;
 
 use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
+use Eva\EvaOAuth\OAuth2\Token\AccessToken;
+use EvaOAuth\Exception\InvalidArgumentException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -19,7 +21,7 @@ class AuthorizationCode implements GrantStrategyInterface
 
     protected $options;
 
-    public function authorize(AuthorizationServerInterface $authServer)
+    public function requestAuthorize(AuthorizationServerInterface $authServer)
     {
         header('Location:' . $this->getAuthorizeUrl($authServer));
     }
@@ -39,16 +41,24 @@ class AuthorizationCode implements GrantStrategyInterface
         return $authServer->getAuthorizeUrl() . '?' . http_build_query($authorizeQuery);
     }
 
-    public function getAccessToken(ResourceServerInterface $resourceServer)
+    public function getAccessToken(ResourceServerInterface $resourceServer, array $urlQuery = array())
     {
-        $code = empty($_GET['code']) ?: $_GET['code'];
-        $state = empty($_GET['state']) ?: $_GET['state'];
+        $urlQuery = $urlQuery ?: $_GET;
+        $code = empty($urlQuery['code']) ?: $urlQuery['code'];
+        $state = empty($urlQuery['state']) ?: $urlQuery['state'];
         $options = $this->options;
+
+        if (!$code) {
+            throw new InvalidArgumentException("No authorization code found");
+        }
+
+        //TODO: Valid state to void attach
 
         $parameters = [
             'grant_type' => 'authorization_code',
             'code' => $code,
             'client_id' => $options['client_id'],
+            'client_secret' => $options['client_secret'],
             'redirect_uri' => $options['redirect_uri'],
         ];
         if ($state) {
@@ -68,17 +78,11 @@ class AuthorizationCode implements GrantStrategyInterface
             $httpClientOptions
         );
 
-        echo "<pre>";
         try {
             $response = $httpClient->send($request);
-            $rawToken = $response->json();
-            var_dump($rawToken);
-            exit;
+            return new AccessToken($response, $resourceServer);
         } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                //Log
-                echo $e->getResponse();
-            }
+            throw new \Eva\EvaOAuth\Exception\RequestException('Get access token failed', $e->getRequest(), $e->getResponse());
         }
     }
 

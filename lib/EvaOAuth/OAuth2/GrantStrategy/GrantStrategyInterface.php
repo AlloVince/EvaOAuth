@@ -32,13 +32,14 @@ interface GrantStrategyInterface
      * @param AuthorizationServerInterface $authServer
      * @return void
      */
-    public function authorize(AuthorizationServerInterface $authServer);
+    public function requestAuthorize(AuthorizationServerInterface $authServer);
 
     /**
      * @param ResourceServerInterface $resourceServer
+     * @param array $urlQuery
      * @return AccessTokenInterface
      */
-    public function getAccessToken(ResourceServerInterface $resourceServer);
+    public function getAccessToken(ResourceServerInterface $resourceServer, array $urlQuery = array());
 
     /**
      * @param Client $httpClient
