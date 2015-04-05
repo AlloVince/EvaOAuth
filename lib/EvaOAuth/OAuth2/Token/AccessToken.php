@@ -10,6 +10,7 @@ namespace Eva\EvaOAuth\OAuth2\Token;
 
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
 use Eva\EvaOAuth\Utils\ResponseParser;
+use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use GuzzleHttp\Message\Response;
 use Eva\EvaOAuth\Token\AccessTokenInterface as BaseTokenInterface;
 
@@ -46,14 +47,15 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     protected $scope;
 
     /**
+     * @var string
+     */
+    protected $tokenVersion = BaseTokenInterface::VERSION_OAUTH2;
+
+    /**
      * @var array
      */
     protected $extra;
 
-    /**
-     * @var string
-     */
-    protected $tokenVersion = BaseTokenInterface::VERSION_OAUTH2;
 
     /**
      * @return string
@@ -64,12 +66,19 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     }
 
     /**
-     * @param array $tokenArray
+     * @param Response $response
+     * @param ResourceServerInterface $resourceServer
      * @return AccessTokenInterface
      */
-    public static function factory(array $tokenArray)
+    public static function factory(Response $response, ResourceServerInterface $resourceServer)
     {
-        // TODO: Implement factory() method.
+        $rawToken = ResponseParser::parse($response, $resourceServer->getAccessTokenFormat());
+        $tokenValue = empty($rawToken['access_token']) ? '' : $rawToken['access_token'];
+        $token = new static($tokenValue);
+        foreach ($rawToken as $key => $value) {
+            $token->$key = $value;
+        }
+        return $token;
     }
 
     /**
@@ -161,18 +170,20 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
         return $this;
     }
 
+
     /**
-     * @param Response $response
-     * @param ResourceServerInterface $resouceServer
+     * @param string $tokenValue
+     * @param array $tokenArray
      */
-    public function __construct(Response $response = null, ResourceServerInterface $resouceServer = null)
+    public function __construct($tokenValue, array $tokenArray = array())
     {
-        if ($response && $resouceServer) {
-            $this->response = $response;
-            $rawToken = ResponseParser::parse($response, $resouceServer->getAccessTokenFormat());
-            foreach ($rawToken as $key => $value) {
-                $this->$key = $value;
-            }
+        $this->tokenValue = (string) $tokenValue;
+        if (!$this->tokenValue) {
+            throw new InvalidArgumentException("No token value input");
+        }
+
+        foreach ($tokenArray as $key => $value) {
+            $this->$key = $value;
         }
     }
 }

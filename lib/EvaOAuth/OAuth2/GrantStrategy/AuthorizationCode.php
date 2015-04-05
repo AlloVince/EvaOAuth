@@ -80,7 +80,7 @@ class AuthorizationCode implements GrantStrategyInterface
 
         try {
             $response = $httpClient->send($request);
-            return new AccessToken($response, $resourceServer);
+            return AccessToken::factory($response, $resourceServer);
         } catch (RequestException $e) {
             throw new \Eva\EvaOAuth\Exception\RequestException('Get access token failed', $e->getRequest(), $e->getResponse());
         }

@@ -19,10 +19,11 @@ interface AccessTokenInterface
     const TYPE_BEARER = 'Bearer';
 
     /**
-     * @param array $tokenArray
+     * @param Response $response
+     * @param ResourceServerInterface $resourceServer
      * @return AccessTokenInterface
      */
-    public static function factory(array $tokenArray);
+    public static function factory(Response $response, ResourceServerInterface $resourceServer);
 
     /**
      * @return string
@@ -50,8 +51,8 @@ interface AccessTokenInterface
     public function getExtra();
 
     /**
-     * @param Response $response
-     * @param ResourceServerInterface $resouceServer
+     * @param string $tokenValue
+     * @param array $tokenArray
      */
-    public function __construct(Response $response = null, ResourceServerInterface $resouceServer = null);
+    public function __construct($tokenValue, array $tokenArray = array());
 }
