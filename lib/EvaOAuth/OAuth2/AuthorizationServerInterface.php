@@ -8,7 +8,14 @@
 
 namespace Eva\EvaOAuth\OAuth2;
 
+/**
+ * Interface AuthorizationServerInterface
+ * @package Eva\EvaOAuth\OAuth2
+ */
 interface AuthorizationServerInterface
 {
+    /**
+     * @return string
+     */
     public function getAuthorizeUrl();
 }

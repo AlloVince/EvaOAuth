@@ -14,6 +14,10 @@ use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use GuzzleHttp\Message\Response;
 use Eva\EvaOAuth\Token\AccessTokenInterface as BaseTokenInterface;
 
+/**
+ * Class AccessToken
+ * @package Eva\EvaOAuth\OAuth2\Token
+ */
 class AccessToken implements AccessTokenInterface, BaseTokenInterface
 {
     /**
@@ -75,10 +79,17 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
         $rawToken = ResponseParser::parse($response, $resourceServer->getAccessTokenFormat());
         $tokenValue = empty($rawToken['access_token']) ? '' : $rawToken['access_token'];
         $token = new static($tokenValue);
+        $token->setResponse($response);
         foreach ($rawToken as $key => $value) {
             $token->$key = $value;
         }
         return $token;
+    }
+
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+        return $this;
     }
 
     /**
@@ -145,6 +156,11 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
         // TODO: Implement toArray() method.
     }
 
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
     public function __set($name, $value)
     {
         if (isset($this->$name)) {

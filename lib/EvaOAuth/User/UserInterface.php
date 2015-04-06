@@ -10,6 +10,10 @@ namespace Eva\EvaOAuth\User;
 
 use Eva\EvaOAuth\OAuth2\AccessTokenInterface;
 
+/**
+ * Interface UserInterface
+ * @package Eva\EvaOAuth\User
+ */
 interface UserInterface
 {
 

@@ -7,6 +7,10 @@
 
 namespace Eva\EvaOAuth\Exception;
 
+/**
+ * Interface ExceptionInterface
+ * @package Eva\EvaOAuth\Exception
+ */
 interface ExceptionInterface
 {
 }

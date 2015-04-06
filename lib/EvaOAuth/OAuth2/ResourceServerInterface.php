@@ -7,22 +7,39 @@
 
 namespace Eva\EvaOAuth\OAuth2;
 
+/**
+ * Interface ResourceServerInterface
+ * @package Eva\EvaOAuth\OAuth2
+ */
 interface ResourceServerInterface
 {
+    /**
+     * HTTP GET method
+     */
     const METHOD_GET = 'GET';
 
+    /**
+     * HTTP POST method
+     */
     const METHOD_POST = 'POST';
 
-    const FORMAT_HTML = 'html';
+    /**
+     * URL query Format
+     */
+    const FORMAT_QUERY = 'query';
 
-    const FORMAT_XML = 'xml';
-
+    /**
+     * JSON Format
+     */
     const FORMAT_JSON = 'json';
 
+    /**
+     * JSONP Format
+     */
     const FORMAT_JSONP = 'jsonp';
 
     /**
-     * Access Token格式，可能是JSON或XML
+     * Access Token格式，可能是JSON或JSONP或Query
      * @return string
      */
     public function getAccessTokenFormat();

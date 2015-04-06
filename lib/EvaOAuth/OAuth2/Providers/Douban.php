@@ -7,9 +7,19 @@
 
 namespace Eva\EvaOAuth\OAuth2\Providers;
 
+/**
+ * Class Douban
+ * @package Eva\EvaOAuth\OAuth2\Providers
+ */
 class Douban extends AbstractProvider
 {
+    /**
+     * @var string
+     */
     protected $authorizeUrl = 'https://www.douban.com/service/auth2/auth';
 
+    /**
+     * @var string
+     */
     protected $accessTokenUrl = 'https://www.douban.com/service/auth2/token';
 }

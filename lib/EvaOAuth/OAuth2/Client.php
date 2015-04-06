@@ -112,11 +112,18 @@ class Client
 
     }
 
+    /**
+     * @return string
+     */
     public function getGrantStrategyName()
     {
         return $this->grantStrategyName;
     }
 
+    /**
+     * @param $grantStrategyName
+     * @return $this
+     */
     public function changeGrantStrategy($grantStrategyName)
     {
         if (false === array_key_exists($grantStrategyName, self::$grantStrategyMapping)) {
@@ -127,6 +134,10 @@ class Client
         return $this;
     }
 
+    /**
+     * @param $strategyName
+     * @param $strategyClass
+     */
     public static function registerGrantStrategy($strategyName, $strategyClass)
     {
         if (!class_exists($strategyClass) || !in_array('Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;', class_implements($strategyClass))) {
@@ -192,6 +203,9 @@ class Client
         return $this->getGrantStrategy()->getAccessToken($resourceServer);
     }
 
+    /**
+     * @param array $options
+     */
     public function __construct(array $options)
     {
         $options = array_merge([

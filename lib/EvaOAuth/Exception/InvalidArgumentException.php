@@ -7,6 +7,10 @@
 
 namespace Eva\EvaOAuth\Exception;
 
+/**
+ * Class InvalidArgumentException
+ * @package Eva\EvaOAuth\Exception
+ */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

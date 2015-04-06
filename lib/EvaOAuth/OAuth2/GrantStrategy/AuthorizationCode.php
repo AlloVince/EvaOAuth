@@ -15,17 +15,34 @@ use EvaOAuth\Exception\InvalidArgumentException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
+/**
+ * Class AuthorizationCode
+ * @package Eva\EvaOAuth\OAuth2\GrantStrategy
+ */
 class AuthorizationCode implements GrantStrategyInterface
 {
+    /**
+     * @var Client
+     */
     protected $httpClient;
 
+    /**
+     * @var array
+     */
     protected $options;
 
+    /**
+     * @param AuthorizationServerInterface $authServer
+     */
     public function requestAuthorize(AuthorizationServerInterface $authServer)
     {
         header('Location:' . $this->getAuthorizeUrl($authServer));
     }
 
+    /**
+     * @param AuthorizationServerInterface $authServer
+     * @return string
+     */
     public function getAuthorizeUrl(AuthorizationServerInterface $authServer)
     {
         $options = $this->options;
@@ -41,6 +58,11 @@ class AuthorizationCode implements GrantStrategyInterface
         return $authServer->getAuthorizeUrl() . '?' . http_build_query($authorizeQuery);
     }
 
+    /**
+     * @param ResourceServerInterface $resourceServer
+     * @param array $urlQuery
+     * @return \Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface
+     */
     public function getAccessToken(ResourceServerInterface $resourceServer, array $urlQuery = array())
     {
         $urlQuery = $urlQuery ?: $_GET;
@@ -86,6 +108,10 @@ class AuthorizationCode implements GrantStrategyInterface
         }
     }
 
+    /**
+     * @param Client $httpClient
+     * @param array $options
+     */
     public function __construct(Client $httpClient, array $options)
     {
         $this->httpClient = $httpClient;

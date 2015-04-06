@@ -22,21 +22,38 @@ class AuthorizedHttpClient
      */
     protected $httpClient;
 
+    /**
+     * @return Client
+     */
     public function getHttpClient()
     {
         return $this->httpClient;
     }
 
+    /**
+     * @param $method
+     * @param $args
+     * @return mixed
+     */
     public function __call($method, $args)
     {
         return call_user_func_array(array($this->httpClient, $method), $args);
     }
 
+    /**
+     * @param $method
+     * @param $args
+     * @return mixed
+     */
     public static function __callStatic($method, $args)
     {
         return call_user_func('GuzzleHttp\Client::' . $method, $args);
     }
 
+    /**
+     * @param AccessTokenInterface $token
+     * @param array $options
+     */
     public function __construct(AccessTokenInterface $token, array $options = [])
     {
         $this->httpClient = $httpClient = new Client($options);

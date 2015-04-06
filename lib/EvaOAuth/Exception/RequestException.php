@@ -7,6 +7,10 @@
 
 namespace Eva\EvaOAuth\Exception;
 
+/**
+ * Class RequestException
+ * @package Eva\EvaOAuth\Exception
+ */
 class RequestException extends \GuzzleHttp\Exception\RequestException implements ExceptionInterface
 {
 }
