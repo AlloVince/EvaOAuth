@@ -11,7 +11,7 @@ namespace Eva\EvaOAuth\OAuth2\GrantStrategy;
 use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
 use Eva\EvaOAuth\OAuth2\Token\AccessToken;
-use EvaOAuth\Exception\InvalidArgumentException;
+use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -52,7 +52,7 @@ class AuthorizationCode implements GrantStrategyInterface
             'redirect_uri' => $options['redirect_uri'],
             'state' => substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10),
         ];
-        if (!$options['scope']) {
+        if ($options['scope']) {
             $authorizeQuery['scope'] = $options['scope'];
         }
         return $authServer->getAuthorizeUrl() . '?' . http_build_query($authorizeQuery);
@@ -66,8 +66,8 @@ class AuthorizationCode implements GrantStrategyInterface
     public function getAccessToken(ResourceServerInterface $resourceServer, array $urlQuery = array())
     {
         $urlQuery = $urlQuery ?: $_GET;
-        $code = empty($urlQuery['code']) ?: $urlQuery['code'];
-        $state = empty($urlQuery['state']) ?: $urlQuery['state'];
+        $code = empty($urlQuery['code']) ? '' : $urlQuery['code'];
+        $state = empty($urlQuery['state']) ? '' : $urlQuery['state'];
         $options = $this->options;
 
         if (!$code) {

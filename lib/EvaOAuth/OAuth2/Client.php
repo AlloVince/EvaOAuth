@@ -140,7 +140,7 @@ class Client
      */
     public static function registerGrantStrategy($strategyName, $strategyClass)
     {
-        if (!class_exists($strategyClass) || !in_array('Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;', class_implements($strategyClass))) {
+        if (!class_exists($strategyClass) || !in_array('Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface', class_implements($strategyClass))) {
             throw new InvalidArgumentException('Register grant strategy failed by unrecognized interface');
         }
 
