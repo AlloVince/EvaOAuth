@@ -2,3 +2,5 @@ composer.lock
 vendor/*
 config.local.php
 config/access_token*
+tests/report/*
+.idea

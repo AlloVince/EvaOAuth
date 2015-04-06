@@ -1,54 +1,17 @@
 <?php
 /**
- * Zend Framework (http://framework.zend.com/)
- *
- * @link      http://github.com/zendframework/zf2 for the canonical source repository
- * @copyright Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
+ * @author    AlloVince
+ * @copyright Copyright (c) 2015 EvaEngine Team (https://github.com/EvaEngine)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
- * @package   Zend_Authentication
  */
 
-namespace EvaOAuth\Storage;
+namespace Eva\EvaOAuth\Storage;
 
-/**
- * @category   Zend
- * @package    Zend_Authentication
- * @subpackage Storage
- */
 interface StorageInterface
 {
-    /**
-     * Returns true if and only if storage is empty
-     *
-     * @throws \Zend\Authentication\Exception\ExceptionInterface If it is impossible to determine whether storage is empty
-     * @return boolean
-     */
-    public function isEmpty();
+    public function save($key, $content, $lifetime);
 
-    /**
-     * Returns the contents of storage
-     *
-     * Behavior is undefined when storage is empty.
-     *
-     * @throws \Zend\Authentication\Exception\ExceptionInterface If reading contents from storage is impossible
-     * @return mixed
-     */
-    public function read();
+    public function get($key);
 
-    /**
-     * Writes $contents to storage
-     *
-     * @param  mixed $contents
-     * @throws \Zend\Authentication\Exception\ExceptionInterface If writing $contents to storage is impossible
-     * @return void
-     */
-    public function write($contents);
-
-    /**
-     * Clears contents from storage
-     *
-     * @throws \Zend\Authentication\Exception\ExceptionInterface If clearing contents from storage is impossible
-     * @return void
-     */
-    public function clear();
+    public function remove($key);
 }

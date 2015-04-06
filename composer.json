@@ -1,25 +1,22 @@
 {
-    "name": "allovince/evaoauth",
-    "description": "EvaOAuth",
+    "name": "evaengine/eva-oauth",
+    "description": "EvaOAuth is an abstract interface to setup OAuth client, both support OAuth1.0a / OAuth2.",
     "license": "BSD-3-Clause",
     "homepage": "http://avnpc.com/",
     "authors": [
         {
-        "name": "AlloVince",
-        "email": "allo.vince@gmail.com",
-        "homepage": "http://avnpc.com"
-    }
+          "name": "AlloVince",
+          "email": "allo.vince@gmail.com",
+          "homepage": "http://avnpc.com"
+        }
     ],
     "require": {
-        "php": ">=5.3.3",
-	"zendframework/zend-config": "2.*",
-	"zendframework/zend-session": "2.*",
-	"zendframework/zend-json": "2.*",
-	"zendframework/zend-http": "2.2.3",
-	"zendframework/zend-eventmanager": "2.*",
-        "zendframework/zendoauth": "2.0.2"
+      "php": ">=5.3.3",
+      "guzzlehttp/guzzle": "5.2.*"
     },
     "autoload": {
-        "psr-0": {"EvaOAuth": "src/"}
+        "psr-4": {
+          "Eva\\EvaOAuth\\": "src/EvaOAuth/"
+        }
     }
 }

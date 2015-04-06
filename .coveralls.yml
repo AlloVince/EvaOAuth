@@ -1,0 +1,4 @@
+src_dir: .
+coverage_clover: ./tmp/clover.xml
+json_path: ./tmp/coveralls.json
+exclude_no_stmt: true
