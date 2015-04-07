@@ -112,6 +112,11 @@ class Client
 
     }
 
+    public function loadUser()
+    {
+
+    }
+
     /**
      * @return string
      */

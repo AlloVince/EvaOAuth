@@ -13,6 +13,10 @@ use GuzzleHttp\Client;
 use Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface as OAuth2AccessTokenInterface;
 use GuzzleHttp\Event\BeforeEvent;
 
+/**
+ * Class AuthorizedHttpClient
+ * @package Eva\EvaOAuth
+ */
 class AuthorizedHttpClient
 {
 

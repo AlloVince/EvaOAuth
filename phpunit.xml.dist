@@ -6,9 +6,8 @@
     </testsuites>
     <filter>
         <whitelist>
-            <directory>lib/</directory>
+            <directory>src/</directory>
             <exclude>
-                <directory>src/</directory>
                 <directory>vendor/</directory>
             </exclude>
         </whitelist>
