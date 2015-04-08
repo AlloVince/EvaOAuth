@@ -7,7 +7,9 @@
 
 namespace Eva\EvaOAuth\OAuth2;
 
+use Eva\EvaOAuth\ClientConsumerTrait;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
+use Eva\EvaOAuth\OAuth2\Token\AccessToken;
 use Eva\EvaOAuth\Storage\StorageInterface;
 use Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;
 
@@ -44,21 +46,6 @@ class Client
     const GRANT_CLIENT_CREDENTIALS = 'client_credentials';
 
     /**
-     * @var \GuzzleHttp\Client
-     */
-    protected static $httpClient;
-
-    /**
-     * @var array
-     */
-    protected static $httpClientDefaultOptions = [];
-
-    /**
-     * @var array
-     */
-    protected $options = [];
-
-    /**
      * @var string
      */
     protected $grantStrategyName = self::GRANT_AUTHORIZATION_CODE;
@@ -73,48 +60,16 @@ class Client
      */
     protected static $grantStrategyMapping = [];
 
-    /**
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
+    use ClientConsumerTrait;
 
     /**
-     * @param array $options
+     * @param AccessToken $token
+     * @param ResourceServerInterface $resourceServer
+     * @return \Eva\EvaOAuth\User\UserInterface
      */
-    public static function setHttpClientDefaultOptions(array $options)
+    public static function getUser(AccessToken $token, ResourceServerInterface $resourceServer)
     {
-        self::$httpClientDefaultOptions = $options;
-    }
-
-
-    /**
-     * @return \GuzzleHttp\Client
-     */
-    public static function getHttpClient()
-    {
-        if (self::$httpClient) {
-            return self::$httpClient;
-        }
-
-        return self::$httpClient = new \GuzzleHttp\Client();
-    }
-
-    public static function getStorage()
-    {
-
-    }
-
-    public static function setStorage(StorageInterface $storage)
-    {
-
-    }
-
-    public function loadUser()
-    {
-
+        return $resourceServer->getUser($token);
     }
 
     /**

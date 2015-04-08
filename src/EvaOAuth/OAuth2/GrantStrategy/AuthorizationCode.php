@@ -63,7 +63,7 @@ class AuthorizationCode implements GrantStrategyInterface
      * @param array $urlQuery
      * @return \Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface
      */
-    public function getAccessToken(ResourceServerInterface $resourceServer, array $urlQuery = array())
+    public function getAccessToken(ResourceServerInterface $resourceServer, array $urlQuery = [])
     {
         $urlQuery = $urlQuery ?: $_GET;
         $code = empty($urlQuery['code']) ? '' : $urlQuery['code'];
@@ -92,7 +92,7 @@ class AuthorizationCode implements GrantStrategyInterface
         $method = $resourceServer->getAccessTokenMethod();
         $httpClientOptions = ($method == ResourceServerInterface::METHOD_GET) ?
             ['query' => $parameters] :
-            ['debug' => 1, 'body' => $parameters];
+            ['debug' => 0, 'body' => $parameters];
 
         $request = $httpClient->createRequest(
             $method,
@@ -104,7 +104,11 @@ class AuthorizationCode implements GrantStrategyInterface
             $response = $httpClient->send($request);
             return AccessToken::factory($response, $resourceServer);
         } catch (RequestException $e) {
-            throw new \Eva\EvaOAuth\Exception\RequestException('Get access token failed', $e->getRequest(), $e->getResponse());
+            throw new \Eva\EvaOAuth\Exception\RequestException(
+                'Get access token failed',
+                $e->getRequest(),
+                $e->getResponse()
+            );
         }
     }
 

@@ -5,19 +5,19 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-namespace Eva\EvaOAuth\OAuth2\Providers;
 
-use Eva\EvaOAuth\Exception\BadMethodCallException;
-use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
-use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
-use Eva\EvaOAuth\OAuth2\Token\AccessToken;
+namespace Eva\EvaOAuth\OAuth1\Providers;
 
-/**
- * Class AbstractProvider
- * @package Eva\EvaOAuth\OAuth2\Providers
- */
-abstract class AbstractProvider implements AuthorizationServerInterface, ResourceServerInterface
+use Eva\EvaOAuth\OAuth1\ServiceProviderInterface;
+use Eva\EvaOAuth\OAuth1\Token\AccessToken;
+
+class AbstractProvider implements ServiceProviderInterface
 {
+    /**
+     * @var string
+     */
+    protected $requestTokenUrl;
+
     /**
      * @var string
      */
@@ -31,12 +31,20 @@ abstract class AbstractProvider implements AuthorizationServerInterface, Resourc
     /**
      * @var string
      */
-    protected $accessTokenMethod = ResourceServerInterface::METHOD_POST;
+    protected $accessTokenMethod = ServiceProviderInterface::METHOD_POST;
 
     /**
      * @var string
      */
-    protected $accessTokenFormat = ResourceServerInterface::FORMAT_JSON;
+    protected $accessTokenFormat = ServiceProviderInterface::FORMAT_JSON;
+
+    /**
+     * @return string
+     */
+    public function getRequestTokenUrl()
+    {
+        return $this->requestTokenUrl;
+    }
 
     /**
      * @return string
@@ -72,10 +80,12 @@ abstract class AbstractProvider implements AuthorizationServerInterface, Resourc
 
     /**
      * @param AccessToken $token
-     * @return \Eva\EvaOAuth\User\UserInterface
+     * @throws BadMethodCallException
      */
     public function getUser(AccessToken $token)
     {
         throw new BadMethodCallException(sprintf("Not supported feature"));
     }
+
+
 }

@@ -12,6 +12,7 @@ use Eva\EvaOAuth\Token\AccessTokenInterface;
 use GuzzleHttp\Client;
 use Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface as OAuth2AccessTokenInterface;
 use GuzzleHttp\Event\BeforeEvent;
+use Eva\EvaOAuth\OAuth2\Token\AccessToken;
 
 /**
  * Class AuthorizedHttpClient
@@ -41,16 +42,6 @@ class AuthorizedHttpClient
     public function __call($method, $args)
     {
         return call_user_func_array(array($this->httpClient, $method), $args);
-    }
-
-    /**
-     * @param $method
-     * @param $args
-     * @return mixed
-     */
-    public static function __callStatic($method, $args)
-    {
-        return call_user_func('GuzzleHttp\Client::' . $method, $args);
     }
 
     /**

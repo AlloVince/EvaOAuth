@@ -7,6 +7,9 @@
 
 namespace Eva\EvaOAuth\OAuth2;
 
+use Eva\EvaOAuth\OAuth2\Token\AccessToken;
+use Eva\EvaOAuth\User\UserInterface;
+
 /**
  * Interface ResourceServerInterface
  * @package Eva\EvaOAuth\OAuth2
@@ -61,4 +64,10 @@ interface ResourceServerInterface
      * @return array
      */
     //public function getAccessTokenFields();
+
+    /**
+     * @param AccessToken $token
+     * @return UserInterface
+     */
+    public function getUser(AccessToken $token);
 }

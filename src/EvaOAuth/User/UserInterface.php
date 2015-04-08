@@ -8,22 +8,44 @@
 
 namespace Eva\EvaOAuth\User;
 
-use Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface;
-
 /**
  * Interface UserInterface
  * @package Eva\EvaOAuth\User
  */
 interface UserInterface
 {
+    /**
+     * @return string
+     */
+    public function getVersion();
 
-    public function getUserId();
+    /**
+     * @return string
+     */
+    public function getProvider();
 
-    public function getUserName();
+    /**
+     * @return string
+     */
+    public function getId();
 
+    /**
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * @return string
+     */
     public function getAvatar();
 
-    public function getProfile();
+    /**
+     * @return string
+     */
+    public function getEmail();
 
-    public function __construct(AccessTokenInterface $accessToken);
+    /**
+     * @return array
+     */
+    public function getExtra();
 }
