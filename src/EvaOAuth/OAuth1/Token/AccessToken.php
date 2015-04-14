@@ -10,52 +10,81 @@ namespace Eva\EvaOAuth\OAuth1\Token;
 
 use Eva\EvaOAuth\OAuth1\ServiceProviderInterface;
 use Eva\EvaOAuth\Token\AccessTokenInterface as BaseTokenInterface;
+use Eva\EvaOAuth\Utils\ResponseParser;
 use GuzzleHttp\Message\Response;
 
+/**
+ * Class AccessToken
+ * @package Eva\EvaOAuth\OAuth1\Token
+ */
 class AccessToken implements AccessTokenInterface, BaseTokenInterface
 {
 
     /**
-     * @param Response $response
-     * @param ServiceProviderInterface $serviceProvider
-     * @return AccessTokenInterface
+     * @var Response
      */
-    public static function factory(Response $response, ServiceProviderInterface $serviceProvider)
-    {
-        // TODO: Implement factory() method.
-    }
+    protected $response;
 
     /**
-     * @return string
+     * @var string
      */
-    public function getTokenSecret()
-    {
-        // TODO: Implement getTokenSecret() method.
-    }
+    protected $tokenValue;
 
     /**
-     * @param string $tokenValue
-     * @param string $tokenSecret
+     * @var string
      */
-    public function __construct($tokenValue, $tokenSecret)
-    {
-        // TODO: Implement __construct() method.
-    }
+    protected $tokenSecret;
+
+    /**
+     * @var string
+     */
+    protected $tokenType = AccessTokenInterface::TYPE_BEARER;
+
+    /**
+     * @var string
+     */
+    protected $tokenVersion = BaseTokenInterface::VERSION_OAUTH2;
+
+    /**
+     * @var array
+     */
+    protected $extra;
+
 
     /**
      * @return string
      */
     public function getTokenVersion()
     {
-        // TODO: Implement getTokenVersion() method.
+        return $this->tokenVersion;
     }
 
     /**
-     * @return string
+     * @param Response $response
+     * @param ServiceProviderInterface $serviceProvider
+     * @return static
      */
-    public function getTokenValue()
+    public static function factory(Response $response, ServiceProviderInterface $serviceProvider)
     {
-        // TODO: Implement getTokenValue() method.
+        $rawToken = ResponseParser::parse($response, $serviceProvider->getAccessTokenFormat());
+        $tokenValue = empty($rawToken['oauth_token']) ? '' : $rawToken['oauth_token'];
+        $tokenSecret = empty($rawToken['oauth_token_secret']) ? '' : $rawToken['oauth_token_secret'];
+        $token = new static($tokenValue, $tokenSecret);
+        $token->setResponse($response);
+        foreach ($rawToken as $key => $value) {
+            $token->$key = $value;
+        }
+        return $token;
+    }
+
+    /**
+     * @param Response $response
+     * @return $this
+     */
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+        return $this;
     }
 
     /**
@@ -63,6 +92,62 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
      */
     public function getResponse()
     {
-        // TODO: Implement getResponse() method.
+        return $this->response;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTokenValue()
+    {
+        return $this->tokenValue;
+    }
+
+    public function getTokenSecret()
+    {
+        return $this->tokenSecret;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTokenType()
+    {
+        return $this->tokenType;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExtra()
+    {
+        return $this->extra;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        // TODO: Implement toArray() method.
+    }
+
+    /**
+     * @param string $tokenValue
+     * @param string $tokenSecret
+     * @param array $tokenArray
+     * @throws InvalidArgumentException
+     */
+    public function __construct($tokenValue, $tokenSecret, array $tokenArray = [])
+    {
+        $this->tokenValue = (string)$tokenValue;
+        $this->tokenSecret = (string)$tokenSecret;
+        if (!$this->tokenValue) {
+            throw new InvalidArgumentException("No token value input");
+        }
+
+        foreach ($tokenArray as $key => $value) {
+            $this->$key = $value;
+        }
     }
 }

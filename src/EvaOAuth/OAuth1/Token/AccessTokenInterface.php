@@ -32,8 +32,9 @@ interface AccessTokenInterface
     public function getTokenSecret();
 
     /**
-     * @param string $tokenValue
-     * @param string $tokenSecret
+     * @param $tokenValue
+     * @param $tokenSecret
+     * @param array $tokenArray
      */
-    public function __construct($tokenValue, $tokenSecret);
+    public function __construct($tokenValue, $tokenSecret, array $tokenArray = []);
 }

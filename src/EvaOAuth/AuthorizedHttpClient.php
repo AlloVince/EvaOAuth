@@ -8,11 +8,16 @@
 
 namespace Eva\EvaOAuth;
 
+use Eva\EvaOAuth\OAuth1\Signature\Hmac;
 use Eva\EvaOAuth\Token\AccessTokenInterface;
+use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Client;
 use Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface as OAuth2AccessTokenInterface;
+use Eva\EvaOAuth\OAuth1\Token\AccessTokenInterface as OAuth1AccessTokenInterface;
 use GuzzleHttp\Event\BeforeEvent;
-use Eva\EvaOAuth\OAuth2\Token\AccessToken;
+use Guzzle\Http\Message\Request;
+use GuzzleHttp\Url;
+
 
 /**
  * Class AuthorizedHttpClient
@@ -64,7 +69,38 @@ class AuthorizedHttpClient
                 }
             );
         } else {
-            //TODO: OAuth1 token handle
+            $httpClient->getEmitter()->on(
+                'before',
+                function (BeforeEvent $event) use ($token) {
+                    /** @var Request $request */
+                    $request = $event->getRequest();
+                    /** @var OAuth1AccessTokenInterface $token */
+
+                    $httpMethod = strtoupper($request->getMethod());
+                    $url = Url::fromString($request->getUrl());
+
+                    $parameters = [
+                        'oauth_consumer_key' => $token->consumer_key,
+                        'oauth_signature_method' => 'HMAC-SHA1',
+                        'oauth_timestamp' => (string) time(),
+                        'oauth_nonce' => strtolower(Text::getRandomString(32)),
+                        'oauth_token' => $token->getTokenValue(),
+                        'oauth_version' => '1.0',
+                    ];
+
+                    $baseString = Text::getBaseString($httpMethod, $url, $parameters);
+                    $signature = (string) new Hmac(
+                        $token->consumer_secret,
+                        $baseString,
+                        $token->getTokenSecret()
+                    );
+                    $parameters['oauth_signature'] = $signature;
+                    $event->getRequest()->setHeader(
+                        'Authorization',
+                        Text::getHeaderString($parameters)
+                    );
+                }
+            );
         }
     }
 }

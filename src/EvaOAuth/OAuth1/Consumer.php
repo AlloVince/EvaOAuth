@@ -12,6 +12,7 @@ use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\ClientConsumerTrait;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
 use Eva\EvaOAuth\OAuth1\Signature\SignatureInterface;
+use Eva\EvaOAuth\OAuth1\Token\AccessToken;
 use Eva\EvaOAuth\OAuth1\Token\RequestToken;
 use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Exception\RequestException;
@@ -55,12 +56,10 @@ class Consumer
             $options['consumer_secret'],
             $baseString
         );
-
         $parameters['oauth_signature'] = $signature;
 
         $httpClient = self::getHttpClient();
         $httpClientOptions = [
-            'debug' => 0,
             'headers' => [
                 'Authorization' => Text::getHeaderString($parameters)
             ]
@@ -95,13 +94,64 @@ class Consumer
         header("Location:$url");
     }
 
-    public function getAccessToken(ServiceProviderInterface $serviceProvider)
+    public function getAccessToken(ServiceProviderInterface $serviceProvider, array $urlQuery = [])
     {
-    }
+        $urlQuery = $urlQuery ?: $_GET;
+        $tokenValue = empty($urlQuery['oauth_token']) ? '' : $urlQuery['oauth_token'];
+        $tokenVerify = empty($urlQuery['oauth_verifier']) ? '' : $urlQuery['oauth_verifier'];
 
-    /**
-     * @param array $options
-     */
+        if (!$tokenValue || !$tokenVerify) {
+            throw new InvalidArgumentException(sprintf('No oauth_token or oauth_verifier input'));
+        }
+        $options = $this->options;
+
+        $httpMethod = $serviceProvider->getAccessTokenMethod();
+        $url = $serviceProvider->getAccessTokenUrl();
+
+        $parameters = [
+            'oauth_consumer_key' => $options['consumer_key'],
+            'oauth_signature_method' => $this->signatureMethod,
+            'oauth_timestamp' => (string) time(),
+            'oauth_nonce' => strtolower(Text::getRandomString(32)),
+            'oauth_token' => $tokenValue,
+            'oauth_version' => '1.0',
+        ];
+
+        $baseString = Text::getBaseString($httpMethod, $url, $parameters);
+        $signature = (string) new Hmac(
+            $options['consumer_secret'],
+            $baseString
+        );
+        $parameters['oauth_signature'] = $signature;
+
+        $httpClient = self::getHttpClient();
+        $httpClientOptions = [
+            'debug' => 0,
+            'headers' => [
+                'Authorization' => Text::getHeaderString($parameters)
+            ],
+            'body' => [
+                'oauth_verifier' => $tokenVerify
+            ]
+        ];
+
+        $request = $httpClient->createRequest(
+            $httpMethod,
+            $url,
+            $httpClientOptions
+        );
+
+        try {
+            $response = $httpClient->send($request);
+            return AccessToken::factory($response, $serviceProvider);
+        } catch (RequestException $e) {
+            throw new \Eva\EvaOAuth\Exception\RequestException(
+                'Get request token failed',
+                $e->getRequest(),
+                $e->getResponse()
+            );
+        };
+    }
 
     /**
      * @param array $options

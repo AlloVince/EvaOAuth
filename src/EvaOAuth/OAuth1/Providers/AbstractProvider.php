@@ -45,7 +45,7 @@ class AbstractProvider implements ServiceProviderInterface
     /**
      * @var string
      */
-    protected $accessTokenFormat = ServiceProviderInterface::FORMAT_JSON;
+    protected $accessTokenFormat = ServiceProviderInterface::FORMAT_QUERY;
 
     /**
      * @return string

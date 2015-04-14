@@ -12,6 +12,7 @@ use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
 use Eva\EvaOAuth\OAuth2\Token\AccessToken;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
+use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -50,7 +51,7 @@ class AuthorizationCode implements GrantStrategyInterface
             'response_type' => 'code',
             'client_id' => $options['client_id'],
             'redirect_uri' => $options['redirect_uri'],
-            'state' => substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10),
+            'state' => Text::getRandomString()
         ];
         if ($options['scope']) {
             $authorizeQuery['scope'] = $options['scope'];
