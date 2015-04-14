@@ -47,6 +47,11 @@ interface ServiceProviderInterface
     /**
      * @return string
      */
+    public function getRequestTokenFormat();
+
+    /**
+     * @return string
+     */
     public function getAuthorizeUrl();
 
     /**

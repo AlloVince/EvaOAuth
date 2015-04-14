@@ -6,7 +6,7 @@
  */
 
 
-namespace Eva\EvaOAuthTest;
+namespace Eva\EvaOAuthTest\Utils;
 
 use Eva\EvaOAuth\Utils\ResponseParser;
 use GuzzleHttp\Message\Response;

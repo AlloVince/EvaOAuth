@@ -10,41 +10,70 @@ namespace Eva\EvaOAuth\OAuth1;
 
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\ClientConsumerTrait;
-use Guzzle\Http\Message\Request;
+use Eva\EvaOAuth\OAuth1\Signature\Hmac;
+use Eva\EvaOAuth\OAuth1\Signature\SignatureInterface;
+use Eva\EvaOAuth\OAuth1\Token\RequestToken;
+use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Exception\RequestException;
 
 class Consumer
 {
     use ClientConsumerTrait;
 
+    protected $signatureMethod = SignatureInterface::METHOD_HMAC_SHA1;
+
+    public function setSignatureMethod($signatureMethod)
+    {
+        $this->signatureMethod = $signatureMethod;
+        return $this;
+    }
+
+    public function getSignatureMethod()
+    {
+        return $this->signatureMethod;
+    }
+
     public function getRequestToken(ServiceProviderInterface $serviceProvider)
     {
         $options = $this->options;
 
+        $httpMethod = ServiceProviderInterface::METHOD_POST;
+
+        $url = $serviceProvider->getRequestTokenUrl();
+
         $parameters = [
             'oauth_consumer_key' => $options['consumer_key'],
-            'oauth_signature_method' => '',
-            'oauth_signature' => '',
-            'oauth_timestamp' => time(),
-            'oauth_nonce' => '',
-            'oauth_version' => '',
-            'oauth_callback' => $options['callback'],
-
+            'oauth_signature_method' => $this->signatureMethod,
+            'oauth_timestamp' => (string) time(),
+            'oauth_nonce' => strtolower(Text::getRandomString(32)),
+            'oauth_version' => '1.0',
+            //'oauth_callback' => $options['callback'],
         ];
 
+        $baseString = Text::getBaseString($httpMethod, $url, $parameters);
+        $signature = (string) new Hmac(
+            $options['consumer_secret'],
+            $baseString
+        );
+
+        $parameters['oauth_signature'] = $signature;
+
         $httpClient = self::getHttpClient();
-
-        $httpClientOptions = ['debug' => 0, 'body' => $parameters];
-
+        $httpClientOptions = [
+            'debug' => 0,
+            'headers' => [
+                'Authorization' => Text::getHeaderString($parameters)
+            ]
+        ];
         $request = $httpClient->createRequest(
-            'POST',
-            $serviceProvider->getRequestTokenUrl(),
+            $httpMethod,
+            $url,
             $httpClientOptions
         );
 
         try {
             $response = $httpClient->send($request);
-            return Request::factory($response, $serviceProvider);
+            return RequestToken::factory($response, $serviceProvider);
         } catch (RequestException $e) {
             throw new \Eva\EvaOAuth\Exception\RequestException(
                 'Get request token failed',
@@ -54,10 +83,16 @@ class Consumer
         }
     }
 
+    public function getAuthorizeUrl(ServiceProviderInterface $serviceProvider, RequestToken $requestToken)
+    {
+        $authorizeUrl = $serviceProvider->getAuthorizeUrl();
+        return $authorizeUrl . '?oauth_token=' . $requestToken->getTokenValue();
+    }
 
     public function requestAuthorize(ServiceProviderInterface $serviceProvider)
     {
-        $requestToken = $this->getRequestToken($serviceProvider);
+        $url = $this->getAuthorizeUrl($serviceProvider, $this->getRequestToken($serviceProvider));
+        header("Location:$url");
     }
 
     public function getAccessToken(ServiceProviderInterface $serviceProvider)

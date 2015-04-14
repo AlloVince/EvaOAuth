@@ -18,6 +18,13 @@ use GuzzleHttp\Message\Response;
 interface RequestTokenInterface
 {
     /**
+     * @param Response $response
+     * @param ServiceProviderInterface $serviceProvider
+     * @return AccessTokenInterface
+     */
+    public static function factory(Response $response, ServiceProviderInterface $serviceProvider);
+
+    /**
      * @return string
      */
     public function getTokenValue();

@@ -11,8 +11,17 @@ namespace Eva\EvaOAuth\OAuth1\Providers;
 use Eva\EvaOAuth\OAuth1\ServiceProviderInterface;
 use Eva\EvaOAuth\OAuth1\Token\AccessToken;
 
+/**
+ * Class AbstractProvider
+ * @package Eva\EvaOAuth\OAuth1\Providers
+ */
 class AbstractProvider implements ServiceProviderInterface
 {
+    /**
+     * @var string
+     */
+    protected $requestTokenFormat = ServiceProviderInterface::FORMAT_QUERY;
+
     /**
      * @var string
      */
@@ -44,6 +53,14 @@ class AbstractProvider implements ServiceProviderInterface
     public function getRequestTokenUrl()
     {
         return $this->requestTokenUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequestTokenFormat()
+    {
+        return $this->requestTokenFormat;
     }
 
     /**

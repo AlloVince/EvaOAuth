@@ -12,7 +12,9 @@
     ],
     "require": {
       "php": ">=5.3.3",
-      "guzzlehttp/guzzle": "5.2.*"
+      "guzzlehttp/guzzle": "5.2.*",
+      "guzzlehttp/log-subscriber": "~1.0",
+      "monolog/monolog": "1.13.*"
     },
     "require-dev": {
       "satooshi/php-coveralls": "dev-master"

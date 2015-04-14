@@ -86,6 +86,10 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
         return $token;
     }
 
+    /**
+     * @param Response $response
+     * @return $this
+     */
     public function setResponse(Response $response)
     {
         $this->response = $response;
