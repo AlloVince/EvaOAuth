@@ -51,7 +51,7 @@ class AuthorizationCode implements GrantStrategyInterface
             'response_type' => 'code',
             'client_id' => $options['client_id'],
             'redirect_uri' => $options['redirect_uri'],
-            'state' => Text::getRandomString()
+            'state' => Text::generateRandomString()
         ];
         if ($options['scope']) {
             $authorizeQuery['scope'] = $options['scope'];

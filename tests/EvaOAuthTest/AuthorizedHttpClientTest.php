@@ -14,9 +14,6 @@ class AuthorizedHttpClientTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->mock = new Mock([
-            new Response(200, ['Content-Type' => 'javascript'], Stream::factory('{"status":"success"}')),
-        ]);
     }
 
     public function testHeader()
@@ -24,7 +21,11 @@ class AuthorizedHttpClientTest extends \PHPUnit_Framework_TestCase
         /** @var Client $client */
         $client = new AuthorizedHttpClient(new AccessToken('foo'));
         $request = $client->createRequest('GET', 'http://baidu.com');
-        $client->getEmitter()->attach($this->mock);
+        $client->getEmitter()->attach(
+            new Mock([
+                new Response(200, [], Stream::factory('some response')),
+            ])
+        );
         $client->send($request);
         $this->assertEquals('Bearer foo', $request->getHeader('Authorization'));
     }

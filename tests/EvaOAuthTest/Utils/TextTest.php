@@ -16,18 +16,38 @@ use GuzzleHttp\Stream\Stream;
 class TextTest extends \PHPUnit_Framework_TestCase
 {
 
+    public function testHeaderString()
+    {
+
+        $this->assertEquals('OAuth foo="bar"', Text::buildHeaderString([
+            'foo' => 'bar'
+        ]));
+
+        $this->assertEquals('OAuth foo="bar", tfoo="tbar"', Text::buildHeaderString([
+            'tfoo' => 'tbar',
+            'foo' => 'bar'
+        ]));
+
+    }
+
+    public function testRandomString()
+    {
+        $this->assertEquals(8, strlen(Text::generateRandomString(8)));
+        $this->assertEquals(32, strlen(Text::generateRandomString(32)));
+    }
+
     public function testBaseString()
     {
         $this->assertEquals(
             'POST&http%3A%2F%2Ffoo&callback%3Dhttp%3A%2F%2Fbar',
-            Text::getBaseString('post', 'http://foo', ['callback' => 'http://bar'])
+            Text::buildBaseString('post', 'http://foo', ['callback' => 'http://bar'])
         );
 
-        $this->assertEquals('POST&url&foo%3Dbar', Text::getBaseString('post', 'url', ['foo' => 'bar']));
+        $this->assertEquals('POST&url&foo%3Dbar', Text::buildBaseString('post', 'url', ['foo' => 'bar']));
 
         $this->assertEquals(
             'POST&https%3A%2F%2Fapi.twitter.com%2Foauth%2Frequest_token&oauth_consumer_key%3DX6vZ7YDHiod0hUyTQj0Gw%26oauth_nonce%3Dddb73c89364451560652f53bcd8f14f7%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1428979350%26oauth_version%3D1.0',
-            Text::getBaseString('post', 'https://api.twitter.com/oauth/request_token', [
+            Text::buildBaseString('post', 'https://api.twitter.com/oauth/request_token', [
                 'oauth_consumer_key' => 'X6vZ7YDHiod0hUyTQj0Gw',
                 'oauth_signature_method' => 'HMAC-SHA1',
                 'oauth_timestamp' => '1428979350',

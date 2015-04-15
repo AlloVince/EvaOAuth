@@ -19,12 +19,14 @@ interface AccessTokenInterface
 {
     const TYPE_BEARER = 'Bearer';
 
+    const TYPE_OAUTH = 'OAuth';
+
     /**
      * @param Response $response
      * @param ServiceProviderInterface $serviceProvider
      * @return AccessTokenInterface
      */
-    public static function factory(Response $response, ServiceProviderInterface $serviceProvider);
+    public static function factory(Response $response, ServiceProviderInterface $serviceProvider, array $options);
 
     /**
      * @return string
@@ -32,9 +34,17 @@ interface AccessTokenInterface
     public function getTokenSecret();
 
     /**
-     * @param $tokenValue
-     * @param $tokenSecret
+     * @return string
+     */
+    public function getConsumerKey();
+
+    /**
+     * @return string
+     */
+    public function getConsumerSecret();
+
+    /**
      * @param array $tokenArray
      */
-    public function __construct($tokenValue, $tokenSecret, array $tokenArray = []);
+    public function __construct(array $tokenArray);
 }

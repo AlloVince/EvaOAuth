@@ -8,6 +8,7 @@
 
 namespace Eva\EvaOAuth\OAuth1\Token;
 
+use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth1\ServiceProviderInterface;
 use Eva\EvaOAuth\Token\AccessTokenInterface as BaseTokenInterface;
 use Eva\EvaOAuth\Utils\ResponseParser;
@@ -43,33 +44,39 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     /**
      * @var string
      */
-    protected $tokenVersion = BaseTokenInterface::VERSION_OAUTH2;
+    protected $tokenVersion = BaseTokenInterface::VERSION_OAUTH1;
+
+    /**
+     * @var string
+     */
+    protected $consumerKey;
+
+    /**
+     * @var string
+     */
+    protected $consumerSecret;
 
     /**
      * @var array
      */
     protected $extra;
 
-
-    /**
-     * @return string
-     */
-    public function getTokenVersion()
-    {
-        return $this->tokenVersion;
-    }
-
     /**
      * @param Response $response
      * @param ServiceProviderInterface $serviceProvider
-     * @return static
+     * @return AccessToken
      */
-    public static function factory(Response $response, ServiceProviderInterface $serviceProvider)
+    public static function factory(Response $response, ServiceProviderInterface $serviceProvider, array $options)
     {
         $rawToken = ResponseParser::parse($response, $serviceProvider->getAccessTokenFormat());
         $tokenValue = empty($rawToken['oauth_token']) ? '' : $rawToken['oauth_token'];
         $tokenSecret = empty($rawToken['oauth_token_secret']) ? '' : $rawToken['oauth_token_secret'];
-        $token = new static($tokenValue, $tokenSecret);
+        $token = new static([
+            'consumer_key' => $options['consumer_key'],
+            'consumer_secret' => $options['consumer_secret'],
+            'token_value' => $tokenValue,
+            'token_secret' => $tokenSecret,
+        ]);
         $token->setResponse($response);
         foreach ($rawToken as $key => $value) {
             $token->$key = $value;
@@ -98,11 +105,22 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     /**
      * @return string
      */
+    public function getTokenVersion()
+    {
+        return $this->tokenVersion;
+    }
+
+    /**
+     * @return string
+     */
     public function getTokenValue()
     {
         return $this->tokenValue;
     }
 
+    /**
+     * @return string
+     */
     public function getTokenSecret()
     {
         return $this->tokenSecret;
@@ -114,6 +132,22 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     public function getTokenType()
     {
         return $this->tokenType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConsumerKey()
+    {
+        return $this->consumerKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConsumerSecret()
+    {
+        return $this->consumerSecret;
     }
 
     /**
@@ -133,21 +167,45 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     }
 
     /**
-     * @param string $tokenValue
-     * @param string $tokenSecret
-     * @param array $tokenArray
-     * @throws InvalidArgumentException
+     * @param $name
+     * @param $value
+     * @return $this
      */
-    public function __construct($tokenValue, $tokenSecret, array $tokenArray = [])
+    public function __set($name, $value)
     {
-        $this->tokenValue = (string)$tokenValue;
-        $this->tokenSecret = (string)$tokenSecret;
-        if (!$this->tokenValue) {
+        $fieldsMapping = [
+            'consumer_key' => 'consumerKey',
+            'consumer_secret' => 'consumerSecret',
+            'token_value' => 'tokenValue',
+            'token_secret' => 'tokenSecret',
+        ];
+
+        if (array_key_exists($name, $fieldsMapping)) {
+            $field = $fieldsMapping[$name];
+            $this->$field = $value;
+        }
+
+        return $this;
+    }
+
+
+    public function __construct(array $tokenParams)
+    {
+        $tokenParams = array_merge([
+            'consumer_key' => '',
+            'consumer_secret' => '',
+            'token_value' => '',
+            'token_secret' => '',
+        ], $tokenParams);
+
+        if (!$tokenParams['consumer_key'] || !$tokenParams['consumer_secret'] || !$tokenParams['token_value'] || !$tokenParams['token_secret']) {
             throw new InvalidArgumentException("No token value input");
         }
 
-        foreach ($tokenArray as $key => $value) {
+        foreach ($tokenParams as $key => $value) {
             $this->$key = $value;
         }
     }
+
+
 }

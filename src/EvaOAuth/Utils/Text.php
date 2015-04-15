@@ -10,7 +10,7 @@ namespace Eva\EvaOAuth\Utils;
 
 class Text
 {
-    public static function getHeaderString(array $header)
+    public static function buildHeaderString(array $header)
     {
         ksort($header);
         $encodedHeader = [];
@@ -20,14 +20,14 @@ class Text
         return 'OAuth ' . implode(', ', $encodedHeader);
     }
 
-    public static function getRandomString($length = 10)
+    public static function generateRandomString($length = 10)
     {
         $length = (int) $length;
         $length = $length > 0 ? $length : 10;
         return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
     }
 
-    public static function getBaseString($method, $url, array $params)
+    public static function buildBaseString($method, $url, array $params)
     {
         ksort($params);
 

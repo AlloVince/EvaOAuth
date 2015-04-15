@@ -15,12 +15,25 @@ use Eva\EvaOAuth\User\StandardUser;
 use GuzzleHttp\Subscriber\Log\Formatter;
 use GuzzleHttp\Subscriber\Log\LogSubscriber;
 
+/**
+ * Class Twitter
+ * @package Eva\EvaOAuth\OAuth1\Providers
+ */
 class Twitter extends AbstractProvider
 {
+    /**
+     * @var string
+     */
     protected $requestTokenUrl = 'https://api.twitter.com/oauth/request_token';
 
+    /**
+     * @var string
+     */
     protected $authorizeUrl = 'https://api.twitter.com/oauth/authorize';
 
+    /**
+     * @var string
+     */
     protected $accessTokenUrl = 'https://api.twitter.com/oauth/access_token';
 
     /**
@@ -38,12 +51,10 @@ class Twitter extends AbstractProvider
         $user = new StandardUser([
             'version' => AccessTokenInterface::VERSION_OAUTH1,
             'provider' => 'Twitter',
-            /*
             'id' => $rawUser['id'],
-            'name' => $rawUser['uid'],
-            'avatar' => $rawUser['avatar'],
+            'name' => $rawUser['name'],
+            'avatar' => $rawUser['profile_image_url'],
             'extra' => $rawUser,
-            */
         ]);
         return $user;
     }
