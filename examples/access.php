@@ -1,6 +1,6 @@
 <?php
-require_once 'client.php';
+require_once 'service.php';
 
 echo '<pre>';
-$token = $client->getAccessToken(new $providerClass());
+$token = $service->getAccessToken();
 var_dump($token);

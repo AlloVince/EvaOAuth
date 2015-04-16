@@ -8,8 +8,9 @@
 namespace Eva\EvaOAuth;
 
 use Eva\EvaOAuth\Storage\StorageInterface;
+use GuzzleHttp\Client;
 
-trait ClientConsumerTrait
+trait AdapterTrait
 {
     /**
      * @var \GuzzleHttp\Client
@@ -52,7 +53,15 @@ trait ClientConsumerTrait
             return self::$httpClient;
         }
 
-        return self::$httpClient = new \GuzzleHttp\Client(self::$httpClientDefaultOptions);
+        return self::$httpClient = new Client(self::$httpClientDefaultOptions);
+    }
+
+    /**
+     * @param Client $httpClient
+     */
+    public static function setHttpClient(Client $httpClient)
+    {
+        self::$httpClient = $httpClient;
     }
 
     public static function getStorage()

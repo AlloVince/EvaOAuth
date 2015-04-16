@@ -9,7 +9,7 @@
 namespace Eva\EvaOAuth\OAuth1;
 
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
-use Eva\EvaOAuth\ClientConsumerTrait;
+use Eva\EvaOAuth\AdapterTrait;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
 use Eva\EvaOAuth\OAuth1\Signature\SignatureInterface;
 use Eva\EvaOAuth\OAuth1\Token\AccessToken;
@@ -23,7 +23,7 @@ use GuzzleHttp\Exception\RequestException;
  */
 class Consumer
 {
-    use ClientConsumerTrait;
+    use AdapterTrait;
 
     /**
      * @var string

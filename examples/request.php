@@ -1,3 +1,4 @@
 <?php
-require_once 'client.php';
-$client->requestAuthorize(new $providerClass());
+
+require_once 'service.php';
+$service->requestAuthorize();

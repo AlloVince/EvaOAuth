@@ -7,7 +7,7 @@
 
 namespace Eva\EvaOAuth\OAuth2;
 
-use Eva\EvaOAuth\ClientConsumerTrait;
+use Eva\EvaOAuth\AdapterTrait;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth2\Token\AccessToken;
 use Eva\EvaOAuth\Storage\StorageInterface;
@@ -60,7 +60,7 @@ class Client
      */
     protected static $grantStrategyMapping = [];
 
-    use ClientConsumerTrait;
+    use AdapterTrait;
 
     /**
      * @param AccessToken $token
