@@ -9,6 +9,10 @@ return [
         'key' => '',
         'secret' => '',
     ],
+    'weibo' => [
+        'key' => '',
+        'secret' => '',
+    ],
     'hundsun' => [
         'key' => '',
         'secret' => ''

@@ -17,6 +17,7 @@
       "monolog/monolog": "1.13.*"
     },
     "require-dev": {
+      "mockery/mockery": "dev-master",
       "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {

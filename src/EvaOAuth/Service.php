@@ -61,6 +61,7 @@ class Service
         'twitter' => 'Eva\EvaOAuth\OAuth1\Providers\Twitter',
         'douban' => 'Eva\EvaOAuth\OAuth2\Providers\Douban',
         'tencent' => 'Eva\EvaOAuth\OAuth2\Providers\Tencent',
+        'weibo' => 'Eva\EvaOAuth\OAuth2\Providers\Weibo',
         'hundsun' => 'Eva\EvaOAuth\OAuth2\Providers\Hundsun',
     ];
 
@@ -81,6 +82,22 @@ class Service
         foreach ($classes as $name => $class) {
             self::$providers[$name] = $class;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public static function getProviders()
+    {
+        return self::$providers;
+    }
+
+    /**
+     * @return OAuth1Provider|OAuth2Provider
+     */
+    public function getProvider()
+    {
+        return $this->provider;
     }
 
     /**
@@ -141,6 +158,18 @@ class Service
         $log->pushHandler(new StreamHandler($logPath, Logger::DEBUG));
         $adapter = $this->getAdapter();
         $adapter::getHttpClient()->getEmitter()->attach(new LogSubscriber($log, Formatter::DEBUG));
+        return $this;
+    }
+
+    /**
+     * Enable debug mode
+     * Guzzle will print all request and response on screen
+     * @return $this
+     */
+    public function debug()
+    {
+        $adapter = $this->getAdapter();
+        $adapter::getHttpClient()->getEmitter()->attach(new LogSubscriber(og, Formatter::DEBUG));
         return $this;
     }
 
