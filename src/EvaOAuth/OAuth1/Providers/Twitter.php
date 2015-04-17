@@ -12,8 +12,7 @@ use Eva\EvaOAuth\AuthorizedHttpClient;
 use Eva\EvaOAuth\OAuth1\Token\AccessToken;
 use Eva\EvaOAuth\Token\AccessTokenInterface;
 use Eva\EvaOAuth\User\StandardUser;
-use GuzzleHttp\Subscriber\Log\Formatter;
-use GuzzleHttp\Subscriber\Log\LogSubscriber;
+use GuzzleHttp\Message\Response;
 
 /**
  * Class Twitter
@@ -42,8 +41,8 @@ class Twitter extends AbstractProvider
      */
     public function getUser(AccessToken $token)
     {
+        /** @var \GuzzleHttp\Client $httpClient */
         $httpClient = new AuthorizedHttpClient($token);
-        $httpClient->getEmitter()->attach(new LogSubscriber(null, Formatter::DEBUG));
         /** @var Response $response */
         $response = $httpClient->get('https://api.twitter.com/1.1/account/verify_credentials.json');
         $rawUser = $response->json();

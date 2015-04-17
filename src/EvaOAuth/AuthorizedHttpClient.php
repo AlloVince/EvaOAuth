@@ -13,11 +13,9 @@ use Eva\EvaOAuth\Token\AccessTokenInterface;
 use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Client;
 use Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface as OAuth2AccessTokenInterface;
-use Eva\EvaOAuth\OAuth1\Token\AccessTokenInterface as OAuth1AccessTokenInterface;
 use GuzzleHttp\Event\BeforeEvent;
 use Guzzle\Http\Message\Request;
 use GuzzleHttp\Url;
-
 
 /**
  * Class AuthorizedHttpClient
@@ -61,7 +59,7 @@ class AuthorizedHttpClient
             $httpClient->getEmitter()->on(
                 'before',
                 function (BeforeEvent $event) use ($token) {
-                    /** @var OAuth2AccessTokenInterface $token */
+                    /** @var \Eva\EvaOAuth\OAuth2\Token\AccessToken $token */
                     $event->getRequest()->setHeader(
                         'Authorization',
                         $token->getTokenType() . ' ' . $token->getTokenValue()
@@ -74,7 +72,7 @@ class AuthorizedHttpClient
                 function (BeforeEvent $event) use ($token) {
                     /** @var Request $request */
                     $request = $event->getRequest();
-                    /** @var OAuth1AccessTokenInterface $token */
+                    /** @var \Eva\EvaOAuth\OAuth1\Token\AccessToken $token */
 
                     $httpMethod = strtoupper($request->getMethod());
                     $url = Url::fromString($request->getUrl());

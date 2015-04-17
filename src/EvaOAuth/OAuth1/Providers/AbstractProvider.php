@@ -8,6 +8,7 @@
 
 namespace Eva\EvaOAuth\OAuth1\Providers;
 
+use Eva\EvaOAuth\Exception\BadMethodCallException;
 use Eva\EvaOAuth\OAuth1\ServiceProviderInterface;
 use Eva\EvaOAuth\OAuth1\Token\AccessToken;
 
@@ -103,6 +104,4 @@ class AbstractProvider implements ServiceProviderInterface
     {
         throw new BadMethodCallException(sprintf("Not supported feature"));
     }
-
-
 }

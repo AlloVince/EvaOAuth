@@ -24,6 +24,7 @@ interface AccessTokenInterface
     /**
      * @param Response $response
      * @param ServiceProviderInterface $serviceProvider
+     * @param array $options
      * @return AccessTokenInterface
      */
     public static function factory(Response $response, ServiceProviderInterface $serviceProvider, array $options);

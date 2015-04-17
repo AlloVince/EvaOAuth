@@ -64,6 +64,7 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     /**
      * @param Response $response
      * @param ServiceProviderInterface $serviceProvider
+     * @param array $options
      * @return AccessToken
      */
     public static function factory(Response $response, ServiceProviderInterface $serviceProvider, array $options)
@@ -198,7 +199,8 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
             'token_secret' => '',
         ], $tokenParams);
 
-        if (!$tokenParams['consumer_key'] || !$tokenParams['consumer_secret'] || !$tokenParams['token_value'] || !$tokenParams['token_secret']) {
+        if (!$tokenParams['consumer_key'] || !$tokenParams['consumer_secret'] ||
+            !$tokenParams['token_value'] || !$tokenParams['token_secret']) {
             throw new InvalidArgumentException("No token value input");
         }
 
@@ -206,6 +208,4 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
             $this->$key = $value;
         }
     }
-
-
 }

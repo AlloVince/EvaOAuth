@@ -10,7 +10,6 @@ namespace Eva\EvaOAuth\OAuth2;
 use Eva\EvaOAuth\AdapterTrait;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth2\Token\AccessToken;
-use Eva\EvaOAuth\Storage\StorageInterface;
 use Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;
 
 /**
@@ -156,7 +155,7 @@ class Client
      */
     public function requestAuthorize(AuthorizationServerInterface $authServer)
     {
-        return $this->getGrantStrategy()->requestAuthorize($authServer);
+        $this->getGrantStrategy()->requestAuthorize($authServer);
     }
 
     /**

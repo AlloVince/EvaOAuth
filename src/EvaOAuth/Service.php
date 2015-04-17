@@ -11,11 +11,27 @@ use Eva\EvaOAuth\Exception\BadMethodCallException;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth1\Consumer;
 use Eva\EvaOAuth\OAuth2\Client;
+use GuzzleHttp\Subscriber\Log\Formatter;
+use GuzzleHttp\Subscriber\Log\LogSubscriber;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Eva\EvaOAuth\OAuth1\Providers\AbstractProvider as OAuth1Provider;
+use Eva\EvaOAuth\OAuth2\Providers\AbstractProvider as OAuth2Provider;
 
+/**
+ * Class Service
+ * @package Eva\EvaOAuth
+ */
 class Service
 {
+    /**
+     * OAuth 1 flag
+     */
     const OAUTH_VERSION_1 = 'OAuth1';
 
+    /**
+     * OAuth 2 flag
+     */
     const OAUTH_VERSION_2 = 'OAuth2';
 
     /**
@@ -34,7 +50,7 @@ class Service
     protected $version;
 
     /**
-     * @var
+     * @var OAuth1Provider|OAuth2Provider
      */
     protected $provider;
 
@@ -67,23 +83,38 @@ class Service
         }
     }
 
+    /**
+     * @return Consumer|Client
+     */
+    public function getAdapter()
+    {
+        if ($this->version === self::OAUTH_VERSION_2) {
+            return $this->client;
+        }
+        return $this->consumer;
+    }
 
+    /**
+     * Redirect to authorize url
+     */
     public function requestAuthorize()
     {
-        if ($this->version === self::OAUTH_VERSION_2) {
-            return $this->client->requestAuthorize($this->provider);
-        }
-        return $this->consumer->requestAuthorize($this->provider);
+        $this->getAdapter()->requestAuthorize($this->provider);
     }
 
+    /**
+     * @return Token\AccessTokenInterface
+     */
     public function getAccessToken()
     {
-        if ($this->version === self::OAUTH_VERSION_2) {
-            return $this->client->getAccessToken($this->provider);
-        }
-        return $this->consumer->getAccessToken($this->provider);
+        return $this->getAdapter()->getAccessToken($this->provider);
     }
 
+    /**
+     * @param array $options
+     * @param $version
+     * @return array
+     */
     public function convertOptions(array $options, $version)
     {
         if ($version === self::OAUTH_VERSION_2) {
@@ -100,6 +131,23 @@ class Service
         ], $options);
     }
 
+    /**
+     * @param string $logPath
+     * @return $this
+     */
+    public function setLogPath($logPath)
+    {
+        $log = new Logger('EvaOAuth');
+        $log->pushHandler(new StreamHandler($logPath, Logger::DEBUG));
+        $adapter = $this->getAdapter();
+        $adapter::getHttpClient()->getEmitter()->attach(new LogSubscriber($log, Formatter::DEBUG));
+        return $this;
+    }
+
+    /**
+     * @param string $providerName
+     * @param array $options
+     */
     public function __construct($providerName, array $options)
     {
         $providerName = strtolower($providerName);

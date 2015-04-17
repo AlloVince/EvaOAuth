@@ -93,7 +93,7 @@ class AuthorizationCode implements GrantStrategyInterface
         $method = $resourceServer->getAccessTokenMethod();
         $httpClientOptions = ($method == ResourceServerInterface::METHOD_GET) ?
             ['query' => $parameters] :
-            ['debug' => 0, 'body' => $parameters];
+            ['body' => $parameters];
 
         $request = $httpClient->createRequest(
             $method,

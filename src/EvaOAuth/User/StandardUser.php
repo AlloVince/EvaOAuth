@@ -5,9 +5,12 @@
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
 
-
 namespace Eva\EvaOAuth\User;
 
+/**
+ * Class StandardUser
+ * @package Eva\EvaOAuth\User
+ */
 class StandardUser implements UserInterface
 {
     /**
@@ -99,6 +102,11 @@ class StandardUser implements UserInterface
     public function getExtra()
     {
         return $this->extra;
+    }
+
+    public function toArray()
+    {
+
     }
 
     /**

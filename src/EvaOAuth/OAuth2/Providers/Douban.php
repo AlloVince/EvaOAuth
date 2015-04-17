@@ -12,6 +12,7 @@ use Eva\EvaOAuth\OAuth2\Token\AccessToken;
 use Eva\EvaOAuth\Token\AccessTokenInterface;
 use Eva\EvaOAuth\User\StandardUser;
 use GuzzleHttp\Message\Response;
+use GuzzleHttp\Client;
 
 /**
  * Class Douban
@@ -35,6 +36,7 @@ class Douban extends AbstractProvider
      */
     public function getUser(AccessToken $token)
     {
+        /** @var Client $httpClient */
         $httpClient = new AuthorizedHttpClient($token);
         /** @var Response $response */
         $response = $httpClient->get('https://api.douban.com/v2/user/~me');

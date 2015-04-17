@@ -17,6 +17,7 @@ use Eva\EvaOAuth\Token\AccessTokenInterface;
 interface UserProviderInterface
 {
     /**
+     * @param AccessTokenInterface $token
      * @return UserInterface
      */
     public function getUser(AccessTokenInterface $token);
