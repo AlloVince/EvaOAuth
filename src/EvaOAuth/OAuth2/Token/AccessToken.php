@@ -9,6 +9,7 @@
 namespace Eva\EvaOAuth\OAuth2\Token;
 
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
+use Eva\EvaOAuth\Token\TokenTrait;
 use Eva\EvaOAuth\Utils\ResponseParser;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use GuzzleHttp\Message\Response;
@@ -20,15 +21,7 @@ use Eva\EvaOAuth\Token\AccessTokenInterface as BaseTokenInterface;
  */
 class AccessToken implements AccessTokenInterface, BaseTokenInterface
 {
-    /**
-     * @var Response
-     */
-    protected $response;
-
-    /**
-     * @var string
-     */
-    protected $tokenValue;
+    use TokenTrait;
 
     /**
      * @var string
@@ -60,15 +53,6 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
      */
     protected $extra;
 
-
-    /**
-     * @return string
-     */
-    public function getTokenVersion()
-    {
-        return $this->tokenVersion;
-    }
-
     /**
      * @param Response $response
      * @param ResourceServerInterface $resourceServer
@@ -84,40 +68,6 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
             $token->$key = $value;
         }
         return $token;
-    }
-
-    /**
-     * @param Response $response
-     * @return $this
-     */
-    public function setResponse(Response $response)
-    {
-        $this->response = $response;
-        return $this;
-    }
-
-    /**
-     * @return Response
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTokenValue()
-    {
-        return $this->tokenValue;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTokenType()
-    {
-        return $this->tokenType;
     }
 
     /**
@@ -153,25 +103,12 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     }
 
     /**
-     * @return array
-     */
-    public function toArray()
-    {
-        // TODO: Implement toArray() method.
-    }
-
-    /**
      * @param $name
      * @param $value
      * @return $this
      */
     public function __set($name, $value)
     {
-        if (isset($this->$name)) {
-            $this->$name = $value;
-            return $this;
-        }
-
         $fieldsMapping = [
             'access_token' => 'tokenValue',
             'refresh_token' => 'refreshToken',

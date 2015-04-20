@@ -25,7 +25,7 @@ class FooStrategy implements GrantStrategyInterface
      */
     public function getAuthorizeUrl(AuthorizationServerInterface $authServer)
     {
-        // TODO: Implement getAuthorizeUrl() method.
+        // TODO: Implement getAuthorizeUri() method.
     }
 
     /**

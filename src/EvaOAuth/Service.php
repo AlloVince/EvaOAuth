@@ -112,6 +112,28 @@ class Service
     }
 
     /**
+     * @return \GuzzleHttp\Client
+     */
+    public function getHttpClient()
+    {
+        $adapter = $this->getAdapter();
+        return $adapter::getHttpClient();
+    }
+
+    /**
+     * @return string
+     */
+    public function getAuthorizeUri()
+    {
+        $adapter = $this->getAdapter();
+        if ($this->version === self::OAUTH_VERSION_2) {
+            return $adapter->getAuthorizeUri($this->provider);
+        }
+        $requestToken = $adapter->getRequestToken($this->provider);
+        return $adapter->getAuthorizeUri($this->provider, $requestToken);
+    }
+
+    /**
      * Redirect to authorize url
      */
     public function requestAuthorize()
@@ -169,7 +191,7 @@ class Service
     public function debug()
     {
         $adapter = $this->getAdapter();
-        $adapter::getHttpClient()->getEmitter()->attach(new LogSubscriber(og, Formatter::DEBUG));
+        $adapter::getHttpClient()->getEmitter()->attach(new LogSubscriber(null, Formatter::DEBUG));
         return $this;
     }
 

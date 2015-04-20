@@ -21,6 +21,11 @@ class AbstractProvider implements ServiceProviderInterface
     /**
      * @var string
      */
+    protected $providerName;
+
+    /**
+     * @var string
+     */
     protected $requestTokenFormat = ServiceProviderInterface::FORMAT_QUERY;
 
     /**
@@ -47,6 +52,17 @@ class AbstractProvider implements ServiceProviderInterface
      * @var string
      */
     protected $accessTokenFormat = ServiceProviderInterface::FORMAT_QUERY;
+
+    /**
+     * @return string
+     */
+    public function getProviderName()
+    {
+        if ($this->providerName) {
+            return $this->providerName;
+        }
+        return $this->providerName = array_pop(explode('\\', __CLASS__));
+    }
 
     /**
      * @return string

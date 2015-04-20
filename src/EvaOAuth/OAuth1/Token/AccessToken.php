@@ -11,6 +11,7 @@ namespace Eva\EvaOAuth\OAuth1\Token;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth1\ServiceProviderInterface;
 use Eva\EvaOAuth\Token\AccessTokenInterface as BaseTokenInterface;
+use Eva\EvaOAuth\Token\TokenTrait;
 use Eva\EvaOAuth\Utils\ResponseParser;
 use GuzzleHttp\Message\Response;
 
@@ -20,16 +21,7 @@ use GuzzleHttp\Message\Response;
  */
 class AccessToken implements AccessTokenInterface, BaseTokenInterface
 {
-
-    /**
-     * @var Response
-     */
-    protected $response;
-
-    /**
-     * @var string
-     */
-    protected $tokenValue;
+    use TokenTrait;
 
     /**
      * @var string
@@ -86,53 +78,11 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
     }
 
     /**
-     * @param Response $response
-     * @return $this
-     */
-    public function setResponse(Response $response)
-    {
-        $this->response = $response;
-        return $this;
-    }
-
-    /**
-     * @return Response
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTokenVersion()
-    {
-        return $this->tokenVersion;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTokenValue()
-    {
-        return $this->tokenValue;
-    }
-
-    /**
      * @return string
      */
     public function getTokenSecret()
     {
         return $this->tokenSecret;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTokenType()
-    {
-        return $this->tokenType;
     }
 
     /**
@@ -159,13 +109,6 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
         return $this->extra;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        // TODO: Implement toArray() method.
-    }
 
     /**
      * @param $name
@@ -200,7 +143,8 @@ class AccessToken implements AccessTokenInterface, BaseTokenInterface
         ], $tokenParams);
 
         if (!$tokenParams['consumer_key'] || !$tokenParams['consumer_secret'] ||
-            !$tokenParams['token_value'] || !$tokenParams['token_secret']) {
+            !$tokenParams['token_value'] || !$tokenParams['token_secret']
+        ) {
             throw new InvalidArgumentException("No token value input");
         }
 

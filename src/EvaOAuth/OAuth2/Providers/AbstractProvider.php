@@ -21,6 +21,11 @@ abstract class AbstractProvider implements AuthorizationServerInterface, Resourc
     /**
      * @var string
      */
+    protected $providerName;
+
+    /**
+     * @var string
+     */
     protected $authorizeUrl;
 
     /**
@@ -37,6 +42,17 @@ abstract class AbstractProvider implements AuthorizationServerInterface, Resourc
      * @var string
      */
     protected $accessTokenFormat = ResourceServerInterface::FORMAT_JSON;
+
+    /**
+     * @return string
+     */
+    public function getProviderName()
+    {
+        if ($this->providerName) {
+            return $this->providerName;
+        }
+        return $this->providerName = array_pop(explode('\\', __CLASS__));
+    }
 
     /**
      * @return string

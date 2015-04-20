@@ -28,6 +28,34 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('GuzzleHttp\Message\Response', $token->getResponse());
     }
 
+    public function testToArray()
+    {
+        $token = new AccessToken('test_value', [
+            'expires_in' => 1234,
+            'refresh_token' => 'test_refresh_token',
+            'scope' => 'test_scope',
+            'foo' => 'test_foo',
+            'bar' => 'test_bar',
+        ]);
+
+        $this->assertEquals('test_scope', $token->getScope());
+        $this->assertEquals([
+            'foo' => 'test_foo',
+            'bar' => 'test_bar',
+        ], $token->getExtra());
+
+
+        $tokenArray = $token->toArray();
+        $this->assertEquals('test_value', $tokenArray['tokenValue']);
+        $this->assertEquals('test_refresh_token', $tokenArray['refreshToken']);
+        $this->assertEquals('test_scope', $tokenArray['scope']);
+        $this->assertEquals([
+            'foo' => 'test_foo',
+            'bar' => 'test_bar',
+        ], $tokenArray['extra']);
+    }
+
+
     /**
      * @expectedException Eva\EvaOAuth\Exception\InvalidArgumentException
      */

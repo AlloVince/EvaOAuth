@@ -106,7 +106,7 @@ class Consumer
      * @param RequestToken $requestToken
      * @return string
      */
-    public function getAuthorizeUrl(ServiceProviderInterface $serviceProvider, RequestToken $requestToken)
+    public function getAuthorizeUri(ServiceProviderInterface $serviceProvider, RequestToken $requestToken)
     {
         $authorizeUrl = $serviceProvider->getAuthorizeUrl();
         return $authorizeUrl . '?oauth_token=' . $requestToken->getTokenValue();
@@ -117,7 +117,7 @@ class Consumer
      */
     public function requestAuthorize(ServiceProviderInterface $serviceProvider)
     {
-        $url = $this->getAuthorizeUrl($serviceProvider, $this->getRequestToken($serviceProvider));
+        $url = $this->getAuthorizeUri($serviceProvider, $this->getRequestToken($serviceProvider));
         header("Location:$url");
     }
 

@@ -9,8 +9,15 @@ use Eva\EvaOAuth\OAuth2\Client;
 class ServiceTest extends \PHPUnit_Framework_TestCase
 {
 
+    protected $options;
+
     public function setUp()
     {
+        $this->options = [
+            'key' => 'test_key',
+            'secret' => 'test_secret',
+            'callback' => 'test_callback',
+        ];
     }
 
     /**
@@ -23,18 +30,10 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testConstruct()
     {
-        $service = new Service('douban', [
-            'key' => 'test_key',
-            'secret' => 'test_secret',
-            'callback' => 'test_callback',
-        ]);
+        $service = new Service('douban', $this->options);
         $this->assertInstanceOf('Eva\EvaOAuth\OAuth2\Client', $service->getAdapter());
 
-        $service = new Service('twitter', [
-            'key' => 'test_key',
-            'secret' => 'test_secret',
-            'callback' => 'test_callback',
-        ]);
+        $service = new Service('twitter', $this->options);
         $this->assertInstanceOf('Eva\EvaOAuth\OAuth1\Consumer', $service->getAdapter());
     }
 
@@ -45,11 +44,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     {
         \Mockery::namedMock('FooProvider');
         Service::registerProvider('foo', 'FooProvider');
-        $service = new Service('foo', [
-            'key' => 'test_key',
-            'secret' => 'test_secret',
-            'callback' => 'test_callback',
-        ]);
+        $service = new Service('foo', $this->options);
     }
 
     public function testRegisterProvider()
@@ -63,11 +58,14 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('foo', Service::getProviders());
         $this->assertArrayHasKey('bar', Service::getProviders());
 
-        $service = new Service('foo', [
-            'key' => 'test_key',
-            'secret' => 'test_secret',
-            'callback' => 'test_callback',
-        ]);
+        $service = new Service('foo', $this->options);
         $this->assertInstanceOf('FooOAuth2Provider', $service->getProvider());
+    }
+
+    public function testDebug()
+    {
+        $service = new Service('foo', $this->options);
+        $service->debug();
+        $this->assertTrue(is_array($service->getHttpClient()->getEmitter()->listeners()));
     }
 }

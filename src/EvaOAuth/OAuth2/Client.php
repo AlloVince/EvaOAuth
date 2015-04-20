@@ -145,7 +145,7 @@ class Client
      * @param AuthorizationServerInterface $authServer
      * @return string
      */
-    public function getAuthorizeUrl(AuthorizationServerInterface $authServer)
+    public function getAuthorizeUri(AuthorizationServerInterface $authServer)
     {
         return $this->getGrantStrategy()->getAuthorizeUrl($authServer);
     }
