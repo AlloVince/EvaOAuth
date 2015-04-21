@@ -86,7 +86,7 @@ class AuthorizationCode implements GrantStrategyInterface
             'redirect_uri' => $options['redirect_uri'],
         ];
         if ($state) {
-            $query['state'] = $state;
+            $parameters['state'] = $state;
         }
 
         $httpClient = $this->httpClient;

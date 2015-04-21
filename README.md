@@ -18,11 +18,11 @@ EvaOAuth provides a standard interface for OAuth1.0(a) / OAuth2.0 client authori
 
 ## Quick Start
 
-EvaOAuth can be found on [Packagist](). The recommended way to install this is through composer.
+EvaOAuth can be found on [Packagist](https://packagist.org/packages/evaengine/eva-oauth). The recommended way to install this is through composer.
 
 Edit your composer.json and add:
 
-```
+``` json
 {
     "require": {
         "evaengine/eva-oauth": "~1.0"
@@ -32,14 +32,14 @@ Edit your composer.json and add:
 
 And install dependencies:
 
-```
-$ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar install
+``` shell
+curl -sS https://getcomposer.org/installer | php
+php composer.phar install
 ```
 
 Let's start a example of Facebook Login, if you have already have a Facebook developer account and created an app, prepare a request.php as below: 
 
-```
+``` php
 $service = new Eva\EvaOAuth\Service('Facebook', [
     'key' => 'You Facebook App ID',
     'secret' => 'You Facebook App Secret',
@@ -50,13 +50,13 @@ $service->requestAuthorize();
 
 Run request.php in browser, will be redirected to Facebook authorization page. After user confirm authorization, prepare the access.php in callback:
 
-```
+``` php
 $token = $service->getAccessToken();
 ```
 
 Once access token received, we could use access token to visit any protected resources.
 
-```
+``` php
 $httpClient = new Eva\EvaOAuth\AuthorizedHttpClient($token);
 $response = $httpClient->get('https://graph.facebook.com/me');
 ```
@@ -65,7 +65,7 @@ That's it, more usages please check examples and wiki.
 
 ## Providers
 
-EvaOAuth support most popular OAuth services as below:
+EvaOAuth supports most popular OAuth services as below:
 
 - OAuth2.0
   - Douban
@@ -75,5 +75,35 @@ EvaOAuth support most popular OAuth services as below:
 - OAuth1.0
   - Twitter
   
+Creating a custom provider require only few lines code, for OAuth2 sites:
 
 
+``` php
+namespace YourNamespace;
+
+class Foursquare extends \Eva\EvaOAuth\OAuth2\Providers\AbstractProvider
+{
+    protected $authorizeUrl = 'https://foursquare.com/oauth2/authorize';
+    protected $accessTokenUrl = 'https://foursquare.com/oauth2/access_token';
+}
+```
+
+Then register to service and create instance:
+
+```
+use Eva\EvaOAuth\Service;
+Service::registerProvider('foursquare', 'YourNamespace\Foursquare');
+$service = new Service('foursquare', [
+    'key' => 'Foursquare App ID',
+    'secret' => 'Foursquare App Secret',
+    'callback' => 'http://somecallback/'
+]);
+```
+
+## Implementation Specification
+
+EvaOAuth based on amazing http client library [Guzzle](https://github.com/guzzle/guzzle), use fully OOP to describe OAuth specification.
+
+Refer wiki for details:
+ 
+- [OAuth2.0](https://github.com/AlloVince/EvaOAuth/wiki/OAuth2.0-Specification-Implementation)

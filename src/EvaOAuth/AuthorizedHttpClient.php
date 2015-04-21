@@ -11,10 +11,12 @@ namespace Eva\EvaOAuth;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
 use Eva\EvaOAuth\Token\AccessTokenInterface;
 use Eva\EvaOAuth\Utils\Text;
-use GuzzleHttp\Client;
 use Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface as OAuth2AccessTokenInterface;
+use GuzzleHttp\Client;
 use GuzzleHttp\Event\BeforeEvent;
-use Guzzle\Http\Message\Request;
+use GuzzleHttp\Message\Request;
+use GuzzleHttp\Subscriber\Log\Formatter;
+use GuzzleHttp\Subscriber\Log\LogSubscriber;
 use GuzzleHttp\Url;
 
 /**
@@ -45,6 +47,14 @@ class AuthorizedHttpClient
     public function __call($method, $args)
     {
         return call_user_func_array(array($this->httpClient, $method), $args);
+    }
+
+    /**
+     * Enable debug
+     */
+    public function debug()
+    {
+        $this->httpClient->getEmitter()->attach(new LogSubscriber(null, Formatter::DEBUG));
     }
 
     /**
