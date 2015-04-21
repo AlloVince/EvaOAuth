@@ -3,9 +3,9 @@ EvaOAuth
 
 [![Latest Stable Version](https://poser.pugx.org/evaengine/eva-oauth/v/stable.svg)](https://packagist.org/packages/evaengine/eva-oauth)
 [![License](https://poser.pugx.org/evaengine/eva-oauth/license.svg)](https://packagist.org/packages/evaengine/eva-oauth)
-[![Build Status](https://travis-ci.org/EvaEngine/EvaOAuth.svg?branch=feature%2Frefactoring)](https://travis-ci.org/EvaEngine/EvaOAuth)
-[![Coverage Status](https://coveralls.io/repos/EvaEngine/EvaOAuth/badge.svg?branch=master)](https://coveralls.io/r/EvaEngine/EvaOAuth?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/EvaEngine/EvaOAuth/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/EvaEngine/EvaOAuth/?branch=master)
+[![Build Status](https://travis-ci.org/AlloVince/EvaOAuth.svg?branch=feature%2Frefactoring)](https://travis-ci.org/AlloVince/EvaOAuth)
+[![Coverage Status](https://coveralls.io/repos/AlloVince/EvaOAuth/badge.svg?branch=master)](https://coveralls.io/r/AlloVince/EvaOAuth?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AlloVince/EvaOAuth/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/EvaEngine/AlloVince/?branch=master)
 
 EvaOAuth provides a standard interface for OAuth1.0(a) / OAuth2.0 client authorization, it is easy to integrate with any PHP project by very few lines code. 
 
