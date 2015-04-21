@@ -14,7 +14,7 @@ if (!array_key_exists($provider, $config)) {
 $service = new Service($provider, [
     'key' => $config[$provider]['key'],
     'secret' => $config[$provider]['secret'],
-    'callback' => dirname('http://' . $_SERVER['SERVER_NAME'] . $_SERVER["REQUEST_URI"]) . '/access.php?provider=' . $provider
+    'callback' => dirname('http://' . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"]) . '/access.php?provider=' . $provider
 ]);
 
 $service->debug();

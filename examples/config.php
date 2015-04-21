@@ -5,6 +5,10 @@ return [
         'key' => '',
         'secret' => '',
     ],
+    'facebook' => [
+        'key' => '',
+        'secret' => '',
+    ],
     'tencent' => [
         'key' => '',
         'secret' => '',

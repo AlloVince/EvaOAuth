@@ -59,6 +59,7 @@ class Service
      */
     protected static $providers = [
         'twitter' => 'Eva\EvaOAuth\OAuth1\Providers\Twitter',
+        'facebook' => 'Eva\EvaOAuth\OAuth2\Providers\Facebook',
         'douban' => 'Eva\EvaOAuth\OAuth2\Providers\Douban',
         'tencent' => 'Eva\EvaOAuth\OAuth2\Providers\Tencent',
         'weibo' => 'Eva\EvaOAuth\OAuth2\Providers\Weibo',
@@ -147,6 +148,33 @@ class Service
     public function getAccessToken()
     {
         return $this->getAdapter()->getAccessToken($this->provider);
+    }
+
+    /**
+     * To compatible with old version
+     * @return array
+     */
+    public function getTokenAndUser()
+    {
+        $adapter = $this->getAdapter();
+
+        $isOAuth2 = $this->version === self::OAUTH_VERSION_2;
+        $token = $adapter->getAccessToken($this->provider);
+        $user = $this->provider->getUser($token);
+
+        return [
+            'adapterKey' => $this->provider->getProviderName(),
+            'token' => $token->getTokenValue(),
+            'version' => $token->getTokenVersion(),
+            'scope' => $isOAuth2 ? $token->getScope() : null,
+            'refreshToken' => $isOAuth2 ? $token->getRefreshToken() : null,
+            'expireTime' => $isOAuth2 ? gmdate('Y-m-d H:i:s', $token->getExpireTimestamp()) : null,
+            'remoteUserId' => $user->getId(),
+            'remoteUserName' => $user->getName(),
+            'remoteEmail' => $user->getEmail(),
+            'remoteImageUrl' => $user->getAvatar(),
+            'remoteExtra' => json_encode($user->getExtra()),
+        ];
     }
 
     /**

@@ -59,7 +59,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterAndChangeGrant()
     {
-        $this->client->registerGrantStrategy('foo', 'Eva\EvaOAuthTest\OAuth2\GrantStrategy\FooStrategy');
+        \Mockery::namedMock('FooStrategy', 'Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface');
+        $this->client->registerGrantStrategy('foo', 'FooStrategy');
         $this->client->changeGrantStrategy('foo');
+        $this->assertEquals('foo', $this->client->getGrantStrategyName());
+        //$this->assertInstanceOf('Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface', $this->client->getGrantStrategy());
     }
 }

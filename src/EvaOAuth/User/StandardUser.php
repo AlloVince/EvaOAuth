@@ -104,9 +104,18 @@ class StandardUser implements UserInterface
         return $this->extra;
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
-
+        $res = [];
+        foreach ($this as $key => $value) {
+            if (true === is_scalar($value) || true === is_array($value)) {
+                $res[$key] = $value;
+            }
+        }
+        return $res;
     }
 
     /**
