@@ -7,7 +7,7 @@ EvaOAuth
 [![Coverage Status](https://coveralls.io/repos/AlloVince/EvaOAuth/badge.svg?branch=master)](https://coveralls.io/r/AlloVince/EvaOAuth?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AlloVince/EvaOAuth/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AlloVince/EvaOAuth/?branch=master)
 
-EvaOAuth provides a standard interface for OAuth1.0(a) / OAuth2.0 client authorization, it is easy to integrate with any PHP project by very few lines code. 
+EvaOAuth provides a standard interface for OAuth1.0 / OAuth2.0 client authorization, it is easy to integrate with any PHP project by very few lines code. 
 
 ## Features
 
@@ -90,7 +90,7 @@ class Foursquare extends \Eva\EvaOAuth\OAuth2\Providers\AbstractProvider
 
 Then register to service and create instance:
 
-```
+``` php
 use Eva\EvaOAuth\Service;
 Service::registerProvider('foursquare', 'YourNamespace\Foursquare');
 $service = new Service('foursquare', [
@@ -106,4 +106,27 @@ EvaOAuth based on amazing http client library [Guzzle](https://github.com/guzzle
 
 Refer wiki for details:
  
+- [OAuth1.0](https://github.com/AlloVince/EvaOAuth/wiki/OAuth1.0-Specification-Implementation)
 - [OAuth2.0](https://github.com/AlloVince/EvaOAuth/wiki/OAuth2.0-Specification-Implementation)
+
+## Debug and Logging
+
+Enable debug mode will print all request & response on screen.
+
+``` php
+$service->debug();
+```
+
+Under production environment, recommend use log to trace problems.
+
+``` php
+$service->setLogPath(__DIR__);
+```
+
+Make sure PHP script have permission to write log path.
+
+
+## API References
+
+Run `phpdoc` will generate API references under `docs/`.
+

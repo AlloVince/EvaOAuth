@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title>EvaEngine</title>
+    <parser>
+        <target>tmp</target>
+        <encoding>utf-8</encoding>
+    </parser>
+    <transformer>
+        <target>docs</target>
+    </transformer>
+    <logging>
+        <level>warn</level>
+        <paths>
+            <default>docs/log/{DATE}.log</default>
+            <errors>docs/log/{DATE}.errors.log</errors>
+        </paths>
+    </logging>
+    <transformations>
+        <template name="responsive-twig"/>
+    </transformations>
+    <files>
+        <directory>src</directory>
+    </files>
+</phpdoc>
