@@ -15,6 +15,7 @@ use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Message\Response;
 
 /**
  * Class AuthorizationCode
@@ -102,6 +103,7 @@ class AuthorizationCode implements GrantStrategyInterface
         );
 
         try {
+            /** @var Response $response */
             $response = $httpClient->send($request);
             return AccessToken::factory($response, $resourceServer);
         } catch (RequestException $e) {

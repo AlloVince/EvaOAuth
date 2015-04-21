@@ -16,6 +16,7 @@ use Eva\EvaOAuth\OAuth1\Token\AccessToken;
 use Eva\EvaOAuth\OAuth1\Token\RequestToken;
 use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Message\Response;
 
 /**
  * Class Consumer
@@ -50,7 +51,7 @@ class Consumer
 
     /**
      * @param ServiceProviderInterface $serviceProvider
-     * @return Token\RequestTokenInterface
+     * @return Token\RequestToken
      */
     public function getRequestToken(ServiceProviderInterface $serviceProvider)
     {
@@ -90,6 +91,7 @@ class Consumer
         );
 
         try {
+            /** @var Response $response */
             $response = $httpClient->send($request);
             return RequestToken::factory($response, $serviceProvider);
         } catch (RequestException $e) {
@@ -173,6 +175,7 @@ class Consumer
         );
 
         try {
+            /** @var Response $response */
             $response = $httpClient->send($request);
             return AccessToken::factory($response, $serviceProvider, $options);
         } catch (RequestException $e) {
@@ -181,7 +184,7 @@ class Consumer
                 $e->getRequest(),
                 $e->getResponse()
             );
-        };
+        }
     }
 
     /**
