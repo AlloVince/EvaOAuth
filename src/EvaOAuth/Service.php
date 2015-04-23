@@ -7,6 +7,7 @@
 
 namespace Eva\EvaOAuth;
 
+use Eva\EvaOAuth\Event\DebugSubscriber;
 use Eva\EvaOAuth\Exception\BadMethodCallException;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth1\Consumer;
@@ -17,6 +18,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Eva\EvaOAuth\OAuth1\Providers\AbstractProvider as OAuth1Provider;
 use Eva\EvaOAuth\OAuth2\Providers\AbstractProvider as OAuth2Provider;
+use Doctrine\Common\Cache\Cache;
 
 /**
  * Class Service
@@ -59,11 +61,24 @@ class Service
      */
     protected static $providers = [
         'twitter' => 'Eva\EvaOAuth\OAuth1\Providers\Twitter',
+        'flickr' => 'Eva\EvaOAuth\OAuth1\Providers\Flickr',
         'facebook' => 'Eva\EvaOAuth\OAuth2\Providers\Facebook',
         'douban' => 'Eva\EvaOAuth\OAuth2\Providers\Douban',
         'tencent' => 'Eva\EvaOAuth\OAuth2\Providers\Tencent',
         'weibo' => 'Eva\EvaOAuth\OAuth2\Providers\Weibo',
         'hundsun' => 'Eva\EvaOAuth\OAuth2\Providers\Hundsun',
+    ];
+
+    /**
+     * @var string
+     */
+    protected static $storageClass = 'Doctrine\Common\Cache\FilesystemCache';
+
+    /**
+     * @var array
+     */
+    protected static $storageOptions = [
+        __DIR__ . '/../../tmp/'
     ];
 
     /**
@@ -91,6 +106,12 @@ class Service
     public static function getProviders()
     {
         return self::$providers;
+    }
+
+    public static function setStorage($storageClass, array $storageOptions = [])
+    {
+        self::$storageClass = $storageClass;
+        self::$storageOptions = $storageOptions;
     }
 
     /**
@@ -220,6 +241,7 @@ class Service
     {
         $adapter = $this->getAdapter();
         $adapter::getHttpClient()->getEmitter()->attach(new LogSubscriber(null, Formatter::DEBUG));
+        //$adapter->getEmitter()->attach(new LoggerSubscriber());
         return $this;
     }
 
@@ -249,9 +271,16 @@ class Service
             $this->provider = new $providerClass();
         } elseif (true === in_array('Eva\EvaOAuth\OAuth1\ServiceProviderInterface', $implements)) {
             $options = $this->convertOptions($options, self::OAUTH_VERSION_1);
-            $this->consumer = new Consumer($options);
             $this->version = self::OAUTH_VERSION_1;
             $this->provider = new $providerClass();
+
+            $storageClass = self::$storageClass;
+            $storageOptions = self::$storageOptions;
+            $reflection = new \ReflectionClass($storageClass);
+            /** @var Cache $instance */
+            $instance = $reflection->newInstanceArgs($storageOptions);
+
+            $this->consumer = new Consumer($options, $instance);
         } else {
             throw new InvalidArgumentException(sprintf("Class %s is not correct oauth adapter", $providerClass));
         }

@@ -39,7 +39,7 @@ class TextTest extends \PHPUnit_Framework_TestCase
     public function testBaseString()
     {
         $this->assertEquals(
-            'POST&http%3A%2F%2Ffoo&callback%3Dhttp%3A%2F%2Fbar',
+            'POST&http%3A%2F%2Ffoo&callback%3Dhttp%253A%252F%252Fbar',
             Text::buildBaseString('post', 'http://foo', ['callback' => 'http://bar'])
         );
 

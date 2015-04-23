@@ -5,6 +5,10 @@ return [
         'key' => '',
         'secret' => '',
     ],
+    'flickr' => [
+        'key' => '',
+        'secret' => '',
+    ],
     'facebook' => [
         'key' => '',
         'secret' => '',

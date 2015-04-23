@@ -7,8 +7,9 @@
 
 namespace Eva\EvaOAuth;
 
-use Eva\EvaOAuth\Storage\StorageInterface;
+use Doctrine\Common\Cache\Cache;
 use GuzzleHttp\Client;
+use GuzzleHttp\Event\Emitter;
 
 trait AdapterTrait
 {
@@ -26,6 +27,16 @@ trait AdapterTrait
      * @var array
      */
     protected $options = [];
+
+    /**
+     * @var Cache
+     */
+    protected $storage;
+
+    /**
+     * @var Emitter
+     */
+    protected $emitter;
 
     /**
      * @return array
@@ -64,13 +75,40 @@ trait AdapterTrait
         self::$httpClient = $httpClient;
     }
 
-    public static function getStorage()
+    /**
+     * @return Cache
+     */
+    public function getStorage()
     {
-
+        return $this->storage;
     }
 
-    public static function setStorage(StorageInterface $storage)
+    /**
+     * @param Cache $storage
+     */
+    public function setStorage(Cache $storage)
     {
+        $this->storage = $storage;
+    }
 
+    /**
+     * @return Emitter
+     */
+    public function getEmitter()
+    {
+        if ($this->emitter) {
+            return $this->emitter;
+        }
+        return $this->emitter = new Emitter();
+    }
+
+    /**
+     * @param Emitter $emitter
+     * @return $this
+     */
+    public function setEmitter(Emitter $emitter)
+    {
+        $this->emitter = $emitter;
+        return $this;
     }
 }

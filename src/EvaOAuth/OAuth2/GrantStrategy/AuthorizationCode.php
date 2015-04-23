@@ -35,10 +35,15 @@ class AuthorizationCode implements GrantStrategyInterface
 
     /**
      * @param AuthorizationServerInterface $authServer
+     * @param string $url
      */
-    public function requestAuthorize(AuthorizationServerInterface $authServer)
+    public function requestAuthorize(AuthorizationServerInterface $authServer, $url = '')
     {
-        header('Location:' . $this->getAuthorizeUrl($authServer));
+        if ($url) {
+            header("Location:$url");
+        } else {
+            header('Location:' . $this->getAuthorizeUrl($authServer));
+        }
     }
 
     /**

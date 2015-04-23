@@ -30,9 +30,10 @@ interface GrantStrategyInterface
      * Redirect to authorize url (Maybe do nothing under some grant types)
      *
      * @param AuthorizationServerInterface $authServer
+     * @param string $url
      * @return void
      */
-    public function requestAuthorize(AuthorizationServerInterface $authServer);
+    public function requestAuthorize(AuthorizationServerInterface $authServer, $url = '');
 
     /**
      * @param ResourceServerInterface $resourceServer

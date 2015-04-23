@@ -8,6 +8,7 @@
 namespace Eva\EvaOAuth\OAuth2;
 
 use Eva\EvaOAuth\AdapterTrait;
+use Eva\EvaOAuth\Event\BeforeAuthorize;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth2\Token\AccessToken;
 use Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;
@@ -155,7 +156,9 @@ class Client
      */
     public function requestAuthorize(AuthorizationServerInterface $authServer)
     {
-        $this->getGrantStrategy()->requestAuthorize($authServer);
+        $uri = $this->getAuthorizeUri($authServer);
+        $this->getEmitter()->emit('beforeAuthorize', new BeforeAuthorize($this, $uri));
+        $this->getGrantStrategy()->requestAuthorize($authServer, $uri);
     }
 
     /**

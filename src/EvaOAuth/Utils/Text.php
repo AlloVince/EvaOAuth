@@ -33,12 +33,12 @@ class Text
 
         $encodedParams = [];
         foreach ($params as $key => $value) {
-            $encodedParams[] = urlencode($key) . '%3D' . urlencode($value);
+            $encodedParams[] = urlencode($key) . '=' . urlencode($value);
         }
         return implode('&', [
             strtoupper($method),
             urlencode($url),
-            implode('%26', $encodedParams)
+            urlencode(implode('&', $encodedParams))
         ]);
     }
 }

@@ -8,6 +8,8 @@
 
 namespace Eva\EvaOAuth\OAuth1;
 
+use Doctrine\Common\Cache\Cache;
+use Eva\EvaOAuth\Event\BeforeAuthorize;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\AdapterTrait;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
@@ -67,8 +69,7 @@ class Consumer
             'oauth_timestamp' => (string) time(),
             'oauth_nonce' => Text::generateRandomString(32),
             'oauth_version' => '1.0',
-            //NOTE: callback will cause 400 error for twitter
-            //'oauth_callback' => $options['callback'],
+            'oauth_callback' => $options['callback'],
         ];
 
         $baseString = Text::buildBaseString($httpMethod, $url, $parameters);
@@ -81,6 +82,7 @@ class Consumer
         $httpClient = self::getHttpClient();
         $httpClientOptions = [
             'headers' => [
+                'X-EvaOAuth-Debug-BaseString' => $baseString, //For debug
                 'Authorization' => Text::buildHeaderString($parameters)
             ]
         ];
@@ -119,7 +121,10 @@ class Consumer
      */
     public function requestAuthorize(ServiceProviderInterface $serviceProvider)
     {
-        $url = $this->getAuthorizeUri($serviceProvider, $this->getRequestToken($serviceProvider));
+        $requestToken = $this->getRequestToken($serviceProvider);
+        $this->getStorage()->save(md5($requestToken->getTokenValue()), $requestToken);
+        $url = $this->getAuthorizeUri($serviceProvider, $requestToken);
+        $this->getEmitter()->emit('beforeAuthorize', new BeforeAuthorize($this, $url, $requestToken));
         header("Location:$url");
     }
 
@@ -137,8 +142,16 @@ class Consumer
         if (!$tokenValue || !$tokenVerify) {
             throw new InvalidArgumentException(sprintf('No oauth_token or oauth_verifier input'));
         }
-        $options = $this->options;
 
+        /** @var RequestToken $requestToken */
+        $requestToken = $this->getStorage()->fetch(md5($tokenValue));
+        if (!$requestToken) {
+            throw new InvalidArgumentException(sprintf('No request token found in storage'));
+        }
+
+        //TODO: verify token here
+
+        $options = $this->options;
         $httpMethod = $serviceProvider->getAccessTokenMethod();
         $url = $serviceProvider->getAccessTokenUrl();
 
@@ -149,18 +162,22 @@ class Consumer
             'oauth_nonce' => Text::generateRandomString(32),
             'oauth_token' => $tokenValue,
             'oauth_version' => '1.0',
+            'oauth_verifier' => $tokenVerify,
+            'oauth_callback' => $options['callback'],
         ];
 
         $baseString = Text::buildBaseString($httpMethod, $url, $parameters);
         $signature = (string) new Hmac(
             $options['consumer_secret'],
-            $baseString
+            $baseString,
+            $requestToken->getTokenSecret()
         );
         $parameters['oauth_signature'] = $signature;
 
         $httpClient = self::getHttpClient();
         $httpClientOptions = [
             'headers' => [
+                'X-EvaOAuth-Debug-BaseString' => $baseString, //For debug
                 'Authorization' => Text::buildHeaderString($parameters)
             ],
             'body' => [
@@ -189,8 +206,9 @@ class Consumer
 
     /**
      * @param array $options
+     * @param Cache $storage
      */
-    public function __construct(array $options)
+    public function __construct(array $options, Cache $storage)
     {
         $options = array_merge([
             'consumer_key' => '',
@@ -202,5 +220,6 @@ class Consumer
             throw new InvalidArgumentException(sprintf("Empty consumer key or secret or callback"));
         }
         $this->options = $options;
+        $this->storage = $storage;
     }
 }

@@ -11,6 +11,7 @@ EvaOAuth provides a standard interface for OAuth1.0 / OAuth2.0 client authorizat
 
 ## Features
 
+- **Standard interface**, same code for both OAuth1.0 and OAuth2.0 different work flow, receiving token and user info as same format either.  
 - **Fully tested** 
 - **Easy to debug**, enable debug mode will record every request and response, to help you find out problems.
 - **Out-of-the-box**, already supported most popular websites including Facebook. Twitter, etc.
@@ -48,7 +49,7 @@ $service = new Eva\EvaOAuth\Service('Facebook', [
 $service->requestAuthorize();
 ```
 
-Run request.php in browser, will be redirected to Facebook authorization page. After user confirm authorization, prepare the access.php in callback:
+Run request.php in browser, will be redirected to Facebook authorization page. After user confirm authorization, prepare the access.php for callback:
 
 ``` php
 $token = $service->getAccessToken();
@@ -120,7 +121,7 @@ $service->debug();
 Under production environment, recommend use log to trace problems.
 
 ``` php
-$service->setLogPath(__DIR__);
+$service->setLogPath('/tmp/access.log');
 ```
 
 Make sure PHP script have permission to write log path.

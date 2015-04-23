@@ -48,10 +48,10 @@ class Hmac implements SignatureInterface
      * @param $input
      * @param string $tokenSecret
      */
-    public function __construct($secret, $input, $tokenSecret = '')
+    public function __construct($secret, $input, $tokenSecret = null)
     {
-        $this->secret = (string) $secret;
+        $this->secret = (string) rawurlencode($secret);
         $this->input = (string) $input;
-        $this->tokenSecret = (string) $tokenSecret;
+        $this->tokenSecret = $tokenSecret ? (string) rawurlencode($tokenSecret) : '';
     }
 }
