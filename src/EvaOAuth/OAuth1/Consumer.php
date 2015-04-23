@@ -12,6 +12,7 @@ use Doctrine\Common\Cache\Cache;
 use Eva\EvaOAuth\Event\BeforeAuthorize;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\AdapterTrait;
+use Eva\EvaOAuth\Exception\VerifyException;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
 use Eva\EvaOAuth\OAuth1\Signature\SignatureInterface;
 use Eva\EvaOAuth\OAuth1\Token\AccessToken;
@@ -131,9 +132,10 @@ class Consumer
     /**
      * @param ServiceProviderInterface $serviceProvider
      * @param array $urlQuery
+     * @param RequestToken $requestToken
      * @return AccessToken
      */
-    public function getAccessToken(ServiceProviderInterface $serviceProvider, array $urlQuery = [])
+    public function getAccessToken(ServiceProviderInterface $serviceProvider, array $urlQuery = [], RequestToken $requestToken = null)
     {
         $urlQuery = $urlQuery ?: $_GET;
         $tokenValue = empty($urlQuery['oauth_token']) ? '' : $urlQuery['oauth_token'];
@@ -144,12 +146,14 @@ class Consumer
         }
 
         /** @var RequestToken $requestToken */
-        $requestToken = $this->getStorage()->fetch(md5($tokenValue));
+        $requestToken = $requestToken ?: $this->getStorage()->fetch(md5($tokenValue));
         if (!$requestToken) {
             throw new InvalidArgumentException(sprintf('No request token found in storage'));
         }
 
-        //TODO: verify token here
+        if ($tokenValue != $requestToken->getTokenValue()) {
+            throw new VerifyException(sprintf('Request token not match'));
+        }
 
         $options = $this->options;
         $httpMethod = $serviceProvider->getAccessTokenMethod();

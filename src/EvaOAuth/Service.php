@@ -72,13 +72,12 @@ class Service
     /**
      * @var string
      */
-    protected static $storageClass = 'Doctrine\Common\Cache\FilesystemCache';
+    protected static $storageClass = '';
 
     /**
      * @var array
      */
     protected static $storageOptions = [
-        __DIR__ . '/../../tmp/'
     ];
 
     /**
@@ -108,10 +107,29 @@ class Service
         return self::$providers;
     }
 
-    public static function setStorage($storageClass, array $storageOptions = [])
+    /**
+     * @param $storageClass
+     * @param array $storageOptions
+     */
+    public static function setStorageDefinition($storageClass, array $storageOptions = [])
     {
         self::$storageClass = $storageClass;
         self::$storageOptions = $storageOptions;
+    }
+
+    /**
+     * @return Cache
+     */
+    public static function getStorage()
+    {
+        $storageClass = self::$storageClass;
+        $storageClass = $storageClass ?: 'Doctrine\Common\Cache\FilesystemCache';
+        $storageOptions = self::$storageOptions;
+        $storageOptions = $storageOptions ?: [__DIR__ . '/../../tmp/'];
+
+        $reflection = new \ReflectionClass($storageClass);
+        /** @var Cache $instance */
+        return $reflection->newInstanceArgs($storageOptions);
     }
 
     /**
@@ -273,14 +291,7 @@ class Service
             $options = $this->convertOptions($options, self::OAUTH_VERSION_1);
             $this->version = self::OAUTH_VERSION_1;
             $this->provider = new $providerClass();
-
-            $storageClass = self::$storageClass;
-            $storageOptions = self::$storageOptions;
-            $reflection = new \ReflectionClass($storageClass);
-            /** @var Cache $instance */
-            $instance = $reflection->newInstanceArgs($storageOptions);
-
-            $this->consumer = new Consumer($options, $instance);
+            $this->consumer = new Consumer($options, self::getStorage());
         } else {
             throw new InvalidArgumentException(sprintf("Class %s is not correct oauth adapter", $providerClass));
         }

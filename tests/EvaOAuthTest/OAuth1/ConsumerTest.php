@@ -99,7 +99,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $accessToken = $this->consumer->getAccessToken(new Twitter(), [
             'oauth_token' => 'test_request_token',
             'oauth_verifier' => 'test_request_token_verifier',
-        ]);
+        ], new RequestToken('test_request_token', 'test_request_token_secret'));
         $this->assertEquals('test_access_token', $accessToken->getTokenValue());
         $this->assertEquals('test_token_secret', $accessToken->getTokenSecret());
     }
@@ -113,6 +113,17 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException Eva\EvaOAuth\Exception\VerifyException
+     */
+    public function testGetAccessTokenNotMatch()
+    {
+        $this->consumer->getAccessToken(new Twitter(), [
+            'oauth_token' => 'test_request_token',
+            'oauth_verifier' => 'test_request_token_verifier',
+        ]);
+    }
+
+    /**
      * @expectedException Eva\EvaOAuth\Exception\RequestException
      */
     public function testGetAccessTokenFailed()
@@ -123,7 +134,6 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $this->consumer->getAccessToken(new Twitter(), [
             'oauth_token' => 'test_request_token',
             'oauth_verifier' => 'test_request_token_verifier',
-
-        ]);
+        ], new RequestToken('test_request_token', 'test_request_token_secret'));
     }
 }
