@@ -7,7 +7,7 @@
 
 namespace Eva\EvaOAuth;
 
-use Eva\EvaOAuth\Event\DebugSubscriber;
+use Eva\EvaOAuth\Events\DebugSubscriber;
 use Eva\EvaOAuth\Exception\BadMethodCallException;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth1\Consumer;
@@ -161,6 +161,14 @@ class Service
     }
 
     /**
+     * @return \GuzzleHttp\Event\Emitter
+     */
+    public function getEmitter()
+    {
+        return $this->getAdapter()->getEmitter();
+    }
+
+    /**
      * @return string
      */
     public function getAuthorizeUri()
@@ -258,7 +266,7 @@ class Service
     public function debug()
     {
         $adapter = $this->getAdapter();
-        $adapter::getHttpClient()->getEmitter()->attach(new LogSubscriber(null, Formatter::DEBUG));
+        $adapter->getEmitter()->attach(new LogSubscriber(null, Formatter::DEBUG));
         //$adapter->getEmitter()->attach(new LoggerSubscriber());
         return $this;
     }

@@ -8,12 +8,16 @@
 
 namespace Eva\EvaOAuth\OAuth2\GrantStrategy;
 
+use Eva\EvaOAuth\Events\BeforeAuthorize;
+use Eva\EvaOAuth\Events\BeforeGetAccessToken;
 use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
+use Eva\EvaOAuth\OAuth2\Client;
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
 use Eva\EvaOAuth\OAuth2\Token\AccessToken;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\Utils\Text;
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Event\HasEmitterTrait;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\Response;
 
@@ -33,17 +37,18 @@ class AuthorizationCode implements GrantStrategyInterface
      */
     protected $options;
 
+    use HasEmitterTrait;
+
+
     /**
      * @param AuthorizationServerInterface $authServer
      * @param string $url
      */
     public function requestAuthorize(AuthorizationServerInterface $authServer, $url = '')
     {
-        if ($url) {
-            header("Location:$url");
-        } else {
-            header('Location:' . $this->getAuthorizeUrl($authServer));
-        }
+        $url = $url ?: $this->getAuthorizeUrl($authServer);
+        $this->getEmitter()->emit('beforeAuthorize', new BeforeAuthorize($url));
+        header("Location:$url");
     }
 
     /**
@@ -108,6 +113,7 @@ class AuthorizationCode implements GrantStrategyInterface
         );
 
         try {
+            $this->getEmitter()->emit('beforeGetAccessToken', new BeforeGetAccessToken($request, $resourceServer));
             /** @var Response $response */
             $response = $httpClient->send($request);
             return AccessToken::factory($response, $resourceServer);
@@ -121,10 +127,10 @@ class AuthorizationCode implements GrantStrategyInterface
     }
 
     /**
-     * @param Client $httpClient
+     * @param HttpClient $httpClient
      * @param array $options
      */
-    public function __construct(Client $httpClient, array $options)
+    public function __construct(HttpClient $httpClient, array $options)
     {
         $this->httpClient = $httpClient;
         $this->options = $options;

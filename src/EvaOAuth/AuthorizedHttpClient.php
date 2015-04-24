@@ -8,6 +8,7 @@
 
 namespace Eva\EvaOAuth;
 
+use Eva\EvaOAuth\Events\EventsManager;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
 use Eva\EvaOAuth\Token\AccessTokenInterface;
 use Eva\EvaOAuth\Utils\Text;
@@ -15,46 +16,19 @@ use Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface as OAuth2AccessTokenInterface
 use GuzzleHttp\Client;
 use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Message\Request;
-use GuzzleHttp\Subscriber\Log\Formatter;
-use GuzzleHttp\Subscriber\Log\LogSubscriber;
 use GuzzleHttp\Url;
 
 /**
  * Class AuthorizedHttpClient
  * @package Eva\EvaOAuth
  */
-class AuthorizedHttpClient
+class AuthorizedHttpClient extends Client
 {
+    private $emitter;
 
-    /**
-     * @var Client
-     */
-    protected $httpClient;
-
-    /**
-     * @return Client
-     */
-    public function getHttpClient()
+    public function getEmitter()
     {
-        return $this->httpClient;
-    }
-
-    /**
-     * @param $method
-     * @param $args
-     * @return mixed
-     */
-    public function __call($method, $args)
-    {
-        return call_user_func_array(array($this->httpClient, $method), $args);
-    }
-
-    /**
-     * Enable debug
-     */
-    public function debug()
-    {
-        $this->httpClient->getEmitter()->attach(new LogSubscriber(null, Formatter::DEBUG));
+        return $this->emitter;
     }
 
     /**
@@ -63,10 +37,11 @@ class AuthorizedHttpClient
      */
     public function __construct(AccessTokenInterface $token, array $options = [])
     {
-        $this->httpClient = $httpClient = new Client($options);
+        parent::__construct($options);
+        $this->emitter = EventsManager::getEmitter();
 
         if ($token instanceof OAuth2AccessTokenInterface) {
-            $httpClient->getEmitter()->on(
+            $this->getEmitter()->on(
                 'before',
                 function (BeforeEvent $event) use ($token) {
                     /** @var \Eva\EvaOAuth\OAuth2\Token\AccessToken $token */
@@ -77,7 +52,7 @@ class AuthorizedHttpClient
                 }
             );
         } else {
-            $httpClient->getEmitter()->on(
+            $this->getEmitter()->on(
                 'before',
                 function (BeforeEvent $event) use ($token) {
                     /** @var Request $request */

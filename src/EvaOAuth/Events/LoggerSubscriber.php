@@ -6,7 +6,7 @@
  */
 
 
-namespace Eva\EvaOAuth\Event;
+namespace Eva\EvaOAuth\Events;
 
 use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Subscriber\Log\SimpleLogger;

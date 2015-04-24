@@ -9,7 +9,7 @@ namespace Eva\EvaOAuth\OAuth2\GrantStrategy;
 
 use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as HttpClient;
 use Eva\EvaOAuth\Token\AccessTokenInterface;
 
 /**
@@ -43,8 +43,8 @@ interface GrantStrategyInterface
     public function getAccessToken(ResourceServerInterface $resourceServer, array $urlQuery = array());
 
     /**
-     * @param Client $httpClient
+     * @param HttpClient $httpClient
      * @param array $options
      */
-    public function __construct(Client $httpClient, array $options);
+    public function __construct(HttpClient $httpClient, array $options);
 }

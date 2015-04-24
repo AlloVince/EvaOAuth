@@ -6,13 +6,15 @@
  */
 
 
-namespace Eva\EvaOAuth\Event;
+namespace Eva\EvaOAuth\Events;
 
 use GuzzleHttp\Event\AbstractEvent;
 use Eva\EvaOAuth\OAuth2\Client;
 use Eva\EvaOAuth\OAuth1\Consumer;
-use Eva\EvaOAuth\OAuth1\Providers\AbstractProvider as OAuth1Provider;
-use Eva\EvaOAuth\OAuth2\Providers\AbstractProvider as OAuth2Provider;
+use GuzzleHttp\Client as HttpClient;
+use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
+use Eva\EvaOAuth\OAuth1\ServiceProviderInterface;
+use GuzzleHttp\Message\Request;
 
 class BeforeGetAccessToken extends AbstractEvent
 {
@@ -22,9 +24,27 @@ class BeforeGetAccessToken extends AbstractEvent
     protected $adapter;
 
     /**
-     * @var OAuth1Provider|OAuth2Provider
+     * @var ResourceServerInterface|ServiceProviderInterface
      */
     protected $provider;
+
+    /**
+     * @var HttpClient
+     */
+    protected $httpClient;
+
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
 
     /**
      * @return Consumer|Client
@@ -35,7 +55,7 @@ class BeforeGetAccessToken extends AbstractEvent
     }
 
     /**
-     * @return OAuth1Provider|OAuth2Provider
+     * @return ResourceServerInterface|ServiceProviderInterface
      */
     public function getProvider()
     {
@@ -43,11 +63,13 @@ class BeforeGetAccessToken extends AbstractEvent
     }
 
     /**
-     * @param $adapter
+     * @param Request $request
      * @param $provider
+     * @param $adapter
      */
-    public function __construct($adapter, $provider)
+    public function __construct(Request $request, $provider, $adapter = null)
     {
+        $this->request = $request;
         $this->adapter = $adapter;
         $this->provider = $provider;
     }

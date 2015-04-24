@@ -9,9 +9,10 @@
 namespace Eva\EvaOAuth\OAuth1;
 
 use Doctrine\Common\Cache\Cache;
-use Eva\EvaOAuth\Event\BeforeAuthorize;
-use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\AdapterTrait;
+use Eva\EvaOAuth\Events\BeforeAuthorize;
+use Eva\EvaOAuth\Events\EventsManager;
+use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\Exception\VerifyException;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
 use Eva\EvaOAuth\OAuth1\Signature\SignatureInterface;
@@ -20,6 +21,7 @@ use Eva\EvaOAuth\OAuth1\Token\RequestToken;
 use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\Response;
+use GuzzleHttp\Event\Emitter;
 
 /**
  * Class Consumer
@@ -67,14 +69,14 @@ class Consumer
         $parameters = [
             'oauth_consumer_key' => $options['consumer_key'],
             'oauth_signature_method' => $this->signatureMethod,
-            'oauth_timestamp' => (string) time(),
+            'oauth_timestamp' => (string)time(),
             'oauth_nonce' => Text::generateRandomString(32),
             'oauth_version' => '1.0',
             'oauth_callback' => $options['callback'],
         ];
 
         $baseString = Text::buildBaseString($httpMethod, $url, $parameters);
-        $signature = (string) new Hmac(
+        $signature = (string)new Hmac(
             $options['consumer_secret'],
             $baseString
         );
@@ -135,8 +137,11 @@ class Consumer
      * @param RequestToken $requestToken
      * @return AccessToken
      */
-    public function getAccessToken(ServiceProviderInterface $serviceProvider, array $urlQuery = [], RequestToken $requestToken = null)
-    {
+    public function getAccessToken(
+        ServiceProviderInterface $serviceProvider,
+        array $urlQuery = [],
+        RequestToken $requestToken = null
+    ) {
         $urlQuery = $urlQuery ?: $_GET;
         $tokenValue = empty($urlQuery['oauth_token']) ? '' : $urlQuery['oauth_token'];
         $tokenVerify = empty($urlQuery['oauth_verifier']) ? '' : $urlQuery['oauth_verifier'];
@@ -162,7 +167,7 @@ class Consumer
         $parameters = [
             'oauth_consumer_key' => $options['consumer_key'],
             'oauth_signature_method' => $this->signatureMethod,
-            'oauth_timestamp' => (string) time(),
+            'oauth_timestamp' => (string)time(),
             'oauth_nonce' => Text::generateRandomString(32),
             'oauth_token' => $tokenValue,
             'oauth_version' => '1.0',
@@ -171,7 +176,7 @@ class Consumer
         ];
 
         $baseString = Text::buildBaseString($httpMethod, $url, $parameters);
-        $signature = (string) new Hmac(
+        $signature = (string)new Hmac(
             $options['consumer_secret'],
             $baseString,
             $requestToken->getTokenSecret()

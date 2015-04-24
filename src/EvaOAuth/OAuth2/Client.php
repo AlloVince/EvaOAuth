@@ -8,7 +8,8 @@
 namespace Eva\EvaOAuth\OAuth2;
 
 use Eva\EvaOAuth\AdapterTrait;
-use Eva\EvaOAuth\Event\BeforeAuthorize;
+use Eva\EvaOAuth\Events\BeforeAuthorize;
+use Eva\EvaOAuth\Events\BeforeGetAccessToken;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth2\Token\AccessToken;
 use Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface;
@@ -139,7 +140,21 @@ class Client
         }
 
         $grantStrategyClass = self::getGrantStrategyMapping()[$this->grantStrategyName];
-        return $this->grantStrategy = new $grantStrategyClass(self::getHttpClient(), $this->options);
+
+        $grantStrategy = new $grantStrategyClass(self::getHttpClient(), $this->options);
+
+        //Events Propagation
+        $grantStrategy->getEmitter()->on('beforeAuthorize', function (BeforeAuthorize $event) {
+            $this->getEmitter()->emit('beforeAuthorize', new BeforeAuthorize($event->getUri(), $this));
+        });
+        $grantStrategy->getEmitter()->on('beforeGetAccessToken', function (BeforeGetAccessToken $event) {
+            $this->getEmitter()->emit(
+                'beforeAuthorize',
+                new BeforeGetAccessToken($event->getRequest(), $event->getProvider(), $this)
+            );
+        });
+
+        return $this->grantStrategy = $grantStrategy;
     }
 
     /**
@@ -157,7 +172,6 @@ class Client
     public function requestAuthorize(AuthorizationServerInterface $authServer)
     {
         $uri = $this->getAuthorizeUri($authServer);
-        $this->getEmitter()->emit('beforeAuthorize', new BeforeAuthorize($this, $uri));
         $this->getGrantStrategy()->requestAuthorize($authServer, $uri);
     }
 

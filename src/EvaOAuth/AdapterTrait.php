@@ -8,13 +8,15 @@
 namespace Eva\EvaOAuth;
 
 use Doctrine\Common\Cache\Cache;
-use GuzzleHttp\Client;
+use Eva\EvaOAuth\Events\EventsManager;
+use Eva\EvaOAuth\HttpClient;
 use GuzzleHttp\Event\Emitter;
+use GuzzleHttp\Client;
 
 trait AdapterTrait
 {
     /**
-     * @var \GuzzleHttp\Client
+     * @var HttpClient
      */
     protected static $httpClient;
 
@@ -56,7 +58,7 @@ trait AdapterTrait
 
 
     /**
-     * @return \GuzzleHttp\Client
+     * @return HttpClient
      */
     public static function getHttpClient()
     {
@@ -64,7 +66,7 @@ trait AdapterTrait
             return self::$httpClient;
         }
 
-        return self::$httpClient = new Client(self::$httpClientDefaultOptions);
+        return self::$httpClient = new HttpClient(self::$httpClientDefaultOptions);
     }
 
     /**
@@ -99,16 +101,7 @@ trait AdapterTrait
         if ($this->emitter) {
             return $this->emitter;
         }
-        return $this->emitter = new Emitter();
-    }
-
-    /**
-     * @param Emitter $emitter
-     * @return $this
-     */
-    public function setEmitter(Emitter $emitter)
-    {
-        $this->emitter = $emitter;
-        return $this;
+        //All adapters share same emitter
+        return $this->emitter = EventsManager::getEmitter();
     }
 }

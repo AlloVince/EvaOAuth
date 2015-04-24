@@ -6,7 +6,7 @@
  */
 
 
-namespace Eva\EvaOAuth\Event;
+namespace Eva\EvaOAuth\Events;
 
 use Eva\EvaOAuth\OAuth1\Token\RequestToken;
 use GuzzleHttp\Event\AbstractEvent;
@@ -49,11 +49,11 @@ class BeforeAuthorize extends AbstractEvent
     }
 
     /**
-     * @param Consumer|Client $adapter
      * @param string $uri
+     * @param Consumer|Client $adapter
      * @param RequestToken $requestToken
      */
-    public function __construct($adapter, $uri, RequestToken $requestToken = null)
+    public function __construct($uri, $adapter = null, RequestToken $requestToken = null)
     {
         $this->adapter = $adapter;
         $this->uri = $uri;
