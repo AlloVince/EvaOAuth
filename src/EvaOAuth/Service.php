@@ -8,13 +8,12 @@
 namespace Eva\EvaOAuth;
 
 use Doctrine\Common\Cache\FilesystemCache;
+use Eva\EvaOAuth\Events\Formatter;
 use Eva\EvaOAuth\Events\LoggerSubscriber;
 use Eva\EvaOAuth\Exception\BadMethodCallException;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth1\Consumer;
 use Eva\EvaOAuth\OAuth2\Client;
-use GuzzleHttp\Subscriber\Log\Formatter;
-use GuzzleHttp\Subscriber\Log\LogSubscriber;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Eva\EvaOAuth\OAuth1\Providers\AbstractProvider as OAuth1Provider;
@@ -244,19 +243,6 @@ class Service
             'consumer_secret' => $options['secret'],
             'callback' => $options['callback'],
         ], $options);
-    }
-
-    /**
-     * @param string $logPath
-     * @return $this
-     */
-    public function setLogPath($logPath)
-    {
-        $log = new Logger('EvaOAuth');
-        $log->pushHandler(new StreamHandler($logPath, Logger::DEBUG));
-        $adapter = $this->getAdapter();
-        $adapter::getHttpClient()->getEmitter()->attach(new LogSubscriber($log, Formatter::DEBUG));
-        return $this;
     }
 
     /**

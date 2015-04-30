@@ -24,21 +24,16 @@ use GuzzleHttp\Url;
  */
 class AuthorizedHttpClient extends Client
 {
-    protected $emitter;
-
-    public function getEmitter()
-    {
-        return $this->emitter;
-    }
-
     /**
      * @param AccessTokenInterface $token
      * @param array $options
      */
     public function __construct(AccessTokenInterface $token, array $options = [])
     {
+        $options = array_merge($options, [
+            'emitter' => EventsManager::getEmitter()
+        ]);
         parent::__construct($options);
-        $this->emitter = EventsManager::getEmitter();
 
         if ($token instanceof OAuth2AccessTokenInterface) {
             $this->getEmitter()->on(

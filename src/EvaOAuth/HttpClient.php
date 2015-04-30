@@ -22,7 +22,9 @@ class HttpClient extends Client
      */
     public function __construct(array $options = [])
     {
+        $options = array_merge($options, [
+            'emitter' => EventsManager::getEmitter()
+        ]);
         parent::__construct($options);
-        $this->emitter = EventsManager::getEmitter();
     }
 }

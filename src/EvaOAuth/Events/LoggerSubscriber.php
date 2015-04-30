@@ -15,7 +15,6 @@ use Psr\Log\LoggerInterface;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\ErrorEvent;
-use GuzzleHttp\Subscriber\Log\Formatter;
 use Psr\Log\LogLevel;
 
 class LoggerSubscriber implements SubscriberInterface

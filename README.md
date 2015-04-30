@@ -105,7 +105,7 @@ $service = new Service('foursquare', [
 
 In OAuth1.0 workflow, we need to store request token somewhere, and use request token exchange for access token.
 
-EvaAuth use [Doctrine\Cache](https://github.com/doctrine/cache) as storage layer. If no configuration, default storage layer use file system to save data, default path is EvaOAuth/tmp.
+EvaOAuth use [Doctrine\Cache](https://github.com/doctrine/cache) as storage layer. If no configuration, default storage layer use file system to save data, default path is EvaOAuth/tmp.
  
 Feel free to change file storage path before `Service` start:
 
@@ -113,13 +113,28 @@ Feel free to change file storage path before `Service` start:
 Service::setStorage(new Doctrine\Common\Cache\FilesystemCache('/tmp'));
 ```
 
-Or use other storage:
+Or use other storage such as Memcache:
 
 ``` php
-$memcache = new \Memcache();
 $storage = new \Doctrine\Common\Cache\MemcacheCache();
-$storage->setMemcache($memcache);
+$storage->setMemcache(new \Memcache());
 Service::setStorage($storage);
+```
+
+## Events Support
+
+EvaOAuth defined some events for easier injection which are:
+
+- BeforeGetRequestToken: Triggered before get request token.
+- BeforeAuthorize: Triggered before redirect to authorize page.
+- BeforeGetAccessToken: Triggered before get access token.
+
+For example, if we want to send an additional header before get access token:
+
+``` php
+$service->getEmitter()->on('beforeGetAccessToken', function(\Eva\EvaOAuth\Events\BeforeGetAccessToken $event) {
+    $event->getRequest()->addHeader('foo', 'bar');
+});
 ```
 
 ## Implementation Specification

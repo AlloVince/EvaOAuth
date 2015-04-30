@@ -11,6 +11,8 @@ namespace Eva\EvaOAuth\OAuth1;
 use Doctrine\Common\Cache\Cache;
 use Eva\EvaOAuth\AdapterTrait;
 use Eva\EvaOAuth\Events\BeforeAuthorize;
+use Eva\EvaOAuth\Events\BeforeGetAccessToken;
+use Eva\EvaOAuth\Events\BeforeGetRequestToken;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\Exception\VerifyException;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
@@ -94,6 +96,10 @@ class Consumer
         );
 
         try {
+            $this->getEmitter()->emit(
+                'beforeGetRequestToken',
+                new BeforeGetRequestToken($request, $serviceProvider, $this)
+            );
             /** @var Response $response */
             $response = $httpClient->send($request);
             return RequestToken::factory($response, $serviceProvider);
@@ -199,6 +205,10 @@ class Consumer
         );
 
         try {
+            $this->getEmitter()->emit(
+                'beforeGetAccessToken',
+                new BeforeGetAccessToken($request, $serviceProvider, $this)
+            );
             /** @var Response $response */
             $response = $httpClient->send($request);
             return AccessToken::factory($response, $serviceProvider, $options);
