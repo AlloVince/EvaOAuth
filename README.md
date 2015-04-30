@@ -11,9 +11,9 @@ EvaOAuth provides a standard interface for OAuth1.0 / OAuth2.0 client authorizat
 
 ## Features
 
-- **Standard interface**, same code for both OAuth1.0 and OAuth2.0 different work flow, receiving token and user info as same format either.  
+- **Standard interface**, same code for both OAuth1.0 and OAuth2.0 different workflow, receiving token and user info as same format either.  
 - **Fully tested** 
-- **Easy to debug**, enable debug mode will record every request and response, to help you find out problems.
+- **Easy to debug**, enable debug mode will record every request and response, help you find out problems quickly.
 - **Out-of-the-box**, already supported most popular websites including Facebook. Twitter, etc.
 - **Scalable**, integrate a new oauth website just need 3 lines code.
 
@@ -148,16 +148,10 @@ Refer wiki for details:
 
 ## Debug and Logging
 
-Enable debug mode will print all request & response on screen.
+Enable debug mode will log all requests & responses.
 
 ``` php
-$service->debug();
-```
-
-Under production environment, recommend use log to trace problems.
-
-``` php
-$service->setLogPath('/tmp/access.log');
+$service->debug('/tmp/access.log');
 ```
 
 Make sure PHP script have permission to write log path.
