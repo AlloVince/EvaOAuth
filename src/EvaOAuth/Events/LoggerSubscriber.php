@@ -9,12 +9,21 @@
 namespace Eva\EvaOAuth\Events;
 
 use GuzzleHttp\Event\SubscriberInterface;
-use GuzzleHttp\Subscriber\Log\SimpleLogger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
+use GuzzleHttp\Event\RequestEvents;
+use GuzzleHttp\Event\CompleteEvent;
+use GuzzleHttp\Event\ErrorEvent;
+use GuzzleHttp\Subscriber\Log\Formatter;
+use Psr\Log\LogLevel;
 
 class LoggerSubscriber implements SubscriberInterface
 {
 
     protected $logger;
+
+    protected $formatter;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -38,20 +47,22 @@ class LoggerSubscriber implements SubscriberInterface
     public function getEvents()
     {
         return [
-            //'beforeGetRequestToken' => ['beforeGetRequestToken'],
-            //'afterGetRequestToken' => ['afterGetRequestToken'],
+            //Guzzle default events
+            'complete' => ['onComplete', RequestEvents::VERIFY_RESPONSE - 10],
+            'error' => ['onError', RequestEvents::EARLY],
             'beforeAuthorize' => ['beforeAuthorize'],
             //'beforeGetAccessToken' => ['beforeGetAccessToken'],
-            //'afterGetAccessToken' => ['afterGetAccessToken'],
-            //'beforeRequestProtectedResource' => ['afterGetAccessToken'],
         ];
     }
 
     public function __construct($logger = null, $formatter = null)
     {
-        $this->logger = $logger instanceof LoggerInterface
-            ? $logger
-            : new SimpleLogger($logger);
+        if (!($logger instanceof LoggerInterface)) {
+            $this->logger = new Logger('EvaOAuth');
+            $this->logger->pushHandler(new StreamHandler($logger, Logger::DEBUG));
+        } else {
+            $this->logger = $logger;
+        }
 
         $this->formatter = $formatter instanceof Formatter
             ? $formatter
@@ -60,9 +71,47 @@ class LoggerSubscriber implements SubscriberInterface
 
     public function beforeAuthorize(BeforeAuthorize $beforeAuthorizeEvent)
     {
+        $this->logger->log(LogLevel::INFO, $beforeAuthorizeEvent->getUri());
+    }
+
+    public function beforeGetRequestToken(BeforeGetRequestToken $beforeGetRequestTokenEvent)
+    {
     }
 
     public function beforeGetAccessToken(BeforeGetAccessToken $beforeGetAccessTokenEvent)
     {
+    }
+
+    public function onComplete(CompleteEvent $event)
+    {
+        $this->logger->log(
+            LogLevel::INFO,
+            $this->formatter->format(
+                $event->getRequest(),
+                $event->getResponse()
+            ),
+            [
+                'request' => $event->getRequest(),
+                'response' => $event->getResponse()
+            ]
+        );
+    }
+
+    public function onError(ErrorEvent $event)
+    {
+        $ex = $event->getException();
+        $this->logger->log(
+            LogLevel::CRITICAL,
+            $this->formatter->format(
+                $event->getRequest(),
+                $event->getResponse(),
+                $ex
+            ),
+            [
+                'request' => $event->getRequest(),
+                'response' => $event->getResponse(),
+                'exception' => $ex
+            ]
+        );
     }
 }

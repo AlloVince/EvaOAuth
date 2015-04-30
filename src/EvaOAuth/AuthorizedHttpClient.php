@@ -24,7 +24,7 @@ use GuzzleHttp\Url;
  */
 class AuthorizedHttpClient extends Client
 {
-    private $emitter;
+    protected $emitter;
 
     public function getEmitter()
     {

@@ -11,7 +11,6 @@ namespace Eva\EvaOAuth\OAuth1;
 use Doctrine\Common\Cache\Cache;
 use Eva\EvaOAuth\AdapterTrait;
 use Eva\EvaOAuth\Events\BeforeAuthorize;
-use Eva\EvaOAuth\Events\EventsManager;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\Exception\VerifyException;
 use Eva\EvaOAuth\OAuth1\Signature\Hmac;
@@ -21,7 +20,6 @@ use Eva\EvaOAuth\OAuth1\Token\RequestToken;
 use Eva\EvaOAuth\Utils\Text;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Message\Response;
-use GuzzleHttp\Event\Emitter;
 
 /**
  * Class Consumer
@@ -127,7 +125,7 @@ class Consumer
         $requestToken = $this->getRequestToken($serviceProvider);
         $this->getStorage()->save(md5($requestToken->getTokenValue()), $requestToken);
         $url = $this->getAuthorizeUri($serviceProvider, $requestToken);
-        $this->getEmitter()->emit('beforeAuthorize', new BeforeAuthorize($this, $url, $requestToken));
+        $this->getEmitter()->emit('beforeAuthorize', new BeforeAuthorize($url, $this, $requestToken));
         header("Location:$url");
     }
 

@@ -141,6 +141,7 @@ class Client
 
         $grantStrategyClass = self::getGrantStrategyMapping()[$this->grantStrategyName];
 
+        /** @var GrantStrategyInterface $grantStrategy */
         $grantStrategy = new $grantStrategyClass(self::getHttpClient(), $this->options);
 
         //Events Propagation
@@ -149,7 +150,7 @@ class Client
         });
         $grantStrategy->getEmitter()->on('beforeGetAccessToken', function (BeforeGetAccessToken $event) {
             $this->getEmitter()->emit(
-                'beforeAuthorize',
+                'beforeGetAccessToken',
                 new BeforeGetAccessToken($event->getRequest(), $event->getProvider(), $this)
             );
         });

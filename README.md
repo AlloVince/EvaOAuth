@@ -101,6 +101,27 @@ $service = new Service('foursquare', [
 ]);
 ```
 
+## Storage
+
+In OAuth1.0 workflow, we need to store request token somewhere, and use request token exchange for access token.
+
+EvaAuth use [Doctrine\Cache](https://github.com/doctrine/cache) as storage layer. If no configuration, default storage layer use file system to save data, default path is EvaOAuth/tmp.
+ 
+Feel free to change file storage path before `Service` start:
+
+``` php
+Service::setStorage(new Doctrine\Common\Cache\FilesystemCache('/tmp'));
+```
+
+Or use other storage:
+
+``` php
+$memcache = new \Memcache();
+$storage = new \Doctrine\Common\Cache\MemcacheCache();
+$storage->setMemcache($memcache);
+Service::setStorage($storage);
+```
+
 ## Implementation Specification
 
 EvaOAuth based on amazing http client library [Guzzle](https://github.com/guzzle/guzzle), use fully OOP to describe OAuth specification.

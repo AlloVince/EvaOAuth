@@ -65,7 +65,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
     public function testDebug()
     {
         $service = new Service('foo', $this->options);
-        $service->debug();
+        $service->debug('test');
         $this->assertTrue(is_array($service->getHttpClient()->getEmitter()->listeners()));
     }
 }

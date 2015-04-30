@@ -7,7 +7,8 @@
 
 namespace Eva\EvaOAuth;
 
-use Eva\EvaOAuth\Events\DebugSubscriber;
+use Doctrine\Common\Cache\FilesystemCache;
+use Eva\EvaOAuth\Events\LoggerSubscriber;
 use Eva\EvaOAuth\Exception\BadMethodCallException;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth1\Consumer;
@@ -81,6 +82,11 @@ class Service
     ];
 
     /**
+     * @var Cache
+     */
+    protected static $storage;
+
+    /**
      * @param string $name
      * @param string $class
      */
@@ -108,28 +114,23 @@ class Service
     }
 
     /**
-     * @param $storageClass
-     * @param array $storageOptions
-     */
-    public static function setStorageDefinition($storageClass, array $storageOptions = [])
-    {
-        self::$storageClass = $storageClass;
-        self::$storageOptions = $storageOptions;
-    }
-
-    /**
      * @return Cache
      */
     public static function getStorage()
     {
-        $storageClass = self::$storageClass;
-        $storageClass = $storageClass ?: 'Doctrine\Common\Cache\FilesystemCache';
-        $storageOptions = self::$storageOptions;
-        $storageOptions = $storageOptions ?: [__DIR__ . '/../../tmp/'];
+        if (self::$storage) {
+            return self::$storage;
+        }
 
-        $reflection = new \ReflectionClass($storageClass);
-        /** @var Cache $instance */
-        return $reflection->newInstanceArgs($storageOptions);
+        return self::$storage = new FilesystemCache(__DIR__ . '/../../tmp/');
+    }
+
+    /**
+     * @param Cache $storage
+     */
+    public static function setStorage(Cache $storage)
+    {
+        self::$storage = $storage;
     }
 
     /**
@@ -261,13 +262,13 @@ class Service
     /**
      * Enable debug mode
      * Guzzle will print all request and response on screen
+     * @param $logPath
      * @return $this
      */
-    public function debug()
+    public function debug($logPath)
     {
         $adapter = $this->getAdapter();
-        $adapter->getEmitter()->attach(new LogSubscriber(null, Formatter::DEBUG));
-        //$adapter->getEmitter()->attach(new LoggerSubscriber());
+        $adapter->getEmitter()->attach(new LoggerSubscriber($logPath, Formatter::DEBUG));
         return $this;
     }
 

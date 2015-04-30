@@ -17,5 +17,4 @@ $service = new Service($provider, [
     'callback' => dirname('http://' . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"]) . '/access.php?provider=' . $provider
 ]);
 
-$service->debug();
-$service->setLogPath(__DIR__ . '/../tmp/access.log');
+$service->debug(__DIR__ . '/../tmp/access.log');

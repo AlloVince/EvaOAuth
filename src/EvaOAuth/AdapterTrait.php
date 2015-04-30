@@ -9,9 +9,8 @@ namespace Eva\EvaOAuth;
 
 use Doctrine\Common\Cache\Cache;
 use Eva\EvaOAuth\Events\EventsManager;
-use Eva\EvaOAuth\HttpClient;
-use GuzzleHttp\Event\Emitter;
 use GuzzleHttp\Client;
+use GuzzleHttp\Event\Emitter;
 
 trait AdapterTrait
 {

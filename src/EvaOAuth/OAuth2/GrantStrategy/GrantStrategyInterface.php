@@ -11,6 +11,7 @@ use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
 use GuzzleHttp\Client as HttpClient;
 use Eva\EvaOAuth\Token\AccessTokenInterface;
+use GuzzleHttp\Event\EmitterInterface;
 
 /**
  * Interface GrantStrategyInterface
@@ -18,6 +19,11 @@ use Eva\EvaOAuth\Token\AccessTokenInterface;
  */
 interface GrantStrategyInterface
 {
+    /**
+     * @return EmitterInterface
+     */
+    public function getEmitter();
+
     /**
      * Generate OAuth authorize URL with query
      *
