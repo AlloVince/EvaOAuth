@@ -41,7 +41,7 @@ class Formatter
      * @link http://httpd.apache.org/docs/1.3/logs.html#common
      * @var string
      */
-    const CLF = "{hostname} {req_header_User-Agent} - [{ts}] \"{method} {resource} {protocol}/{version}\" {code} {res_header_Content-Length}";
+    const CLF = "{hostname} {req_header_User-Agent} - [{ts}] \"{method} {resource} {protocol}\" {code} {res_header_Content-Length}";
     const DEBUG = ">>>>>>>>\n{request}\n<<<<<<<<\n{response}\n--------\n{error}";
     const SHORT = '[{ts}] "{method} {resource} {protocol}/{version}" {code}';
 

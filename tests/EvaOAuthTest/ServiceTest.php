@@ -68,4 +68,5 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $service->debug('test');
         $this->assertTrue(is_array($service->getHttpClient()->getEmitter()->listeners()));
     }
+
 }

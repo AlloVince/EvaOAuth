@@ -65,4 +65,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $this->client->getGrantStrategyName());
         //$this->assertInstanceOf('Eva\EvaOAuth\OAuth2\GrantStrategy\GrantStrategyInterface', $this->client->getGrantStrategy());
     }
+
+    public function testDefaultHttpClient()
+    {
+        Client::setHttpClientDefaultOptions([
+            'timeout' => 3,
+        ]);
+        $this->assertInstanceOf('Eva\EvaOAuth\HttpClient', Client::getHttpClient());
+        //$this->assertEquals(3, Client::getHttpClient()->getDefaultOption());
+    }
 }

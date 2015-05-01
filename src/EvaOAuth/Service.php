@@ -9,7 +9,7 @@ namespace Eva\EvaOAuth;
 
 use Doctrine\Common\Cache\FilesystemCache;
 use Eva\EvaOAuth\Events\Formatter;
-use Eva\EvaOAuth\Events\LoggerSubscriber;
+use Eva\EvaOAuth\Events\LogSubscriber;
 use Eva\EvaOAuth\Exception\BadMethodCallException;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\OAuth1\Consumer;
@@ -254,7 +254,7 @@ class Service
     public function debug($logPath)
     {
         $adapter = $this->getAdapter();
-        $adapter->getEmitter()->attach(new LoggerSubscriber($logPath, Formatter::DEBUG));
+        $adapter->getEmitter()->attach(new LogSubscriber($logPath, Formatter::DEBUG));
         return $this;
     }
 

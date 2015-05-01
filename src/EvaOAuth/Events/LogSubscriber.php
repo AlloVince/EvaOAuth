@@ -17,11 +17,20 @@ use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\ErrorEvent;
 use Psr\Log\LogLevel;
 
-class LoggerSubscriber implements SubscriberInterface
+/**
+ * Class LogSubscriber
+ * @package Eva\EvaOAuth\Events
+ */
+class LogSubscriber implements SubscriberInterface
 {
-
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
 
+    /**
+     * @var Formatter
+     */
     protected $formatter;
 
     /**
@@ -56,11 +65,11 @@ class LoggerSubscriber implements SubscriberInterface
 
     public function __construct($logger = null, $formatter = null)
     {
-        if (!($logger instanceof LoggerInterface)) {
+        if ($logger instanceof LoggerInterface) {
+            $this->logger = $logger;
+        } else {
             $this->logger = new Logger('EvaOAuth');
             $this->logger->pushHandler(new StreamHandler($logger, Logger::DEBUG));
-        } else {
-            $this->logger = $logger;
         }
 
         $this->formatter = $formatter instanceof Formatter
