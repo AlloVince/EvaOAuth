@@ -28,4 +28,11 @@ interface SignatureInterface
      * Refer http://oauth.net/core/1.0a/#anchor21
      */
     const METHOD_PLAINTEXT = 'PLAINTEXT';
+
+    /**
+     * @param string $input
+     * @param string $secret
+     * @param string $tokenSecret
+     */
+    public function __construct($input, $secret, $tokenSecret);
 }

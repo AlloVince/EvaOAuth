@@ -9,10 +9,10 @@
 namespace Eva\EvaOAuth\OAuth1\Signature;
 
 /**
- * Class Hmac
+ * Class PlainText
  * @package Eva\EvaOAuth\OAuth1\Signature
  */
-class Hmac implements SignatureInterface
+class PlainText implements SignatureInterface
 {
     /**
      * @var string
@@ -40,18 +40,16 @@ class Hmac implements SignatureInterface
      */
     public function __toString()
     {
-        return base64_encode(hash_hmac('sha1', $this->input, $this->secret . '&' . $this->tokenSecret, true));
+        return $this->secret . '&' . $this->tokenSecret;
     }
 
     /**
-     * @param $input
      * @param $secret
      * @param string $tokenSecret
      */
     public function __construct($input, $secret, $tokenSecret = null)
     {
         $this->secret = (string) rawurlencode($secret);
-        $this->input = (string) $input;
         $this->tokenSecret = $tokenSecret ? (string) rawurlencode($tokenSecret) : '';
     }
 }

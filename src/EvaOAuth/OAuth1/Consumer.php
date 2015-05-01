@@ -34,7 +34,7 @@ class Consumer
     /**
      * @var string
      */
-    protected $signatureMethod = SignatureInterface::METHOD_HMAC_SHA1;
+    protected $signatureMethod;
 
     /**
      * @param $signatureMethod
@@ -55,17 +55,33 @@ class Consumer
     }
 
     /**
+     * @param string $signatureMethod
+     * @return string
+     */
+    protected function getSignatureClass($signatureMethod = null)
+    {
+        $signatureMethod = $signatureMethod ?: $this->signatureMethod;
+        $signatureClasses = [
+            SignatureInterface::METHOD_PLAINTEXT => 'Eva\EvaOAuth\OAuth1\Signature\PlainText',
+            SignatureInterface::METHOD_HMAC_SHA1 => 'Eva\EvaOAuth\OAuth1\Signature\Hmac',
+            SignatureInterface::METHOD_RSA_SHA1 => 'Eva\EvaOAuth\OAuth1\Signature\Rsa',
+        ];
+        if (false === isset($signatureClasses[$signatureMethod])) {
+            throw new InvalidArgumentException(sprintf('Signature method %s not able to process', $signatureMethod));
+        }
+
+        return $signatureClasses[$signatureMethod];
+    }
+
+    /**
      * @param ServiceProviderInterface $serviceProvider
      * @return Token\RequestToken
      */
     public function getRequestToken(ServiceProviderInterface $serviceProvider)
     {
         $options = $this->options;
-
         $httpMethod = ServiceProviderInterface::METHOD_POST;
-
         $url = $serviceProvider->getRequestTokenUrl();
-
         $parameters = [
             'oauth_consumer_key' => $options['consumer_key'],
             'oauth_signature_method' => $this->signatureMethod,
@@ -74,11 +90,11 @@ class Consumer
             'oauth_version' => '1.0',
             'oauth_callback' => $options['callback'],
         ];
-
         $baseString = Text::buildBaseString($httpMethod, $url, $parameters);
-        $signature = (string)new Hmac(
-            $options['consumer_secret'],
-            $baseString
+        $signatureClass = $this->getSignatureClass();
+        $signature = (string)new $signatureClass(
+            $baseString,
+            $options['consumer_secret']
         );
         $parameters['oauth_signature'] = $signature;
 
@@ -180,9 +196,10 @@ class Consumer
         ];
 
         $baseString = Text::buildBaseString($httpMethod, $url, $parameters);
-        $signature = (string)new Hmac(
-            $options['consumer_secret'],
+        $signatureClass = $this->getSignatureClass();
+        $signature = (string)new $signatureClass(
             $baseString,
+            $options['consumer_secret'],
             $requestToken->getTokenSecret()
         );
         $parameters['oauth_signature'] = $signature;
@@ -231,6 +248,8 @@ class Consumer
             'consumer_key' => '',
             'consumer_secret' => '',
             'callback' => '',
+            //'signature_method' => SignatureInterface::METHOD_HMAC_SHA1,
+            'signature_method' => SignatureInterface::METHOD_PLAINTEXT,
         ], $options);
 
         if (!$options['consumer_key'] || !$options['consumer_secret'] || !$options['callback']) {
@@ -238,5 +257,6 @@ class Consumer
         }
         $this->options = $options;
         $this->storage = $storage;
+        $this->signatureMethod = $options['signature_method'];
     }
 }
