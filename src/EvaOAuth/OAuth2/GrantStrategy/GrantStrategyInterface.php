@@ -7,6 +7,7 @@
 
 namespace Eva\EvaOAuth\OAuth2\GrantStrategy;
 
+use Doctrine\Common\Cache\Cache;
 use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
 use Eva\EvaOAuth\OAuth2\ResourceServerInterface;
 use GuzzleHttp\Client as HttpClient;
@@ -51,6 +52,7 @@ interface GrantStrategyInterface
     /**
      * @param HttpClient $httpClient
      * @param array $options
+     * @param Cache $storage
      */
-    public function __construct(HttpClient $httpClient, array $options);
+    public function __construct(HttpClient $httpClient, array $options, Cache $storage = null);
 }

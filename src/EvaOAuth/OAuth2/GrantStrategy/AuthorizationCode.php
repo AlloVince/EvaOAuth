@@ -8,6 +8,7 @@
 
 namespace Eva\EvaOAuth\OAuth2\GrantStrategy;
 
+use Doctrine\Common\Cache\Cache;
 use Eva\EvaOAuth\Events\BeforeAuthorize;
 use Eva\EvaOAuth\Events\BeforeGetAccessToken;
 use Eva\EvaOAuth\OAuth2\AuthorizationServerInterface;
@@ -36,6 +37,11 @@ class AuthorizationCode implements GrantStrategyInterface
      * @var array
      */
     protected $options;
+
+    /**
+     * @var Cache
+     */
+    protected $storage;
 
     use HasEmitterTrait;
 
@@ -129,10 +135,12 @@ class AuthorizationCode implements GrantStrategyInterface
     /**
      * @param HttpClient $httpClient
      * @param array $options
+     * @param Cache $storage
      */
-    public function __construct(HttpClient $httpClient, array $options)
+    public function __construct(HttpClient $httpClient, array $options, Cache $storage = null)
     {
         $this->httpClient = $httpClient;
         $this->options = $options;
+        $this->storage = $storage;
     }
 }

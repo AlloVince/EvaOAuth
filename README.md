@@ -9,6 +9,8 @@ EvaOAuth
 
 EvaOAuth provides a standard interface for OAuth1.0 / OAuth2.0 client authorization, it is easy to integrate with any PHP project by very few lines code. 
 
+[中文文档](http://avnpc.com/pages/evaoauth)
+
 ## Features
 
 - **Standard interface**, same code for both OAuth1.0 and OAuth2.0 different workflow, receiving token and user info as same format either.  
@@ -62,7 +64,7 @@ $httpClient = new Eva\EvaOAuth\AuthorizedHttpClient($token);
 $response = $httpClient->get('https://graph.facebook.com/me');
 ```
  
-That's it, more usages please check examples and wiki.
+That's it, more usages please check [examples](https://github.com/AlloVince/EvaOAuth/tree/master/examples) and [wiki](https://github.com/AlloVince/EvaOAuth/wiki).
 
 ## Providers
 
