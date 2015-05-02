@@ -44,7 +44,8 @@ class PlainText implements SignatureInterface
     }
 
     /**
-     * @param $secret
+     * @param string $input
+     * @param string $secret
      * @param string $tokenSecret
      */
     public function __construct($input, $secret, $tokenSecret = null)

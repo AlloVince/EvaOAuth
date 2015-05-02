@@ -7,7 +7,9 @@ EvaOAuth
 [![Coverage Status](https://coveralls.io/repos/AlloVince/EvaOAuth/badge.svg?branch=master)](https://coveralls.io/r/AlloVince/EvaOAuth?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AlloVince/EvaOAuth/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AlloVince/EvaOAuth/?branch=master)
 
-EvaOAuth 是一个统一接口设计的PHP OAuth Client库，兼容OAuth1.0与OAuth2.0规范，可以通过10多行代码集成到任意项目中。
+EvaOAuth 是一个统一接口设计的[PHP OAuth](http://avnpc.com/pages/evaoauth) Client库，兼容OAuth1.0与OAuth2.0规范，可以通过10多行代码集成到任意项目中。
+
+项目代码托管在 [https://github.com/AlloVince/EvaOAuth](https://github.com/AlloVince/EvaOAuth) ，欢迎Star及Fork贡献代码。
 
 ## 为什么选择EvaOAuth 
 
@@ -169,7 +171,7 @@ $service->debug('/tmp/access.log');
 
 ## 问题反馈及贡献代码
 
-项目代码托管在 https://github.com/AlloVince/EvaOAuth，欢迎Star及Fork贡献代码。
+项目代码托管在 [https://github.com/AlloVince/EvaOAuth](https://github.com/AlloVince/EvaOAuth]) ，欢迎Star及Fork贡献代码。
 
 有问题欢迎在[EvaOAuth Issue](https://github.com/AlloVince/EvaOAuth/issues)提出。
 

@@ -9,7 +9,8 @@
 namespace Eva\EvaOAuth;
 
 use Eva\EvaOAuth\Events\EventsManager;
-use Eva\EvaOAuth\OAuth1\Signature\Hmac;
+use Eva\EvaOAuth\Exception\InvalidArgumentException;
+use Eva\EvaOAuth\OAuth1\Signature\SignatureInterface;
 use Eva\EvaOAuth\Token\AccessTokenInterface;
 use Eva\EvaOAuth\Utils\Text;
 use Eva\EvaOAuth\OAuth2\Token\AccessTokenInterface as OAuth2AccessTokenInterface;
@@ -35,6 +36,7 @@ class AuthorizedHttpClient extends Client
         ]);
         parent::__construct($options);
 
+
         if ($token instanceof OAuth2AccessTokenInterface) {
             $this->getEmitter()->on(
                 'before',
@@ -47,9 +49,25 @@ class AuthorizedHttpClient extends Client
                 }
             );
         } else {
+            $signatureMethod = isset($options['signature_method'])
+                ? $options['signature_method']
+                : SignatureInterface::METHOD_HMAC_SHA1;
+            $signatureClasses = [
+                SignatureInterface::METHOD_PLAINTEXT => 'Eva\EvaOAuth\OAuth1\Signature\PlainText',
+                SignatureInterface::METHOD_HMAC_SHA1 => 'Eva\EvaOAuth\OAuth1\Signature\Hmac',
+                SignatureInterface::METHOD_RSA_SHA1 => 'Eva\EvaOAuth\OAuth1\Signature\Rsa',
+            ];
+            if (false === isset($signatureClasses[$signatureMethod])) {
+                throw new InvalidArgumentException(sprintf(
+                    'Signature method %s not able to process',
+                    $signatureMethod
+                ));
+            }
+            $signatureClass = $signatureClasses[$signatureMethod];
+
             $this->getEmitter()->on(
                 'before',
-                function (BeforeEvent $event) use ($token) {
+                function (BeforeEvent $event) use ($token, $signatureClass) {
                     /** @var Request $request */
                     $request = $event->getRequest();
                     /** @var \Eva\EvaOAuth\OAuth1\Token\AccessToken $token */
@@ -58,14 +76,14 @@ class AuthorizedHttpClient extends Client
                     $url = Url::fromString($request->getUrl());
                     $parameters = [
                         'oauth_consumer_key' => $token->getConsumerKey(),
-                        'oauth_signature_method' => 'HMAC-SHA1',
-                        'oauth_timestamp' => (string) time(),
+                        'oauth_signature_method' => SignatureInterface::METHOD_HMAC_SHA1,
+                        'oauth_timestamp' => (string)time(),
                         'oauth_nonce' => strtolower(Text::generateRandomString(32)),
                         'oauth_token' => $token->getTokenValue(),
                         'oauth_version' => '1.0',
                     ];
 
-                    $signature = (string) new Hmac(
+                    $signature = (string)new $signatureClass(
                         $token->getConsumerSecret(),
                         Text::buildBaseString($httpMethod, $url, $parameters),
                         $token->getTokenSecret()

@@ -15,7 +15,6 @@ use Eva\EvaOAuth\Events\BeforeGetAccessToken;
 use Eva\EvaOAuth\Events\BeforeGetRequestToken;
 use Eva\EvaOAuth\Exception\InvalidArgumentException;
 use Eva\EvaOAuth\Exception\VerifyException;
-use Eva\EvaOAuth\OAuth1\Signature\Hmac;
 use Eva\EvaOAuth\OAuth1\Signature\SignatureInterface;
 use Eva\EvaOAuth\OAuth1\Token\AccessToken;
 use Eva\EvaOAuth\OAuth1\Token\RequestToken;
@@ -248,8 +247,7 @@ class Consumer
             'consumer_key' => '',
             'consumer_secret' => '',
             'callback' => '',
-            //'signature_method' => SignatureInterface::METHOD_HMAC_SHA1,
-            'signature_method' => SignatureInterface::METHOD_PLAINTEXT,
+            'signature_method' => SignatureInterface::METHOD_HMAC_SHA1,
         ], $options);
 
         if (!$options['consumer_key'] || !$options['consumer_secret'] || !$options['callback']) {
