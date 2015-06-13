@@ -69,6 +69,16 @@ trait TokenTrait
     }
 
     /**
+     * @param string $tokenType
+     * @return $this
+     */
+    public function setTokenType($tokenType)
+    {
+        $this->tokenType = (string) $tokenType;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
