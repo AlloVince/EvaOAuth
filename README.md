@@ -163,3 +163,6 @@ Make sure PHP script have permission to write log path.
 
 Run `phpdoc` will generate API references under `docs/`.
 
+![](https://avnpc.com/static/images/telegram.png)
+
+[Join My Telegram Group](https://t.me/joinchat/HKvcQAw2kqASoYfxiSrIbA)
