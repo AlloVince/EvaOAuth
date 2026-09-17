@@ -1,168 +1,253 @@
-EvaOAuth
-=========
+# EvaOAuth 2.0
 
-[![Latest Stable Version](https://poser.pugx.org/evaengine/eva-oauth/v/stable.svg)](https://packagist.org/packages/evaengine/eva-oauth)
-[![License](https://poser.pugx.org/evaengine/eva-oauth/license.svg)](https://packagist.org/packages/evaengine/eva-oauth)
-[![Build Status](https://travis-ci.org/AlloVince/EvaOAuth.svg?branch=feature%2Frefactoring)](https://travis-ci.org/AlloVince/EvaOAuth)
-[![Coverage Status](https://coveralls.io/repos/AlloVince/EvaOAuth/badge.svg?branch=master)](https://coveralls.io/r/AlloVince/EvaOAuth?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/AlloVince/EvaOAuth/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AlloVince/EvaOAuth/?branch=master)
+Framework-agnostic PHP 8.2–8.5 OAuth client: one login, token and identity API over separate OAuth 2.0 + PKCE and OAuth 1.0a engines. [中文](README_CN.md)
 
-EvaOAuth provides a standard interface for OAuth1.0 / OAuth2.0 client authorization, it is easy to integrate with any PHP project by very few lines code. 
+## GitHub login
 
-[中文文档](http://avnpc.com/pages/evaoauth)
+Register an OAuth app with the exact HTTPS callback below. Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in your server environment. Route both the login entry and callback to this code, before any output; replace `app.example` with your host.
 
-## Features
+```php
+<?php
+require 'vendor/autoload.php';
 
-- **Standard interface**, same code for both OAuth1.0 and OAuth2.0 different workflow, receiving token and user info as same format either.  
-- **Fully tested** 
-- **Easy to debug**, enable debug mode will record every request and response, help you find out problems quickly.
-- **Out-of-the-box**, already supported most popular websites including Facebook. Twitter, etc.
-- **Scalable**, integrate a new oauth website just need 3 lines code.
+use Eva\EvaOAuth\OAuth;
+use Eva\EvaOAuth\Provider\GitHub;
 
-## Quick Start
-
-EvaOAuth can be found on [Packagist](https://packagist.org/packages/evaengine/eva-oauth). The recommended way to install this is through composer.
-
-Edit your composer.json and add:
-
-``` json
-{
-    "require": {
-        "evaengine/eva-oauth": "~1.0"
-    }
+if (!session_start([
+    'use_strict_mode' => true,
+    'use_only_cookies' => true,
+    'cookie_secure' => true,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Lax',
+])) {
+    throw new \RuntimeException('Unable to start the login session.');
 }
-```
-
-And install dependencies:
-
-``` shell
-curl -sS https://getcomposer.org/installer | php
-php composer.phar install
-```
-
-Let's start a example of Facebook Login, if you have already have a Facebook developer account and created an app, prepare a request.php as below: 
-
-``` php
-$service = new Eva\EvaOAuth\Service('Facebook', [
-    'key' => 'You Facebook App ID',
-    'secret' => 'You Facebook App Secret',
-    'callback' => 'http://localhost/EvaOAuth/example/access.php'
-]);
-$service->requestAuthorize();
-```
-
-Run request.php in browser, will be redirected to Facebook authorization page. After user confirm authorization, prepare the access.php for callback:
-
-``` php
-$token = $service->getAccessToken();
-```
-
-Once access token received, we could use access token to visit any protected resources.
-
-``` php
-$httpClient = new Eva\EvaOAuth\AuthorizedHttpClient($token);
-$response = $httpClient->get('https://graph.facebook.com/me');
-```
- 
-That's it, more usages please check [examples](https://github.com/AlloVince/EvaOAuth/tree/master/examples) and [wiki](https://github.com/AlloVince/EvaOAuth/wiki).
-
-## Providers
-
-EvaOAuth supports most popular OAuth services as below:
-
-- OAuth2.0
-  - Douban
-  - Facebook
-  - Tencent
-  - Weibo
-- OAuth1.0
-  - Twitter
-  
-Creating a custom provider require only few lines code, for OAuth2 sites:
-
-
-``` php
-namespace YourNamespace;
-
-class Foursquare extends \Eva\EvaOAuth\OAuth2\Providers\AbstractProvider
-{
-    protected $authorizeUrl = 'https://foursquare.com/oauth2/authorize';
-    protected $accessTokenUrl = 'https://foursquare.com/oauth2/access_token';
+$oauth = new OAuth([
+    'github' => new GitHub(
+        getenv('GITHUB_CLIENT_ID'),
+        getenv('GITHUB_CLIENT_SECRET'),
+        'https://app.example/callback/github',
+    ),
+], httpClient: $httpClient ?? null);
+header('Cache-Control: no-store');
+header('Referrer-Policy: no-referrer');
+if ($_GET === []) {
+    $url = $oauth->authorize('github');
+    header('Location: ' . $url, true, 302);
+    return;
 }
+$result = $oauth->callback('github', $_GET);
+session_regenerate_id(true);
+$token = $result->token;
+$_SESSION['oauth_identity'] = [
+    'provider' => $result->provider,
+    'id' => $result->user->id,
+    'name' => $result->user->name,
+    'email' => $result->user->email,
+];
+header('Location: /account', true, 303);
 ```
 
-Then register to service and create instance:
+This completes the provider login; your application must resolve `(provider, id)` to its local account and enforce authorization. Do not link accounts by email alone. `name`, `email`, `avatar` and `emailVerified` can be null. GitHub's `/user` may omit private email even with `user:email`; this provider does not fetch `/user/emails` automatically. Never send `$token` to the browser.
 
-``` php
-use Eva\EvaOAuth\Service;
-Service::registerProvider('foursquare', 'YourNamespace\Foursquare');
-$service = new Service('foursquare', [
-    'key' => 'Foursquare App ID',
-    'secret' => 'Foursquare App Secret',
-    'callback' => 'http://somecallback/'
+The optional `$httpClient` is your PSR-18 client; omit it to use the built-in transport. The snippet assumes a fresh request and an active, secure server-side session; check session startup failures in your application bootstrap. Handle callback exceptions using your error handler, not a raw exception page. An empty query starts authorization; dedicate this route to GitHub. When adding providers, bind each distinct callback path to a fixed provider name in your router; the facade cannot inspect the actual incoming route. Never choose the callback provider from query parameters.
+
+## Install and why EvaOAuth
+
+After a 2.x release is published:
+
+```sh
+composer require evaengine/eva-oauth:^2.0
+```
+
+For this development checkout: `composer install`. Requires PHP 8.2, 8.3, 8.4 or 8.5, JSON and OpenSSL; no Laravel, Symfony, Google SDK or full framework is required. Composer installs Guzzle and the stable League OAuth1/OAuth2 engines.
+
+Using a League engine directly is reasonable for a single protocol. EvaOAuth adds browser-bound, one-use authorization transactions, secure defaults, provider/configuration-bound tokens, normalized identity, the same OAuth1/OAuth2 application API, restricted resource origins, fixed exceptions and metadata-only tracing. It does not pretend that OAuth1 token secrets are OAuth2 refresh tokens.
+
+## Providers and common API
+
+| Provider | Protocol | Default behavior |
+| --- | --- | --- |
+| `Provider\GitHub` | OAuth2 code + S256 PKCE | `read:user user:email`, `/user` identity |
+| `Provider\Google` | OAuth2 code + S256 PKCE | `openid profile email`, offline access, UserInfo identity |
+| `Provider\Flickr` | OAuth1.0a | Request token, consent, access token, signed identity request |
+| `Provider\OAuth2Provider` | OAuth2 code + S256 PKCE | Your HTTPS endpoints, scopes and identity mapper |
+| `Provider\OAuth1Provider` | OAuth1.0a | Your HTTPS endpoints and identity mapper |
+
+`authorize(name)` returns a URL, never sends browser headers. `callback(name, query)` returns `AuthorizationResult(provider, token, user)`. `exchange(name, query)` consumes the same callback but returns only a `Token`; do not call both for one callback. `user(name, token)` fetches identity. `request(name, token, psrRequest)` signs a provider-bound request. `refresh(name, token)` returns a new OAuth2 token; OAuth1 refresh is unsupported.
+
+## Google and refresh tokens
+
+Use the same session and redirect/callback handling as above, with a distinct callback URI:
+
+```php
+$oauth = new \Eva\EvaOAuth\OAuth([
+    'google' => new \Eva\EvaOAuth\Provider\Google(
+        getenv('GOOGLE_CLIENT_ID'),
+        getenv('GOOGLE_CLIENT_SECRET'),
+        'https://app.example/callback/google',
+    ),
+], httpClient: $httpClient ?? null);
+$url = $oauth->authorize('google');
+```
+
+After Google's browser redirect, use this on the callback route (not immediately after `authorize`):
+
+```php
+$result = $oauth->callback('google', $_GET);
+$token = $result->token;
+$user = $result->user;
+```
+
+Later, with that provider-bound token loaded from protected server-side storage:
+
+```php
+if ($token->refreshToken !== null && $token->isExpired()) {
+    $token = $oauth->refresh('google', $token);
+}
+$record = $token->toArray();
+$restored = \Eva\EvaOAuth\Token::fromArray($record);
+```
+
+`toArray()` deliberately exports credentials: encrypt the record at rest, restrict access, and atomically replace the old record after refresh. JSON/debug views redact tokens and are **not** persistence formats; PHP serialization is rejected. `expiresAt` is a nullable Unix timestamp; an absent expiry is unknown, not proof of indefinite validity. A reported `expires_in=0` means immediately expired and must never be normalized to an absent expiry; such a token cannot be used to fetch identity before a successful refresh. Requests do not refresh automatically. A refresh response without a new refresh token preserves the old one; a replacement is retained. Serialize refresh operations per account to avoid rotation races. Missing/revoked/expired refresh credentials require a new authorization, not an endless retry loop.
+
+Google requests `access_type=offline`; that does not guarantee a refresh token on every login. Google normally issues it on the initial grant; re-consent may be needed. For an explicit re-consent workflow configure a generic OAuth2 provider with the same Google endpoints, a `sub` mapper, `issuer: 'https://accounts.google.com'` and `authorizationParameters: ['access_type' => 'offline', 'prompt' => 'consent']`; do not force consent on every routine login. Changed configuration changes token binding, so keep each flow's configuration stable. Google testing-mode grants can expire; consent-screen publication, app verification and granted scopes are application responsibilities.
+
+Endpoints checked against [Google's official web-server guide](https://developers.google.com/identity/protocols/oauth2/web-server) and [discovery metadata](https://accounts.google.com/.well-known/openid-configuration) on 2026-09-17:
+
+- Authorization: `https://accounts.google.com/o/oauth2/v2/auth`
+- Token and refresh: `https://oauth2.googleapis.com/token`
+- UserInfo: `https://openidconnect.googleapis.com/v1/userinfo`
+
+Identity comes from the authenticated UserInfo response (`sub`), not an unvalidated ID token. EvaOAuth is not an OIDC/JWT validator and does not implement discovery or DPoP.
+
+## Flickr: the same application boundary
+
+With an active session, Flickr uses the same authorize/callback/result pattern, but its engine performs OAuth1 request-token and HMAC signing internally:
+
+```php
+$oauth = new \Eva\EvaOAuth\OAuth([
+    'flickr' => new \Eva\EvaOAuth\Provider\Flickr(
+        getenv('FLICKR_CLIENT_ID'),
+        getenv('FLICKR_CLIENT_SECRET'),
+        'https://app.example/callback/flickr',
+    ),
+], httpClient: $httpClient ?? null);
+$url = $oauth->authorize('flickr');
+```
+
+Redirect the browser to `$url`; on the callback route:
+
+```php
+$result = $oauth->callback('flickr', $_GET);
+$token = $result->token;
+$user = $result->user;
+```
+
+Flickr defaults to read permissions; use its optional fourth `permissions` argument for `write` or `delete` only when needed. Persist the OAuth1 `tokenSecret` together with `accessToken` using the protected `toArray()` record. There is no OAuth2-style refresh grant. The OAuth1 adapter rejects ambiguous parameter shapes (duplicate names, query/form collisions, bracketed names or caller-supplied `oauth_*` fields), pre-existing Authorization headers and unsupported form streams instead of signing them incorrectly. See [Flickr's official OAuth documentation](https://www.flickr.com/services/api/auth.oauth.html).
+
+## Add an OAuth2 provider
+
+Endpoints are trusted deployment configuration, never callback input. A mapper must return `Identity` and reject missing or malformed identifiers. This example uses placeholder domains to illustrate your own service:
+
+```php
+$custom = new \Eva\EvaOAuth\Provider\OAuth2Provider(
+    clientId: getenv('CUSTOM_CLIENT_ID'),
+    clientSecret: getenv('CUSTOM_CLIENT_SECRET'),
+    redirect: 'https://app.example/callback/custom',
+    authorizeUrl: 'https://auth.example/authorize',
+    accessTokenUrl: 'https://auth.example/token',
+    userUrl: 'https://api.example/me',
+    scopes: ['profile'],
+    identityMapper: static function (array $data): \Eva\EvaOAuth\Identity {
+        if (!isset($data['account_id']) || !is_string($data['account_id'])) {
+            throw new \Eva\EvaOAuth\Exception\ProviderException();
+        }
+        return new \Eva\EvaOAuth\Identity($data['account_id']);
+    },
+    clientAuthentication: 'client_secret_basic',
+);
+$oauth = new \Eva\EvaOAuth\OAuth(['custom' => $custom], httpClient: $httpClient ?? null);
+$url = $oauth->authorize('custom');
+```
+
+Use `callback('custom', $_GET)` after consent. `client_secret_post` is the default alternative. Optional `authorizationParameters`, `scopeSeparator`, `responseScopeSeparator`, `issuer` and `resourceOrigins` cover common variations. `scopeSeparator` controls authorization request scopes; `responseScopeSeparator` controls token-response parsing and defaults to a space, while GitHub uses commas. The optional trusted `issuer` is checked against callback `iss` when supplied: it must match exactly, and a supplied `iss` is rejected when no issuer is configured. Google configures `https://accounts.google.com`. Unknown OAuth2 callback extension parameters are ignored per RFC 6749; recognized fields retain strict type/shape validation and cannot override security checks. Required state/PKCE/grant parameters cannot be overridden. Additional resource origins must be exact HTTPS origins; only add origins you trust to receive credentials. For reusable mapping, extend the readonly provider class and override `identity()`, not the protocol engine. Third-party League providers are not directly interchangeable with EvaOAuth providers.
+
+## PSR-18 HTTP, PSR-3 logging and authorized requests
+
+Your PSR-18 client and PSR-3 logger are injected once; Guzzle is the default, and no logger output is produced by default. With `$custom` from the preceding example:
+
+```php
+$httpClient = $httpClient ?? new \GuzzleHttp\Client([
+    'allow_redirects' => false,
+    'http_errors' => false,
+    'timeout' => 15,
+    'connect_timeout' => 5,
 ]);
+$logger = $logger ?? new \Psr\Log\NullLogger();
+$oauth = new \Eva\EvaOAuth\OAuth(
+    ['custom' => $custom],
+    httpClient: $httpClient,
+    logger: $logger,
+);
 ```
 
-## Storage
+Given a token obtained through that same custom provider:
 
-In OAuth1.0 workflow, we need to store request token somewhere, and use request token exchange for access token.
-
-EvaOAuth use [Doctrine\Cache](https://github.com/doctrine/cache) as storage layer. If no configuration, default storage layer use file system to save data, default path is EvaOAuth/tmp.
- 
-Feel free to change file storage path before `Service` start:
-
-``` php
-Service::setStorage(new Doctrine\Common\Cache\FilesystemCache('/tmp'));
+```php
+$response = $oauth->request(
+    'custom',
+    $token,
+    new \GuzzleHttp\Psr7\Request('GET', 'https://api.example/me'),
+);
+$status = $response->getStatusCode();
 ```
 
-Or use other storage such as Memcache:
+An injected client must retain TLS verification, apply finite timeouts and **not follow redirects** or log raw traffic. EvaOAuth rejects 3xx responses, but cannot undo credentials leaked by a transport that already followed a redirect. Resource requests are constrained to configured origins and reject query bearer credentials. The default transport uses a 15-second total and 5-second connection timeout; no automatic retries are provided.
 
-``` php
-$storage = new \Doctrine\Common\Cache\MemcacheCache();
-$storage->setMemcache(new \Memcache());
-Service::setStorage($storage);
+### Safe trace: actual fields
+
+The logger receives debug-level events with these exact metadata schemas:
+
+```text
+oauth.http.response {operation: "http", method: "POST", status: 200, duration_ms: 12.5}
+oauth.http.failure  {operation: "http", method: "GET", category: "transport", duration_ms: 15.0}
 ```
 
-## Events Support
+Numbers are illustrative, not a recorded live request. `method` is an allowlisted HTTP verb or `OTHER`; `operation` is currently always `http`, not a provider/grant identifier. HTTP error responses still produce `oauth.http.response` with their status; malformed payloads do not create a separate parse event. Logger failures do not break the flow. There are no URLs, headers, bodies, query values, provider messages or exception chains in these events. Use event order, status and duration to diagnose transport/provider failures; attach your own non-secret correlation ID outside the OAuth request data. Never enable Guzzle `debug`, dump request objects, or include callback URLs in APM/access logs.
 
-EvaOAuth defined some events for easier injection which are:
+## Exceptions and security responsibilities
 
-- BeforeGetRequestToken: Triggered before get request token.
-- BeforeAuthorize: Triggered before redirect to authorize page.
-- BeforeGetAccessToken: Triggered before get access token.
+All public OAuth failures derive from `Exception\OAuthException`:
 
-For example, if we want to send an additional header before get access token:
+| Exception | Application response |
+| --- | --- |
+| `ConfigurationException` | Fix credentials, provider map, session setup or token binding; do not retry blindly |
+| `CallbackException` | Reject malformed, expired, denied, mismatched or replayed callback; offer a new login |
+| `ProviderException` | Provider HTTP/data/signing failure or expired token; show a generic failure and investigate safe metadata |
+| `TransportException` | Network/transport failure; apply a bounded application retry policy only where safe |
+| `UnsupportedOperationException` | Do not attempt the operation for this protocol/token |
 
-``` php
-$service->getEmitter()->on('beforeGetAccessToken', function(\Eva\EvaOAuth\Events\BeforeGetAccessToken $event) {
-    $event->getRequest()->addHeader('foo', 'bar');
-});
+Messages are fixed and previous exceptions are removed. Do not expose stack traces, local variables or credentials; application validation and PHP errors also need a safe global handler. A callback is consumed before exchange, so retrying the same callback is not supported. Use `exchange()` plus `user()` when identity-fetch recovery is needed without re-exchanging a code.
+
+- Use HTTPS for endpoints, resources and distinct registered callback URIs per configured provider. Derive neither endpoints nor redirect destinations from user input. Account linking needs explicit user confirmation and local CSRF defenses.
+- Start PHP sessions before creating the default store; secure/HttpOnly/SameSite=Lax cookies and strict mode require HTTPS. Retain the session lock through transaction access. Regenerate the session ID after successful login and enforce application session expiration/logout.
+- Default pending transactions expire after 600 seconds and cap at 10 per browser. `State\SessionStateStore(ttl: ..., capacity: ...)` permits 1–1800 seconds and 1–100 entries. Exceeding capacity evicts oldest attempts. A custom `StateStore` must browser-scope keys and implement atomic one-use `consume`, expiration and bounds across workers. `MemoryStateStore` is for tests, not multi-request production login.
+- State, S256 PKCE, CSPRNG values and OAuth1 temporary secrets are handled by the library. Protect the session backend; never share pending state globally between browsers. Keep provider configuration stable across login/callback/refresh; secret rotation can invalidate existing token bindings.
+- Encrypt stored token records, protect backups and keys, apply least privilege, delete/revoke grants when appropriate, and manage refresh concurrency. Token/debug redaction does not protect explicit property access, `toArray()`, arbitrary object casts or your own telemetry.
+- Prevent callback query strings appearing in web-server/proxy/APM logs. Serve no third-party resources on callbacks; use `no-store`, `no-referrer` and redirect to a clean local URL. Escape profile data before rendering; treat email as optional and do not infer verification.
+- Maintain trust in configured provider hosts/DNS and transport proxy settings; the origin policy is not a general network sandbox. Provider registration, scope review, rate limits, consent policies and incident response remain yours.
+
+## Development and migration
+
+```sh
+composer install
+composer verify
+composer validate --strict
 ```
 
-## Implementation Specification
+`verify` runs PHPUnit, PHPStan level 6, PSR-12 PHPCS, strict Composer validation and locked dependency audit (including abandoned packages). Only the `missingType.iterableValue` PHPStan identifier is disabled because this project uses native types without code comments; no baseline or blanket suppression is used. CI declares PHP 8.2–8.5 and a lowest-dependency job. This is not a claim that remote jobs have already run.
 
-EvaOAuth based on amazing http client library [Guzzle](https://github.com/guzzle/guzzle), use fully OOP to describe OAuth specification.
+All PHP fences in both READMEs are extracted and executed with mocked HTTP by `tests/Modern/DocumentationTest.php`; separate wire-level tests verify protocol details. No demo website or live provider credentials are needed. The obsolete `src/`, example website and old tests have been removed; the 1.x implementation remains available in Git history. Tests and development tooling are available in the source repository, not the production package archive.
 
-Refer wiki for details:
- 
-- [OAuth1.0](https://github.com/AlloVince/EvaOAuth/wiki/OAuth1.0-Specification-Implementation)
-- [OAuth2.0](https://github.com/AlloVince/EvaOAuth/wiki/OAuth2.0-Specification-Implementation)
-
-## Debug and Logging
-
-Enable debug mode will log all requests & responses.
-
-``` php
-$service->debug('/tmp/access.log');
-```
-
-Make sure PHP script have permission to write log path.
-
-
-## API References
-
-Run `phpdoc` will generate API references under `docs/`.
-
-![](https://avnpc.com/static/images/telegram.png)
-
-[Join My Telegram Group](https://t.me/joinchat/HKvcQAw2kqASoYfxiSrIbA)
+See [1.x → 2.x migration](UPGRADING.md), [architecture](docs/ARCHITECTURE.md), [acceptance evidence](docs/ACCEPTANCE.md), [release procedure](docs/RELEASING.md) and [ADR](docs/ADR-001.md). Licensed under [BSD-3-Clause](LICENSE).

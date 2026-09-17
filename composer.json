@@ -1,28 +1,33 @@
 {
     "name": "evaengine/eva-oauth",
-    "description": "EvaOAuth is an abstract interface to setup OAuth client, both support OAuth1.0a / OAuth2.",
+    "description": "Framework-agnostic OAuth 1.0a and OAuth 2.0 client with unified login, identity and safe diagnostics.",
+    "type": "library",
     "license": "BSD-3-Clause",
-    "homepage": "http://avnpc.com/",
-    "authors": [
-        {
-          "name": "AlloVince",
-          "email": "allo.vince@gmail.com",
-          "homepage": "http://avnpc.com"
-        }
-    ],
+    "authors": [{"name": "AlloVince", "email": "allo.vince@gmail.com"}],
     "require": {
-      "php": ">=5.4",
-      "guzzlehttp/guzzle": "~5.2",
-      "doctrine/cache": "~1.4",
-      "monolog/monolog": "~1.13"
+        "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "guzzlehttp/guzzle": "^7.10",
+        "guzzlehttp/psr7": "^2.8",
+        "league/oauth2-client": "^2.9.1",
+        "league/oauth1-client": "^1.11",
+        "psr/http-client": "^1.0",
+        "psr/http-message": "^2.0",
+        "psr/log": "^3.0"
     },
     "require-dev": {
-      "mockery/mockery": "dev-master",
-      "satooshi/php-coveralls": "dev-master"
+        "phpunit/phpunit": "^11.5",
+        "phpstan/phpstan": "^2.1",
+        "squizlabs/php_codesniffer": "^3.13"
     },
-    "autoload": {
-        "psr-4": {
-          "Eva\\EvaOAuth\\": "src/EvaOAuth/"
-        }
-    }
+    "autoload": {"psr-4": {"Eva\\EvaOAuth\\": "lib/"}},
+    "autoload-dev": {"psr-4": {"Eva\\EvaOAuth\\Tests\\": "tests/Modern/"}},
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=512M",
+        "style": "phpcs",
+        "verify": ["@test", "@analyse", "@style", "@composer validate --strict", "@composer audit --locked --abandoned=fail"]
+    },
+    "config": {"sort-packages": true, "allow-plugins": false}
 }

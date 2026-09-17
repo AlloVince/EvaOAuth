@@ -1,18 +1,13 @@
-<phpunit bootstrap="./tests/Bootstrap.php" colors="true">
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php" colors="true">
     <testsuites>
-        <testsuite name="EvaOAuth Unit Test">
-            <directory>./tests</directory>
+        <testsuite name="Modern">
+            <directory>tests/Modern</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist>
-            <directory>src/</directory>
-            <exclude>
-                <directory>vendor/</directory>
-            </exclude>
-        </whitelist>
-    </filter>
-    <logging>
-        <log type="coverage-clover" target="tmp/clover.xml"/>
-    </logging>
+    <source>
+        <include>
+            <directory>lib</directory>
+        </include>
+    </source>
 </phpunit>

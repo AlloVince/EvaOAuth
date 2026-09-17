@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ruleset name="EvaOAuth">
+    <description>PSR-12 for the maintained library and modern tests.</description>
+    <file>lib</file>
+    <file>tests/Modern</file>
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+    <rule ref="PSR12"/>
+</ruleset>

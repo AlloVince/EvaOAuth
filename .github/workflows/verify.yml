@@ -1,0 +1,47 @@
+name: Verify
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: PHP ${{ matrix.php }} locked dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4', '8.5']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: json, openssl, mbstring, dom, xml, xmlwriter
+          coverage: none
+          tools: composer:v2
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: composer verify
+
+  lowest:
+    name: PHP 8.2 lowest dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: json, openssl, mbstring, dom, xml, xmlwriter
+          coverage: none
+          tools: composer:v2
+      - run: composer update --prefer-lowest --prefer-stable --no-interaction --prefer-dist --no-progress
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: composer verify
