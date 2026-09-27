@@ -34,8 +34,10 @@ $oauth = new OAuth([
         clientSecret: $_ENV['GITHUB_CLIENT_SECRET'],
         redirectUri: 'https://example.com/oauth/github/callback',
     ),
-]);
+], httpClient: $httpClient ?? null);
 ```
+
+`$httpClient` 是可选的 PSR-18 client，不传时使用内置的 HTTP 实现。
 
 开始授权：
 
@@ -72,13 +74,18 @@ $oauth = new OAuth([
         clientSecret: $_ENV['GOOGLE_CLIENT_SECRET'],
         redirectUri: 'https://example.com/oauth/google/callback',
     ),
-]);
+], httpClient: $httpClient ?? null);
 ```
 
-后面的应用代码保持一致：
+只替换了 Provider 和它的凭据，授权仍然返回一个 URL：
 
 ```php
 $url = $oauth->authorize('google');
+```
+
+回调调用与 GitHub 完全相同：
+
+```php
 $result = $oauth->callback('google', $_GET);
 ```
 
@@ -97,9 +104,14 @@ $oauth = new OAuth([
         clientSecret: $_ENV['FLICKR_SECRET'],
         redirectUri: 'https://example.com/oauth/flickr/callback',
     ),
-]);
+], httpClient: $httpClient ?? null);
 
 $url = $oauth->authorize('flickr');
+```
+
+回调调用保持一致：
+
+```php
 $result = $oauth->callback('flickr', $_GET);
 ```
 

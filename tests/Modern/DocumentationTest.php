@@ -6,18 +6,20 @@ namespace Eva\EvaOAuth\Tests;
 
 use Eva\EvaOAuth\AuthorizationResult;
 use Eva\EvaOAuth\OAuth;
-use Eva\EvaOAuth\Token;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\AbstractLogger;
 
 #[RunTestsInSeparateProcesses]
 #[PreserveGlobalState(false)]
 final class DocumentationTest extends TestCase
 {
+    private static array $headers = [];
+
+    private static string $imports = '';
+
     public static function documents(): iterable
     {
         yield 'English' => ['README.md'];
@@ -32,76 +34,80 @@ final class DocumentationTest extends TestCase
         self::assertIsString($markdown);
         preg_match_all('/^```php\h*\R(.*?)^```\h*$/ms', $markdown, $matches);
         $snippets = $matches[1];
-        self::assertCount(9, $snippets, 'Every added PHP fence must have an execution scenario.');
-        foreach (['GITHUB', 'GOOGLE', 'FLICKR', 'CUSTOM'] as $provider) {
-            putenv($provider . '_CLIENT_ID=documentation-client');
-            putenv($provider . '_CLIENT_SECRET=documentation-secret');
-        }
+        self::assertCount(11, $snippets, 'Every added PHP fence must have an execution scenario.');
+        $this->credentials();
+        self::$headers = [];
+        self::$imports = $this->imports($snippets);
         $_GET = [];
+
         $githubHttp = new MockHttpClient([
             $this->json(['access_token' => 'github-access', 'token_type' => 'Bearer']),
             $this->json(['id' => 42, 'name' => 'Ada', 'email' => 'ada@example.test']),
         ]);
-        $login = $this->execute($snippets[0], ['httpClient' => $githubHttp]);
+        $variables = $this->execute($snippets[0], ['httpClient' => $githubHttp]);
+        self::assertInstanceOf(OAuth::class, $variables['oauth']);
         self::assertSame(PHP_SESSION_ACTIVE, session_status());
-        self::assertSame('1', ini_get('session.use_strict_mode'));
-        self::assertSame('1', ini_get('session.use_only_cookies'));
-        $cookies = session_get_cookie_params();
-        self::assertTrue($cookies['secure']);
-        self::assertTrue($cookies['httponly']);
-        self::assertSame('Lax', $cookies['samesite']);
-        $start = $this->query($login['url']);
+
+        $this->execute($snippets[1], $variables);
+        $redirect = $this->redirect();
+        self::assertStringStartsWith('https://github.com/login/oauth/authorize?', $redirect);
+        $start = $this->query($redirect);
         self::assertSame('S256', $start['code_challenge_method']);
+        self::assertSame('code', $start['response_type']);
+        self::assertSame('https://example.com/oauth/github/callback', $start['redirect_uri']);
+        self::assertSame('documentation-client', $start['client_id']);
+        self::assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/D', $start['state']);
         self::assertCount(0, $githubHttp->requests);
-        $oldSessionId = session_id();
-        session_write_close();
+
         $_GET = ['state' => $start['state'], 'code' => 'github-code'];
-        $callback = $this->execute($snippets[0], ['httpClient' => $githubHttp]);
-        self::assertNotSame($oldSessionId, session_id());
-        self::assertInstanceOf(AuthorizationResult::class, $callback['result']);
-        self::assertSame('github-access', $callback['token']->accessToken);
-        self::assertSame([
-            'provider' => 'github',
-            'id' => '42',
-            'name' => 'Ada',
-            'email' => 'ada@example.test',
-        ], $_SESSION['oauth_identity']);
+        $result = $this->authorizationResult($this->execute($snippets[2], $variables));
+        self::assertSame('github', $result->provider);
+        self::assertSame('oauth2', $result->token->protocol);
+        self::assertSame('github-access', $result->token->accessToken);
+        self::assertSame('42', $result->user->id);
+        self::assertSame('Ada', $result->user->name);
+        self::assertSame('ada@example.test', $result->user->email);
         self::assertCount(2, $githubHttp->requests);
         self::assertSame([], $githubHttp->queue);
+        self::assertSame('https://github.com/login/oauth/access_token', (string) $githubHttp->requests[0]->getUri());
+        self::assertSame('https://api.github.com/user', (string) $githubHttp->requests[1]->getUri());
 
         $googleHttp = new MockHttpClient([
             $this->json([
-                'access_token' => 'google-old',
+                'access_token' => 'google-access',
                 'token_type' => 'Bearer',
                 'refresh_token' => 'google-refresh',
                 'expires_in' => 3600,
             ]),
-            $this->json(['sub' => 'google-user', 'name' => 'Ada', 'email_verified' => true]),
-            $this->json(['access_token' => 'google-new', 'token_type' => 'Bearer', 'expires_in' => 3600]),
+            $this->json([
+                'sub' => 'google-user',
+                'name' => 'Ada',
+                'email' => 'ada@example.test',
+                'email_verified' => true,
+            ]),
         ]);
-        $google = $this->execute($snippets[1], ['httpClient' => $googleHttp]);
-        $start = $this->query($google['url']);
+        $variables = $this->execute($snippets[3], ['httpClient' => $googleHttp]);
+        self::assertInstanceOf(OAuth::class, $variables['oauth']);
+        $variables = $this->execute($snippets[4], $variables);
+        self::assertCount(0, $googleHttp->requests);
+        $start = $this->query($variables['url']);
         self::assertSame('offline', $start['access_type']);
+        self::assertSame('S256', $start['code_challenge_method']);
         self::assertSame('openid profile email', $start['scope']);
+
         $_GET = ['state' => $start['state'], 'code' => 'google-code'];
-        $google = $this->execute($snippets[2], $google);
-        self::assertSame('google-user', $google['user']->id);
-        self::assertTrue($google['user']->emailVerified);
-        $record = $google['token']->toArray();
-        $record['expiresAt'] = time() - 1;
-        $google['token'] = Token::fromArray($record);
-        $google = $this->execute($snippets[3], $google);
-        self::assertSame('google-new', $google['token']->accessToken);
-        self::assertSame('google-refresh', $google['token']->refreshToken);
-        self::assertFalse($google['token']->isExpired());
-        self::assertEquals($google['token'], $google['restored']);
-        self::assertSame($google['token']->toArray(), $google['record']);
-        self::assertCount(3, $googleHttp->requests);
+        $result = $this->authorizationResult($this->execute($snippets[5], $variables));
+        self::assertSame('google', $result->provider);
+        self::assertSame('google-user', $result->user->id);
+        self::assertTrue($result->user->emailVerified);
+        self::assertSame('google-refresh', $result->token->refreshToken);
+        self::assertCount(2, $googleHttp->requests);
         self::assertSame([], $googleHttp->queue);
-        self::assertSame('https://oauth2.googleapis.com/token', (string) $googleHttp->requests[2]->getUri());
-        parse_str((string) $googleHttp->requests[2]->getBody(), $refresh);
-        self::assertSame('refresh_token', $refresh['grant_type']);
-        self::assertSame('google-refresh', $refresh['refresh_token']);
+        self::assertSame('https://oauth2.googleapis.com/token', (string) $googleHttp->requests[0]->getUri());
+        self::assertSame(
+            'https://openidconnect.googleapis.com/v1/userinfo',
+            (string) $googleHttp->requests[1]->getUri(),
+        );
 
         $flickrHttp = new MockHttpClient([
             new Response(
@@ -116,73 +122,106 @@ final class DocumentationTest extends TestCase
             ),
             $this->json(['stat' => 'ok', 'user' => ['id' => '123@N00', 'username' => ['_content' => 'Ada']]]),
         ]);
-        $flickr = $this->execute($snippets[4], ['httpClient' => $flickrHttp]);
-        $start = $this->query($flickr['url']);
+        $variables = $this->execute($snippets[6], ['httpClient' => $flickrHttp]);
+        self::assertInstanceOf(OAuth::class, $variables['oauth']);
+        self::assertCount(1, $flickrHttp->requests);
+        $start = $this->query($variables['url']);
         self::assertSame('temporary', $start['oauth_token']);
         self::assertSame('read', $start['perms']);
+
         $_GET = ['oauth_token' => $start['oauth_token'], 'oauth_verifier' => 'flickr-verifier'];
-        $flickr = $this->execute($snippets[5], $flickr);
-        self::assertSame('flickr', $flickr['result']->provider);
-        self::assertSame('123@N00', $flickr['user']->id);
-        self::assertSame('Ada', $flickr['user']->name);
-        self::assertSame('oauth1', $flickr['token']->protocol);
-        self::assertSame('flickr-secret', $flickr['token']->tokenSecret);
+        $variables = $this->execute($snippets[7], $variables);
+        $result = $this->authorizationResult($variables);
+        self::assertSame('flickr', $result->provider);
+        self::assertSame('oauth1', $result->token->protocol);
+        self::assertSame('flickr-access', $result->token->accessToken);
+        self::assertSame('flickr-secret', $result->token->tokenSecret);
+        self::assertSame('123@N00', $result->user->id);
+        self::assertSame('Ada', $result->user->name);
         self::assertCount(3, $flickrHttp->requests);
         self::assertSame([], $flickrHttp->queue);
         self::assertStringContainsString('oauth_signature=', $flickrHttp->requests[2]->getHeaderLine('Authorization'));
 
-        $customHttp = new MockHttpClient([
-            $this->json(['access_token' => 'custom-access', 'token_type' => 'Bearer']),
-            $this->json(['account_id' => 'custom-user']),
-            $this->json(['account_id' => 'custom-user']),
-        ]);
-        $custom = $this->execute($snippets[6], ['httpClient' => $customHttp]);
-        $start = $this->query($custom['url']);
-        self::assertSame('profile', $start['scope']);
-        $logger = new class extends AbstractLogger {
-            public array $events = [];
-
-            public function log($level, string|\Stringable $message, array $context = []): void
-            {
-                $this->events[] = [$level, (string) $message, $context];
-            }
-        };
-        $custom['logger'] = $logger;
-        $custom = $this->execute($snippets[7], $custom);
-        self::assertInstanceOf(OAuth::class, $custom['oauth']);
-        $result = $custom['oauth']->callback('custom', ['state' => $start['state'], 'code' => 'custom-code']);
-        self::assertSame('custom-user', $result->user->id);
-        $custom['token'] = $result->token;
-        $custom = $this->execute($snippets[8], $custom);
-        self::assertSame(200, $custom['status']);
-        self::assertCount(3, $customHttp->requests);
-        self::assertSame([], $customHttp->queue);
-        self::assertStringStartsWith('Basic ', $customHttp->requests[0]->getHeaderLine('Authorization'));
-        self::assertSame('Bearer custom-access', $customHttp->requests[2]->getHeaderLine('Authorization'));
-        self::assertCount(3, $logger->events);
-        $stages = [];
-        foreach ($logger->events as [$level, $event, $metadata]) {
-            self::assertSame('debug', $level);
-            self::assertSame('oauth.http.response', $event);
-            self::assertSame(['provider', 'stage', 'method', 'status', 'duration_ms'], array_keys($metadata));
-            self::assertSame('custom', $metadata['provider']);
-            self::assertIsFloat($metadata['duration_ms']);
-            self::assertSame(200, $metadata['status']);
-            $stages[] = $metadata['stage'];
-        }
-        self::assertSame(['token_exchange', 'identity', 'resource_request'], $stages);
+        $this->execute($snippets[8], $variables);
+        $variables = $this->execute($snippets[9], $variables);
+        self::assertNull($result->user->avatar);
+        self::assertNull($result->user->emailVerified);
+        $variables = $this->execute($snippets[10], $variables);
+        self::assertSame($result->token->toArray(), $variables['data']);
+        self::assertSame('flickr-access', $variables['data']['accessToken']);
+        self::assertSame([], self::$headers);
         session_destroy();
     }
 
-    private function execute(string $source, array $variables): array
+    public static function recordHeader(string $header): void
+    {
+        self::$headers[] = $header;
+    }
+
+    private function execute(string $source, array $variables = []): array
+    {
+        return (static function (string $source, array $variables): array {
+            extract($variables, EXTR_SKIP);
+            eval(self::fence($source));
+            return get_defined_vars();
+        })($source, $variables);
+    }
+
+    private static function fence(string $source): string
     {
         $source = preg_replace('/\A<\?php\s*/', '', $source);
         self::assertIsString($source);
-        return (static function (string $source, array $variables): array {
-            extract($variables, EXTR_SKIP);
-            eval($source);
-            return get_defined_vars();
-        })($source, $variables);
+        $source = preg_replace('/\b(?:exit|die)\b\s*;/', 'return;', $source);
+        self::assertIsString($source);
+        $source = preg_replace('/^use\s+[^;]+;\h*$/m', '', $source);
+        self::assertIsString($source);
+        return 'namespace Eva\EvaOAuth\Tests; ' . self::$imports . "\n" . $source;
+    }
+
+    private function imports(array $snippets): string
+    {
+        $imports = [];
+        foreach ($snippets as $snippet) {
+            preg_match_all('/^use\s+[^;]+;$/m', $snippet, $found);
+            foreach ($found[0] as $line) {
+                $imports[$line] = $line;
+            }
+        }
+        ksort($imports);
+        return implode("\n", $imports) . "\n";
+    }
+
+    private function credentials(): void
+    {
+        $credentials = [
+            'GITHUB_CLIENT_ID' => 'documentation-client',
+            'GITHUB_CLIENT_SECRET' => 'documentation-secret',
+            'GOOGLE_CLIENT_ID' => 'documentation-client',
+            'GOOGLE_CLIENT_SECRET' => 'documentation-secret',
+            'FLICKR_KEY' => 'documentation-client',
+            'FLICKR_SECRET' => 'documentation-secret',
+        ];
+        foreach ($credentials as $name => $value) {
+            putenv($name . '=' . $value);
+            $_ENV[$name] = $value;
+        }
+    }
+
+    private function redirect(): string
+    {
+        $headers = self::$headers;
+        self::$headers = [];
+        self::assertCount(1, $headers);
+        self::assertStringStartsWith('Location: ', $headers[0]);
+        return substr($headers[0], strlen('Location: '));
+    }
+
+    private function authorizationResult(array $variables): AuthorizationResult
+    {
+        self::assertArrayHasKey('result', $variables);
+        $result = $variables['result'];
+        self::assertInstanceOf(AuthorizationResult::class, $result);
+        return $result;
     }
 
     private function query(string $url): array
@@ -195,4 +234,9 @@ final class DocumentationTest extends TestCase
     {
         return new Response(200, ['Content-Type' => 'application/json'], json_encode($data, JSON_THROW_ON_ERROR));
     }
+}
+
+function header(string $header, bool $replace = true, int $response_code = 0): void
+{
+    DocumentationTest::recordHeader($header);
 }

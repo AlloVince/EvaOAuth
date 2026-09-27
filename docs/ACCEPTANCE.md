@@ -12,6 +12,33 @@ no OAuth application credentials or provider account sessions were available on 
 machine and the maintainer chose to publish without them and skip them as follow-up work. See
 [Live provider verification](#live-provider-verification-not-performed).
 
+## Post-release documentation restructure
+
+After `2.0.0` was tagged, both READMEs were shortened to a quick start and the long-form material was
+moved out of them. Commits `fe6d126` and `681cd41` rewrote `README.md` / `README_CN.md`, deleted
+`README_FULL.md` / `README_CN_FULL.md` and relocated the long-form guides to `docs/ADVANCED.md` and
+`docs/ADVANCED_CN.md`. The provider fences expose the PSR-18 injection point again
+(`httpClient: $httpClient ?? null`), and `authorize()` and `callback()` are documented as separate
+fences because they are separate requests.
+
+Every claim below that counts 9 README fences, quotes "executed unchanged (only the `<?php` tag is
+stripped)", reports 1037 assertions or cites the removed "Add an OAuth2 provider" and single-file
+sections describes the released tree `d5e2b89` and is kept as that record. Current state:
+
+| Status | Claim | Evidence |
+| --- | --- | --- |
+| [PASS] | README executability | `DocumentationTest::testEveryReadmePhpFenceExecutes` — 11 PHP fences per README, both languages; `composer verify` reports 131 tests / 1067 assertions on PHP 8.5.11 |
+| [PASS] | Documented quick start | fence 1 builds the GitHub provider against a real PHP session; fence 2 redirects to `github.com/login/oauth/authorize` with `S256`, a 64-hex state, the documented `client_id` and callback; fence 3 completes the callback over a mocked PSR-18 client, hitting `login/oauth/access_token` and `api.github.com/user`, and exposes `$result->token`, `$result->user->id`, `->name`, `->email` |
+| [PASS] | Same application API for the other providers | Google: `access_type=offline`, `openid profile email`, `sub` mapping, `email_verified`, refresh token retained; Flickr: request token → consent URL with `perms=read` → access token → signed `flickr.test.login`; last fence exports `$result->token->toArray()` |
+| [PASS] | Harness adaptations | the fences are fragments of one file, so they run in a single scope carrying the union of their `use` statements; `Eva\EvaOAuth\Tests\header()` captures the documented redirect because the CLI SAPI discards it; a request-terminating `exit;`/`die;` runs as a fence-scope `return` |
+| [PASS] | Session hardening is documented, not asserted | the removed README fences passed cookie flags, `use_strict_mode` and `session_regenerate_id(true)` to `session_start()`; those were properties of the old example, not of the library. The guidance now lives in `docs/ADVANCED.md` and no test asserts it |
+
+CI evidence: runs `36311541677` and `36311765249` (heads `fe6d126`, `681cd41`) failed in
+`DocumentationTest` only, with `Provider\GitHub::__construct(): Argument #1 ($clientId) must be of type
+string, null given`, because the rewritten fences read `$_ENV` while the harness seeded `putenv()`
+only. The rewrite above restores the documented flow; the CI run for the fix is not recorded here
+yet.
+
 ## Observed commands
 
 | Command | Where | Observed result |
@@ -170,8 +197,9 @@ or callback query strings.
 
 Protocol tests assert real PSR request methods, endpoints, headers, form fields and signatures against
 mocked responses, not live services. `DocumentationTest` evaluates the actual extracted PHP of both
-READMEs; fixtures enter only through the public PSR-18 injection point, and a real PHP session is
-started, closed, reopened and regenerated. PHP CLI executes header calls but does not prove browser
-redirect delivery, cookie or proxy deployment, consent screens or provider uptime. Google endpoints
+READMEs; fixtures enter only through the public PSR-18 injection point, and a real PHP session backs
+the default state store for the whole documented flow. The harness reads the documented `Location`
+header back, which still does not prove browser redirect delivery, cookie or proxy deployment,
+consent screens or provider uptime. Google endpoints
 and scopes were re-checked against the official web-server guide and discovery metadata; that is a
 documentation check, not a live login.

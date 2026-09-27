@@ -34,8 +34,10 @@ $oauth = new OAuth([
         clientSecret: $_ENV['GITHUB_CLIENT_SECRET'],
         redirectUri: 'https://example.com/oauth/github/callback',
     ),
-]);
+], httpClient: $httpClient ?? null);
 ```
+
+`$httpClient` is an optional PSR-18 client of your choice; omit it to use the built-in transport.
 
 Start authorization:
 
@@ -72,13 +74,18 @@ $oauth = new OAuth([
         clientSecret: $_ENV['GOOGLE_CLIENT_SECRET'],
         redirectUri: 'https://example.com/oauth/google/callback',
     ),
-]);
+], httpClient: $httpClient ?? null);
 ```
 
-The rest of the application code stays the same:
+Only the provider and its credentials changed. Authorization is still a URL:
 
 ```php
 $url = $oauth->authorize('google');
+```
+
+The callback is the same call as for GitHub:
+
+```php
 $result = $oauth->callback('google', $_GET);
 ```
 
@@ -97,9 +104,14 @@ $oauth = new OAuth([
         clientSecret: $_ENV['FLICKR_SECRET'],
         redirectUri: 'https://example.com/oauth/flickr/callback',
     ),
-]);
+], httpClient: $httpClient ?? null);
 
 $url = $oauth->authorize('flickr');
+```
+
+The callback is the same call again:
+
+```php
 $result = $oauth->callback('flickr', $_GET);
 ```
 
