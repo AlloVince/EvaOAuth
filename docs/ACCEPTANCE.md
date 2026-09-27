@@ -21,13 +21,17 @@ list is `[PASS]`. See [Live provider verification](#live-provider-verification-n
 | `composer audit --locked --abandoned=fail` | same clean clone | PASS: no advisories, no abandoned packages |
 | `composer update --prefer-lowest --prefer-stable` | second clean clone | PASS: resolved league/oauth1-client `1.11.0`, league/oauth2-client `2.9.1`, guzzlehttp/guzzle `7.15.2`, guzzlehttp/psr7 `2.13.0`, psr/http-message `2.0`, psr/http-client `1.0.2`, psr/log `3.0.0`, phpunit `11.5.50`, phpstan `2.1.0` |
 | `composer verify` | lowest-dependency clone, PHP 8.5.11 | PASS: 131 tests / 1037 assertions, all five stages |
-| `composer verify` | CI run `36306265436`, five jobs | PASS: PHP 8.2, 8.3, 8.4, 8.5 locked and PHP 8.2 lowest, all `success`; lowest job reports `OK (131 tests, 1037 assertions)` |
+| `composer verify` | CI runs `36306265436` (`dc6ed6f`) and `36306377223` (`59f7a74`), five jobs each | PASS: PHP 8.2, 8.3, 8.4, 8.5 locked and PHP 8.2 lowest, all `success`; lowest job reports `OK (131 tests, 1037 assertions)` |
 | `composer archive --format=zip` | release candidate worktree | PASS: 45 files, see [Distribution archive](#distribution-archive) |
 | `composer test -- --filter DocumentationTest` | local | PASS: all 9 PHP fences in each README executed against mocked HTTP |
 
-CI evidence: <https://github.com/AlloVince/EvaOAuth/actions/runs/36306265436> (head SHA
-`dc6ed6f9daeac1ec57337007a59865cddc31c535`, started 2026-09-27T08:27:44Z, conclusion `success`).
-`composer audit` results are time-dependent and must be repeated immediately before tagging.
+CI evidence for the code and documentation state at `59f7a74`: run
+<https://github.com/AlloVince/EvaOAuth/actions/runs/36306377223> (head SHA
+`59f7a74b5eef8d91e578d0a1c6e4d8a80998ec4c`, started 2026-09-27T08:29:56Z, conclusion `success`, all
+five jobs). The identical matrix was green one commit earlier on the code change itself, run
+`36306265436` on `dc6ed6f`, where the lowest job reports `OK (131 tests, 1037 assertions)`.
+`composer audit` results are time-dependent and must be repeated immediately before tagging, and the
+release commit needs its own green run for its own SHA.
 
 ## Capability checklist
 
@@ -36,7 +40,7 @@ source repository, which is not part of the distribution archive.
 
 | Status | Capability | Evidence |
 | --- | --- | --- |
-| [PASS] | PHP 8.2–8.5 support | `composer.json` requires `~8.2.0 \|\| ~8.3.0 \|\| ~8.4.0 \|\| ~8.5.0`; CI jobs for each version green in run `36306265436`; no version-specific syntax in `lib/` |
+| [PASS] | PHP 8.2–8.5 support | `composer.json` requires `~8.2.0 \|\| ~8.3.0 \|\| ~8.4.0 \|\| ~8.5.0`; CI jobs for each version green in runs `36306265436` and `36306377223`; no version-specific syntax in `lib/` |
 | [PASS] | OAuth2 Authorization Code + S256 PKCE | `OAuth2Test::testCodePkceIdentityAndReplay` asserts the wire request (endpoint, `Content-Type`, `Accept`, grant fields, verifier) and the SHA-256 challenge relationship; `HardenedOAuth2Provider::getRandomPkceCode` uses `random_bytes` |
 | [PASS] | State validation, one use, browser bound | `OAuth2Test::testBrowserAndConfigurationBinding`, `testMalformedCallbackConsumed`, `testConcurrentAttemptsHaveIndependentVerifiers`; `OAuth::doExchange` consumes through `StateStore` before any exchange |
 | [PASS] | Refresh grant | `OAuth2Test::testRefreshRetentionRotationAndNoVerifier`, `testRefreshKeepsEpochExpiredSemantics`; Google refresh snippet executed by `DocumentationTest` |
@@ -128,8 +132,8 @@ or callback query strings.
 1. [BLOCKED] GitHub, Google and Flickr live verification (above).
 2. [PASS] `composer verify`, `composer validate --strict`, `composer audit --locked --abandoned=fail`
    in a clean checkout — re-run immediately before tagging because audit findings are time-dependent.
-3. [PASS] CI matrix and lowest-dependency job — run `36306265436`; re-run if the release commit
-   changes any file.
+3. [PASS] CI matrix and lowest-dependency job — runs `36306265436` and `36306377223`; re-run if the
+   release commit changes any file.
 4. [PASS] Documentation set: `CHANGELOG.md`, `SECURITY.md`, `UPGRADING.md`, `docs/ACCEPTANCE.md`
    (this file), `docs/ARCHITECTURE.md`, `docs/ADR-001.md`, `docs/RELEASING.md`, `docs/FUTURE.md`.
 5. [ ] Maintainer actions still outstanding: create tag `2.0.0`, publish the GitHub Release from
