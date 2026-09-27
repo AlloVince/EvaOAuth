@@ -8,7 +8,7 @@ EvaOAuth gives OAuth 1.0a and OAuth 2.0 the same application-level API, so most 
 authorize → callback → token + user
 ```
 
-It is framework-agnostic and works with any PSR-compatible PHP application.
+It is framework-agnostic and works with any PSR-compatible PHP application. [中文](README_CN.md)
 
 ## Installation
 
