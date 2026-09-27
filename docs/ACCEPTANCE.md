@@ -1,15 +1,16 @@
 # EvaOAuth 2.0 acceptance evidence
 
-Acceptance pass executed on 2026-09-27 against commit `dc6ed6f` on branch
-`feature/evaoauth-2.0`. Local runtime: PHP 8.5.11 (Homebrew), Composer 2.10.3, macOS (darwin).
+Acceptance pass executed on 2026-09-27 on `feature/evaoauth-2.0`, released as commit `d5e2b89`.
+Local runtime: PHP 8.5.11 (Homebrew), Composer 2.10.3, macOS (darwin).
 Every `[PASS]` below cites a test, source file, executable example, documentation statement or an
 observed command/CI run. Claims carried over from earlier reports were re-derived from code and
 re-executed; nothing here is inherited from a previous review.
 
-**Release status: BLOCKED.** The three live-provider gates (GitHub, Google, Flickr OAuth1) were not
-performed, because no OAuth application credentials or provider account sessions were available on
-the acceptance machine and the maintainer chose to skip them. Everything else in the release gate
-list is `[PASS]`. See [Live provider verification](#live-provider-verification-not-performed).
+**Release status: PUBLISHED as 2.0.0 on 2026-09-27, commit `d5e2b89`.** Every automated gate is
+`[PASS]`. The three live-provider gates (GitHub, Google, Flickr OAuth1) were not performed, because
+no OAuth application credentials or provider account sessions were available on the acceptance
+machine and the maintainer chose to publish without them and skip them as follow-up work. See
+[Live provider verification](#live-provider-verification-not-performed).
 
 ## Observed commands
 
@@ -127,19 +128,43 @@ run the harness, and record only non-secret outcomes (`id`, `name`, whether `ema
 behaviour, and the observed failure class of a cancelled callback). Never commit credentials, tokens
 or callback query strings.
 
+## Release record
+
+`2.0.0` was published on 2026-09-27 from commit `d5e2b89`, which is the fast-forward of
+`feature/evaoauth-2.0` onto `master` and the head of the release commit.
+
+- Tag `2.0.0` (annotated) → `d5e2b893d69891cebff4a82b6ddf2e3834fdd349`; the tagged tree was
+  re-verified locally before tagging (131 tests / 1037 assertions, `composer validate --strict`,
+  `composer audit --locked --abandoned=fail` all clean) and the CI matrix was green for the same
+  SHA (run `36306472497`).
+- GitHub Release "EvaOAuth 2.0.0": <https://github.com/AlloVince/EvaOAuth/releases/tag/2.0.0>
+  (published, not a draft or pre-release), notes condensed from `CHANGELOG.md`.
+- Consumer install check: a throwaway project required `evaengine/eva-oauth:2.0.0` from the Git
+  repository and resolved the **tag** (source reference `d5e2b89`, not a dev branch). The README
+  quickstart was then executed from the installed package with stubbed HTTP: GitHub, Google and
+  Flickr `authorize()` produced the expected endpoints, scopes, `access_type=offline`, S256
+  challenges, a 64-hex state and a Flickr consent URL carrying a request token; `callback()` with
+  an unknown state raised `CallbackException`; a complete callback produced
+  `provider/id/name/email` with `email = null` and a JSON-redacted token.
+- Packagist had not re-indexed the repository 18 minutes after the tag (its metadata still served
+  `1.0.2` and a 2019 `dev-master` reference), so `composer require evaengine/eva-oauth:^2.0` from
+  Packagist could not be confirmed at publication time. Re-check
+  <https://packagist.org/packages/evaengine/eva-oauth>; if the index is still stale, trigger
+  "Update package" on that page. The tag itself is complete and installable, as the consumer check
+  above shows.
+
 ## Remaining release gates
 
-1. [BLOCKED] GitHub, Google and Flickr live verification (above).
-2. [PASS] `composer verify`, `composer validate --strict`, `composer audit --locked --abandoned=fail`
-   in a clean checkout — re-run immediately before tagging because audit findings are time-dependent.
-3. [PASS] CI matrix and lowest-dependency job — runs `36306265436` and `36306377223`; re-run if the
-   release commit changes any file.
-4. [PASS] Documentation set: `CHANGELOG.md`, `SECURITY.md`, `UPGRADING.md`, `docs/ACCEPTANCE.md`
+1. [DONE] All automated gates: `composer verify`, `composer validate --strict`,
+   `composer audit --locked --abandoned=fail` in a clean checkout, the PHP 8.2–8.5 matrix and the
+   lowest-dependency job (run `36306472497` on `d5e2b89`).
+2. [DONE] Documentation set: `CHANGELOG.md`, `SECURITY.md`, `UPGRADING.md`, `docs/ACCEPTANCE.md`
    (this file), `docs/ARCHITECTURE.md`, `docs/ADR-001.md`, `docs/RELEASING.md`, `docs/FUTURE.md`.
-5. [ ] Maintainer actions still outstanding: create tag `2.0.0`, publish the GitHub Release from
-   `CHANGELOG.md`, confirm Packagist shows `2.0.0`, and install it into a fresh consumer project with
-   `composer require evaengine/eva-oauth:^2.0` to confirm the tag (not a dev branch) resolves and
-   that the README's minimal authorize/callback example runs there.
+3. [DONE] Package contents: 45-file archive inspected; tag verified installable by a consumer.
+4. [OUTSTANDING] Packagist index refresh for `2.0.0` (third-party latency, see the release record).
+5. [OUTSTANDING] Live GitHub, Google and Flickr verification. It was skipped by maintainer decision
+   at publication time; the gates are recorded as not performed above and remain valid follow-up
+   work.
 
 ## Verification boundary
 
