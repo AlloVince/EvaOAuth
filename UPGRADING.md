@@ -9,11 +9,11 @@
 | `Service('Facebook', ['key' => ..., 'secret' => ..., 'callback' => ...])` | `OAuth(['github' => new Provider\GitHub(clientId, clientSecret, redirectUri)])` or a generic provider | Explicit provider objects replace global alias registration and string-based construction |
 | `requestAuthorize()` | `OAuth::authorize(name): string` | Send your own Location response; the library does not send headers or terminate execution |
 | `getAccessToken()` | `OAuth::exchange(name, query): Token` | Pass the callback query explicitly; state/request-token validation and one-use consumption are mandatory |
-| `getTokenAndUser()` | `OAuth::callback(name, query): AuthorizationResult` | Read `$result->token` and `$result->user`; do not exchange the callback twice |
+| `getTokenAndUser()` | `OAuth::callback(name, query): AuthorizationResult` | Read `$result->token` and `$result->user`; the callback is consumed before the exchange, so it is one-shot — use `exchange()` then `user()` when identity fetching must be retriable |
 | `OAuth1\Providers\AbstractProvider`, `OAuth2\Providers\AbstractProvider` | `Provider\OAuth1Provider`, `Provider\OAuth2Provider` | Configure endpoints and identity mapping, or extend a readonly provider; do not port protocol code |
 | `Service::registerProvider()` | Constructor provider map | Register local names explicitly; callback URIs must differ across configured providers |
 | `Storage`, `Service::setStorage()`, Doctrine Cache | Inject `State\StateStore`; default `SessionStateStore` | Browser-scoped, bounded, expiring and atomic-consume transactions replace global filesystem cache |
-| `debug(path)` and raw HTTP/event logging | Inject PSR-3 `LoggerInterface` | Remove raw bodies/headers/URLs from all logging layers; use safe fixed metadata events |
+| `debug(path)` and raw HTTP/event logging | Inject PSR-3 `LoggerInterface` | Remove raw bodies/headers/URLs from all logging layers; safe events carry `provider`, `stage`, `method`, `status`, `category` and `duration_ms` only |
 | `AuthorizedHttpClient($token)` | `OAuth::request(name, token, RequestInterface)` | Use immutable PSR-7 requests and PSR-18 transport; resource origins are restricted |
 | `StandardUser` getters | Readonly `Identity` properties | Use `id`, `name`, `email`, `avatar`, `emailVerified`; all except `id` can be null |
 | Mutable protocol-specific access tokens | Readonly unified `Token` | Preserve protocol-specific optional fields and provider binding; replace values after refresh |
@@ -33,7 +33,7 @@ The complete, executable replacement for the common request-page/callback-page f
 
 ## Persisted credentials
 
-2.x `Token` contains `provider` (a stable configuration binding, **not** the registry alias), `protocol`, `accessToken`, nullable `refreshToken`, nullable Unix `expiresAt`, nullable OAuth1 `tokenSecret` and `scopes`. The configuration binding includes client credentials and endpoints; changing these may invalidate old tokens and pending transactions. Plan reauthorization during credential/configuration rotation rather than silently rewriting bindings.
+2.x `Token` contains `provider` (a provider-identity hash, **not** the registry alias), `protocol`, `accessToken`, nullable `refreshToken`, nullable Unix `expiresAt`, nullable OAuth1 `tokenSecret` and `scopes`. The identity hash covers the provider class, protocol, client id and callback URI. Rotating a client secret, or changing scopes, endpoints, scope separators, client authentication, origin policy or issuer, therefore does **not** invalidate stored tokens; registering a new client id, moving the callback URI, switching provider class or switching protocol does. Pending authorization transactions are bound separately to the full configuration, so a login already in flight is rejected if any of it changes. Plan reauthorization deliberately for identity changes, and rotate the secret at the provider as well as in your configuration when you need old grants to stop working.
 
 `Token::toArray()` is the explicit secret-bearing export and `Token::fromArray()` restores that record. Encrypt and authenticate records outside the library. JSON serialization and debug output omit credentials; PHP serialization throws. Do not migrate by serializing old objects, and never run `unserialize()` on untrusted records.
 

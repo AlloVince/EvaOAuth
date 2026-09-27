@@ -6,6 +6,7 @@ namespace Eva\EvaOAuth\Tests;
 
 use Eva\EvaOAuth\Exception\CallbackException;
 use Eva\EvaOAuth\Exception\ConfigurationException;
+use Eva\EvaOAuth\Exception\OAuthException;
 use Eva\EvaOAuth\Exception\ProviderException;
 use Eva\EvaOAuth\Exception\TransportException;
 use Eva\EvaOAuth\Identity;
@@ -78,7 +79,7 @@ final class OAuth2Test extends TestCase
         self::assertSame('123', $result->user->id);
         self::assertSame('Ada', $result->user->name);
         self::assertSame('ada@example.test', $result->user->email);
-        self::assertSame($provider->binding(), $result->token->provider);
+        self::assertSame($provider->tokenBinding(), $result->token->provider);
         self::assertSame('refresh-secret', $result->token->refreshToken);
         self::assertGreaterThanOrEqual($before + 3600, $result->token->expiresAt);
         $request = $http->requests[0];
@@ -123,7 +124,7 @@ final class OAuth2Test extends TestCase
         ]);
         $oauth = new OAuth(['github' => $provider], new MemoryStateStore(), $http);
         $old = new Token(
-            $provider->binding(),
+            $provider->tokenBinding(),
             'oauth2',
             'old-access',
             'original-refresh',
@@ -492,7 +493,7 @@ final class OAuth2Test extends TestCase
         self::assertNotNull($token->expiresAt);
         self::assertTrue($token->isExpired($token->expiresAt));
         self::assertFalse(
-            (new Token($provider->binding(), 'oauth2', 't', expiresAt: $token->expiresAt + 1))
+            (new Token($provider->tokenBinding(), 'oauth2', 't', expiresAt: $token->expiresAt + 1))
                 ->isExpired($token->expiresAt)
         );
         $this->expectException(ProviderException::class);
@@ -514,14 +515,21 @@ final class OAuth2Test extends TestCase
     public function testTokenValidationAndPersistence(): void
     {
         $provider = $this->provider();
-        $token = new Token($provider->binding(), 'oauth2', 'access-token', 'refresh-token', time() + 60, scopes: ['a']);
+        $token = new Token(
+            $provider->tokenBinding(),
+            'oauth2',
+            'access-token',
+            'refresh-token',
+            time() + 60,
+            scopes: ['a'],
+        );
         self::assertSame($token->toArray(), Token::fromArray($token->toArray())->toArray());
-        $expired = new Token($provider->binding(), 'oauth2', 'access-token', expiresAt: 0);
+        $expired = new Token($provider->tokenBinding(), 'oauth2', 'access-token', expiresAt: 0);
         self::assertTrue($expired->isExpired());
         self::assertSame($expired->toArray(), Token::fromArray($expired->toArray())->toArray());
         $this->expectException(ConfigurationException::class);
         Token::fromArray([
-            'provider' => $provider->binding(),
+            'provider' => $provider->tokenBinding(),
             'protocol' => 'oauth2',
             'accessToken' => 'x',
             'surprise' => true,
@@ -590,7 +598,8 @@ final class OAuth2Test extends TestCase
         $http = new MockHttpClient();
         $oauth = new OAuth(['github' => $provider], new MemoryStateStore(), $http);
         try {
-            $oauth->request('github', new Token($provider->binding(), 'oauth2', 'secret'), new Request('GET', $url));
+            $token = new Token($provider->tokenBinding(), 'oauth2', 'secret');
+            $oauth->request('github', $token, new Request('GET', $url));
             self::fail('Forbidden resource accepted.');
         } catch (ProviderException) {
             self::assertCount(0, $http->requests);
@@ -634,9 +643,217 @@ final class OAuth2Test extends TestCase
     public function testWrongTokenBinding(): void
     {
         $provider = $this->provider();
-        $oauth = new OAuth(['github' => $provider], new MemoryStateStore(), new MockHttpClient());
+        $http = new MockHttpClient();
+        $oauth = new OAuth(['github' => $provider], new MemoryStateStore(), $http);
+        $token = new Token('wrong-binding', 'oauth2', 'secret', 'refresh-secret');
+        foreach (['user', 'refresh'] as $operation) {
+            try {
+                $oauth->{$operation}('github', $token);
+                self::fail('Token from another provider accepted by ' . $operation . '().');
+            } catch (ConfigurationException) {
+                self::assertCount(0, $http->requests);
+            }
+        }
         $this->expectException(ConfigurationException::class);
-        $oauth->user('github', new Token('wrong-binding', 'oauth2', 'secret'));
+        $oauth->request('github', $token, new Request('GET', 'https://api.github.com/user'));
+    }
+
+    public static function traceScenarios(): iterable
+    {
+        yield 'denied callback' => [
+            'callback',
+            [],
+            ['state' => 'REPLACE', 'error' => 'access_denied'],
+            [['oauth.failure', 'callback', 'callback', []]],
+        ];
+        yield 'replayed state' => [
+            'callback',
+            [],
+            ['state' => 'f' . str_repeat('0', 63), 'code' => 'code'],
+            [['oauth.failure', 'callback', 'callback', []]],
+        ];
+        yield 'provider rejects the code' => [
+            'exchange',
+            [new Response(400, [], 'bad_verification_code')],
+            ['state' => 'REPLACE', 'code' => 'code'],
+            [
+                ['oauth.http.response', 'token_exchange', null, ['method' => 'POST', 'status' => 400]],
+                ['oauth.failure', 'token_exchange', 'provider', []],
+            ],
+        ];
+        yield 'identity endpoint fails' => [
+            'callback',
+            [
+                new Response(200, [], '{"access_token":"ok","token_type":"Bearer"}'),
+                new Response(503, [], 'unavailable'),
+            ],
+            ['state' => 'REPLACE', 'code' => 'code'],
+            [
+                ['oauth.http.response', 'token_exchange', null, ['method' => 'POST', 'status' => 200]],
+                ['oauth.http.response', 'identity', null, ['method' => 'GET', 'status' => 503]],
+                ['oauth.failure', 'callback', 'provider', []],
+            ],
+        ];
+        yield 'transport failure' => [
+            'exchange',
+            [new \RuntimeException('raw-client-secret')],
+            ['state' => 'REPLACE', 'code' => 'code'],
+            [
+                ['oauth.http.failure', 'token_exchange', 'transport', ['method' => 'POST']],
+                ['oauth.failure', 'token_exchange', 'transport', []],
+            ],
+        ];
+    }
+
+    #[DataProvider('traceScenarios')]
+    public function testTraceIdentifiesProviderStageAndCategory(
+        string $operation,
+        array $queue,
+        array $query,
+        array $expected,
+    ): void {
+        $logger = new class extends AbstractLogger {
+            public array $records = [];
+
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                $this->records[] = ['level' => $level, 'event' => (string) $message, 'context' => $context];
+            }
+        };
+        $keys = [
+            'oauth.http.response' => ['provider', 'stage', 'method', 'status', 'duration_ms'],
+            'oauth.http.failure' => ['provider', 'stage', 'method', 'category', 'duration_ms'],
+            'oauth.failure' => ['provider', 'stage', 'category', 'duration_ms'],
+        ];
+        $http = new MockHttpClient(array_values($queue));
+        $oauth = new OAuth(['github' => $this->provider()], new MemoryStateStore(), $http, $logger);
+        $query['state'] = $operation === 'exchange' || $query['state'] === 'REPLACE'
+            ? $this->start($oauth)['state']
+            : $query['state'];
+        $this->expectException(OAuthException::class);
+        try {
+            $operation === 'callback'
+                ? $oauth->callback('github', $query)
+                : $oauth->exchange('github', $query);
+        } catch (OAuthException $error) {
+            self::assertCount(count($expected), $logger->records);
+            foreach ($expected as $index => [$event, $stage, $category, $extra]) {
+                $record = $logger->records[$index];
+                self::assertSame('debug', $record['level']);
+                self::assertSame($event, $record['event']);
+                self::assertSame($keys[$event], array_keys($record['context']));
+                self::assertSame('github', $record['context']['provider']);
+                self::assertSame($stage, $record['context']['stage']);
+                self::assertIsFloat($record['context']['duration_ms']);
+                if ($category !== null) {
+                    self::assertSame($category, $record['context']['category']);
+                }
+                foreach ($extra as $key => $value) {
+                    self::assertSame($value, $record['context'][$key]);
+                }
+            }
+            $trace = json_encode($logger->records, JSON_THROW_ON_ERROR);
+            foreach (['secret', 'https', 'access_token', 'github.com', 'code', 'error'] as $needle) {
+                self::assertStringNotContainsString($needle, $trace);
+            }
+            throw $error;
+        }
+    }
+
+    public function testTokenBindingSurvivesCredentialRotationButNotProviderIdentityChange(): void
+    {
+        $provider = $this->provider();
+        $http = new MockHttpClient([$this->response(['id' => 'rotated-user'])]);
+        $oauth = new OAuth(['github' => $provider], new MemoryStateStore(), $http);
+        $token = new Token($provider->tokenBinding(), 'oauth2', 'persisted-access');
+
+        $rotated = new GitHub('client-id', 'rotated-client-secret', 'https://app.example/callback/github');
+        self::assertNotSame($provider->binding(), $rotated->binding());
+        self::assertSame($provider->tokenBinding(), $rotated->tokenBinding());
+        self::assertSame('rotated-user', (new OAuth(
+            ['github' => $rotated],
+            new MemoryStateStore(),
+            $http,
+        ))->user('github', $token)->id);
+
+        $rescoped = new OAuth2Provider(
+            'client-id',
+            'client-secret',
+            'https://app.example/callback/custom',
+            'https://auth.example/authorize',
+            'https://auth.example/token',
+            'https://api.example/me',
+            ['profile'],
+        );
+        $moved = new OAuth2Provider(
+            'client-id',
+            'rotated-client-secret',
+            'https://app.example/callback/custom',
+            'https://auth.example/v2/authorize',
+            'https://auth.example/v2/token',
+            'https://api.example/v2/me',
+            ['profile', 'email'],
+            authorizationParameters: ['prompt' => 'consent'],
+            clientAuthentication: 'client_secret_basic',
+            resourceOrigins: ['https://uploads.example'],
+        );
+        self::assertNotSame($rescoped->binding(), $moved->binding());
+        self::assertSame($rescoped->tokenBinding(), $moved->tokenBinding());
+        self::assertNotSame($rescoped->tokenBinding(), $provider->tokenBinding());
+
+        foreach (
+            [
+            new GitHub('other-client-id', 'client-secret', 'https://app.example/callback/github'),
+            new GitHub('client-id', 'client-secret', 'https://app.example/callback/other'),
+            new Google('client-id', 'client-secret', 'https://app.example/callback/github'),
+            ] as $different
+        ) {
+            $candidate = new OAuth(['github' => $different], new MemoryStateStore(), $http);
+            try {
+                $candidate->user('github', $token);
+                self::fail('Token accepted by a different provider identity.');
+            } catch (ConfigurationException) {
+                self::assertCount(1, $http->requests);
+            }
+        }
+        self::assertSame('oauth2', $token->protocol);
+    }
+
+    public function testIdentityFailureConsumesCallbackAndRecoversWithExchangeThenUser(): void
+    {
+        $provider = $this->provider();
+        $http = new MockHttpClient([
+            $this->response(['access_token' => 'first-access', 'token_type' => 'Bearer']),
+            new Response(500, [], 'unavailable'),
+            $this->response(['access_token' => 'second-access', 'token_type' => 'Bearer']),
+            new Response(500, [], 'unavailable'),
+        ]);
+        $oauth = new OAuth(['github' => $provider], new MemoryStateStore(), $http);
+        $start = $this->start($oauth);
+        try {
+            $oauth->callback('github', ['state' => $start['state'], 'code' => 'code']);
+            self::fail('Identity failure not surfaced.');
+        } catch (ProviderException $error) {
+            self::assertNull($error->getPrevious());
+        }
+        try {
+            $oauth->callback('github', ['state' => $start['state'], 'code' => 'code']);
+            self::fail('Consumed callback replayed.');
+        } catch (CallbackException) {
+            self::assertCount(2, $http->requests);
+        }
+        $start = $this->start($oauth);
+        $token = $oauth->exchange('github', ['state' => $start['state'], 'code' => 'code']);
+        self::assertSame('second-access', $token->accessToken);
+        try {
+            $oauth->user('github', $token);
+            self::fail('Identity retry not attempted.');
+        } catch (ProviderException) {
+            self::assertCount(4, $http->requests);
+        }
+        $http->queue[] = $this->response(['id' => 'recovered', 'name' => 'Ada']);
+        self::assertSame('recovered', $oauth->user('github', $token)->id);
+        self::assertCount(5, $http->requests);
     }
 
     public function testTransportUrlPolicyFailureClassification(): void

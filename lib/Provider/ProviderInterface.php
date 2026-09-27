@@ -14,6 +14,8 @@ interface ProviderInterface
 
     public function binding(): string;
 
+    public function tokenBinding(): string;
+
     public function identity(array $data): Identity;
 
     public function resourceUrl(): string;

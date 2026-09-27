@@ -85,7 +85,7 @@ final class OAuth2Engine
                     ? [] : explode($this->provider->responseScopeSeparator, $values['scope']))
                 : (($previous !== null ? $previous->scopes : null) ?? $this->provider->scopes);
             return new Token(
-                $this->provider->binding(),
+                $this->provider->tokenBinding(),
                 'oauth2',
                 $result->getToken(),
                 $result->getRefreshToken() ?? $previous?->refreshToken,

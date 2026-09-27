@@ -60,9 +60,9 @@ header('Location: /account', true, 303);
 composer require evaengine/eva-oauth:^2.0
 ```
 
-当前开发仓库使用 `composer install`。要求 PHP 8.2、8.3、8.4 或 8.5，JSON 和 OpenSSL 扩展。Composer 安装 Guzzle 及稳定版 League OAuth1/OAuth2 引擎；不需要 Laravel、Symfony、Google SDK 或完整框架。
+本仓库的检出目录使用 `composer install`。要求 PHP 8.2、8.3、8.4 或 8.5，JSON 和 OpenSSL 扩展。Composer 安装 Guzzle 及稳定版 League OAuth1/OAuth2 引擎；不需要 Laravel、Symfony、Google SDK 或完整框架。
 
-单一协议可以直接使用 League。EvaOAuth 额外提供浏览器绑定的一次性授权事务、安全默认值、Provider 配置绑定的 Token、统一身份、统一 OAuth1/OAuth2 API、资源来源限制、固定异常和仅元数据的 Trace。OAuth1 的 Token Secret 不会被伪装成 OAuth2 Refresh Token。
+单一协议可以直接使用 League。EvaOAuth 额外提供浏览器绑定的一次性授权事务、安全默认值、Provider 身份绑定的 Token、统一身份、统一 OAuth1/OAuth2 API、资源来源限制、固定异常和仅元数据的 Trace。OAuth1 的 Token Secret 不会被伪装成 OAuth2 Refresh Token。
 
 ## Provider 与通用 API
 
@@ -111,7 +111,7 @@ $restored = \Eva\EvaOAuth\Token::fromArray($record);
 
 `toArray()` **包含明文凭据**，请加密保存、限制访问，在刷新成功后原子替换记录。JSON/debug 输出脱敏，不能用于持久化；禁止 PHP serialize。`expiresAt` 是可空 Unix 时间戳，缺失表示未知，不代表永久有效。`expires_in=0` 表示立即过期，绝不能转换成缺失的到期时间；此 Token 必须先成功刷新才能获取身份。资源请求不会自动刷新。刷新响应未包含新 refresh token 时保留旧值，包含时使用新值。按账户串行刷新以避免轮换竞争；缺少、撤销或过期的刷新凭据应重新授权，而非无限重试。
 
-Google 默认申请 `access_type=offline`，但不保证每次登录都返回 refresh token，通常首次授权才返回。需要重新同意时，可使用 Google 相同 endpoint、`sub` 映射的通用 OAuth2 Provider，配置 `issuer: 'https://accounts.google.com'` 和 `authorizationParameters: ['access_type' => 'offline', 'prompt' => 'consent']`，不要每次正常登录都强制同意。修改配置会改变 Token 绑定，各流程必须保持配置一致。Google 测试模式授权可能过期；同意屏幕发布、应用验证和 Scope 审核由应用负责。
+Google 默认申请 `access_type=offline`，但不保证每次登录都返回 refresh token，通常首次授权才返回。需要重新同意时，可使用 Google 相同 endpoint、`sub` 映射的通用 OAuth2 Provider，配置 `issuer: 'https://accounts.google.com'` 和 `authorizationParameters: ['access_type' => 'offline', 'prompt' => 'consent']`，不要每次正常登录都强制同意。待授权事务绑定 Provider 的完整配置，因此同一登录流程内保持配置一致；已签发的 Token 绑定的是 Provider **身份**，轮换 Client Secret 或调整 scope、endpoint、选项都不会让已保存的 refresh token 失效，只有更换 client_id、回调地址、Provider 类或协议才会失效。Google 测试模式授权可能过期；同意屏幕发布、应用验证和 Scope 审核由应用负责。
 
 2026-09-17 已核对 [Google 官方服务器端指南](https://developers.google.com/identity/protocols/oauth2/web-server) 与 [官方 discovery](https://accounts.google.com/.well-known/openid-configuration)：
 
@@ -210,11 +210,12 @@ $status = $response->getStatusCode();
 Logger 收到 debug 级事件，其结构如下，数值仅为示意而非真实请求记录：
 
 ```text
-oauth.http.response {operation: "http", method: "POST", status: 200, duration_ms: 12.5}
-oauth.http.failure  {operation: "http", method: "GET", category: "transport", duration_ms: 15.0}
+oauth.http.response {provider: "google", stage: "token_exchange", method: "POST", status: 200, duration_ms: 12.5}
+oauth.http.failure  {provider: "google", stage: "identity", method: "GET", category: "transport", duration_ms: 15.0}
+oauth.failure       {provider: "google", stage: "token_exchange", category: "provider", duration_ms: 120.4}
 ```
 
-`method` 为白名单 HTTP 方法或 `OTHER`；`operation` 当前固定为 `http`，不是 Provider 或 grant 名称。HTTP 错误仍记录带状态码的 response 事件，非法响应体不会另发 parse 事件。Logger 自身失败不会破坏授权。事件不包含 URL、Header、Body、Query、第三方错误文本或异常链。通过事件顺序、状态及耗时排查问题；关联 ID 应由应用生成，不取自 OAuth 凭据。禁止开启 Guzzle debug、dump 请求对象或在 APM/access log 中记录完整回调地址。
+`provider` 是你在注册表中使用的名称，`stage` 取值为 `authorize`、`request_token`、`token_exchange`、`token_refresh`、`identity`、`resource_request`、`callback`；`method` 为白名单 HTTP 方法或 `OTHER`。HTTP 错误仍记录带状态码的 response 事件，非法响应体不会另发 parse 事件。`oauth.failure` 记录每个以 `OAuthException` 结束的公开调用，`category` 取值为 `callback`、`configuration`、`provider`、`transport`、`unsupported`，因此无需任何敏感信息即可定位失败发生在哪个 Provider、哪个阶段。Logger 自身失败不会破坏授权。事件不包含 URL、Header、Body、Query、第三方错误文本或异常链。通过事件顺序、状态、阶段及耗时排查问题；关联 ID 应由应用生成，不取自 OAuth 凭据。禁止开启 Guzzle debug、dump 请求对象或在 APM/access log 中记录完整回调地址。
 
 ## 异常与安全责任
 
@@ -228,12 +229,18 @@ oauth.http.failure  {operation: "http", method: "GET", category: "transport", du
 | `TransportException` | 网络错误，仅在安全且有界的操作中考虑应用级重试 |
 | `UnsupportedOperationException` | 不对此协议或 Token 使用该操作 |
 
-不要暴露堆栈、局部变量或凭据，应用校验和 PHP 错误也需要安全的全局错误处理。事务在交换前消费，同一回调不可重试；需要独立恢复身份获取时使用 `exchange()` 后再 `user()`。
+不要暴露堆栈、局部变量或凭据，应用校验和 PHP 错误也需要安全的全局错误处理。回调是一次性的：state 或 request token 在交换前已消费，因此身份请求失败的回调无法重试，只能让用户重新登录。需要可恢复的身份获取时，先交换并持久化，再按需多次获取身份：
+
+```text
+$token = $oauth->exchange('github', $_GET);   // 已消费 state 的 Token
+// 将 $token->toArray() 保存到受保护的存储中
+$user = $oauth->user('github', $token);       // 可重试，不再交换 code
+```
 
 - Endpoint、资源和回调强制 HTTPS，每个配置的 Provider 使用独立、精确注册的回调。不得从用户输入派生 endpoint 或重定向目标。账户关联还需显式确认和应用 CSRF 防御。
 - 构建默认 Store 前启动 Session，启用 strict mode、secure/HttpOnly/SameSite=Lax Cookie。事务访问期间保持 Session 锁，登录后更新 Session ID，应用自行管理会话到期和退出。
 - 默认每浏览器最多 10 个待授权事务，600 秒过期。`State\SessionStateStore(ttl: ..., capacity: ...)` 支持 1–1800 秒及 1–100 条，超限淘汰最早事务。自定义 `StateStore` 必须跨进程实现浏览器隔离、原子一次性 consume、过期和容量限制。MemoryStateStore 仅用于测试，不用于生产跨请求登录。
-- 库负责 State、S256 PKCE、安全随机数和 OAuth1 临时凭据；你负责保护 Session 后端，不能跨浏览器共享待授权状态。登录、回调和刷新保持 Provider 配置一致，轮换 Client Secret 可能使旧 Token 绑定失效。
+- 库负责 State、S256 PKCE、安全随机数和 OAuth1 临时凭据；你负责保护 Session 后端，不能跨浏览器共享待授权状态。同一登录/回调流程内保持 Provider 配置一致；`Token::provider` 保存的是 Provider 身份哈希，因此轮换凭据不会让已保存的 Token 失效。
 - 加密 Token 记录，限制权限，保护备份与密钥，必要时撤销/删除授权，控制刷新并发。脱敏不保护显式属性读取、toArray、对象强制转换或自行添加的遥测。
 - Web Server、Proxy 和 APM 不记录回调 Query。回调不加载第三方资源，使用 no-store/no-referrer 并重定向至干净本地地址。展示身份数据前转义，不假定邮箱存在或已经验证。
 - 保证配置的域名、DNS 和代理可信；origin 限制不是通用网络沙箱。Provider 注册、Scope 审查、限流、同意政策及事故响应由应用负责。

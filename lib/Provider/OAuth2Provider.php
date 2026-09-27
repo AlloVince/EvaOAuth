@@ -91,6 +91,13 @@ readonly class OAuth2Provider implements ProviderInterface, \JsonSerializable
         ]));
     }
 
+    final public function tokenBinding(): string
+    {
+        return hash('sha256', serialize([
+            static::class, $this->protocol(), $this->clientId, $this->redirect,
+        ]));
+    }
+
     public function identity(#[\SensitiveParameter] array $data): Identity
     {
         try {

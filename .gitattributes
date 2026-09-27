@@ -6,6 +6,7 @@
 /.scrutinizer.yml export-ignore
 /.travis.yml export-ignore
 /TASK.md export-ignore
+/docs/TASK_REVIEW.md export-ignore
 /tests export-ignore
 /examples export-ignore
 /src export-ignore

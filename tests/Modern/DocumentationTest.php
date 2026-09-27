@@ -160,13 +160,17 @@ final class DocumentationTest extends TestCase
         self::assertStringStartsWith('Basic ', $customHttp->requests[0]->getHeaderLine('Authorization'));
         self::assertSame('Bearer custom-access', $customHttp->requests[2]->getHeaderLine('Authorization'));
         self::assertCount(3, $logger->events);
+        $stages = [];
         foreach ($logger->events as [$level, $event, $metadata]) {
             self::assertSame('debug', $level);
             self::assertSame('oauth.http.response', $event);
-            self::assertSame(['operation', 'method', 'status', 'duration_ms'], array_keys($metadata));
-            self::assertSame('http', $metadata['operation']);
+            self::assertSame(['provider', 'stage', 'method', 'status', 'duration_ms'], array_keys($metadata));
+            self::assertSame('custom', $metadata['provider']);
+            self::assertIsFloat($metadata['duration_ms']);
             self::assertSame(200, $metadata['status']);
+            $stages[] = $metadata['stage'];
         }
+        self::assertSame(['token_exchange', 'identity', 'resource_request'], $stages);
         session_destroy();
     }
 

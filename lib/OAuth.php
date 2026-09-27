@@ -10,6 +10,7 @@ use Eva\EvaOAuth\Exception\CallbackException;
 use Eva\EvaOAuth\Exception\ConfigurationException;
 use Eva\EvaOAuth\Exception\OAuthException;
 use Eva\EvaOAuth\Exception\ProviderException;
+use Eva\EvaOAuth\Exception\TransportException;
 use Eva\EvaOAuth\Exception\UnsupportedOperationException;
 use Eva\EvaOAuth\Http\ResponseData;
 use Eva\EvaOAuth\Http\Transport;
@@ -63,37 +64,125 @@ final class OAuth
     public function authorize(string $name): string
     {
         $provider = $this->provider($name);
-        $start = $this->engine($provider)->begin();
-        if ($provider instanceof OAuth2Provider) {
-            $transaction = new OAuth2Transaction(
-                $provider->binding(),
-                $provider->redirectUri(),
-                $start['verifier'],
-                $provider->issuer,
-            );
-            $key = 'oauth2:' . $start['state'];
-        } else {
-            $transaction = new OAuth1Transaction(
-                $provider->binding(),
-                $provider->redirectUri(),
-                $start['token'],
-                $start['secret'],
-            );
-            $key = 'oauth1:' . $start['token'];
+        $transport = $this->transport->withContext(
+            $name,
+            $provider instanceof OAuth1Provider ? 'request_token' : 'authorize',
+        );
+        $started = hrtime(true);
+        try {
+            $start = $this->engine($provider, $transport)->begin();
+            if ($provider instanceof OAuth2Provider) {
+                $transaction = new OAuth2Transaction(
+                    $provider->binding(),
+                    $provider->redirectUri(),
+                    $start['verifier'],
+                    $provider->issuer,
+                );
+                $key = 'oauth2:' . $start['state'];
+            } else {
+                $transaction = new OAuth1Transaction(
+                    $provider->binding(),
+                    $provider->redirectUri(),
+                    $start['token'],
+                    $start['secret'],
+                );
+                $key = 'oauth1:' . $start['token'];
+            }
+            $this->stateStore->put($key, $transaction);
+            return $start['url'];
+        } catch (OAuthException $error) {
+            throw $this->reported($transport, $error, $started);
         }
-        $this->stateStore->put($key, $transaction);
-        return $start['url'];
     }
 
     public function callback(string $name, #[\SensitiveParameter] array $query): AuthorizationResult
     {
-        $token = $this->exchange($name, $query);
-        return new AuthorizationResult($name, $token, $this->user($name, $token));
+        $provider = $this->provider($name);
+        $transport = $this->transport->withContext($name, 'callback');
+        $started = hrtime(true);
+        try {
+            $token = $this->doExchange($provider, $transport->at('token_exchange'), $query);
+            return new AuthorizationResult(
+                $name,
+                $token,
+                $this->doUser($provider, $transport->at('identity'), $token),
+            );
+        } catch (OAuthException $error) {
+            throw $this->reported($transport, $error, $started);
+        }
     }
 
     public function exchange(string $name, #[\SensitiveParameter] array $query): Token
     {
         $provider = $this->provider($name);
+        $transport = $this->transport->withContext($name, 'token_exchange');
+        $started = hrtime(true);
+        try {
+            return $this->doExchange($provider, $transport, $query);
+        } catch (OAuthException $error) {
+            throw $this->reported($transport, $error, $started);
+        }
+    }
+
+    public function refresh(string $name, #[\SensitiveParameter] Token $token): Token
+    {
+        $provider = $this->provider($name);
+        $transport = $this->transport->withContext($name, 'token_refresh');
+        $started = hrtime(true);
+        try {
+            $this->tokenBinding($provider, $token);
+            if (!$provider instanceof OAuth2Provider) {
+                throw new UnsupportedOperationException();
+            }
+            return (new OAuth2Engine($provider, $transport))->refresh($token);
+        } catch (OAuthException $error) {
+            throw $this->reported($transport, $error, $started);
+        }
+    }
+
+    public function user(string $name, #[\SensitiveParameter] Token $token): Identity
+    {
+        $provider = $this->provider($name);
+        $transport = $this->transport->withContext($name, 'identity');
+        $started = hrtime(true);
+        try {
+            return $this->doUser($provider, $transport, $token);
+        } catch (OAuthException $error) {
+            throw $this->reported($transport, $error, $started);
+        }
+    }
+
+    public function request(
+        string $name,
+        #[\SensitiveParameter] Token $token,
+        #[\SensitiveParameter] RequestInterface $request,
+    ): ResponseInterface {
+        $provider = $this->provider($name);
+        $transport = $this->transport->withContext($name, 'resource_request');
+        $started = hrtime(true);
+        try {
+            $this->tokenBinding($provider, $token);
+            if ($token->isExpired()) {
+                throw new ProviderException();
+            }
+            UrlPolicy::resource($request, $provider->allowedOrigins());
+            $response = $this->engine($provider, $transport)->request($token, $request);
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                throw new ProviderException();
+            }
+            return $response;
+        } catch (OAuthException $error) {
+            throw $this->reported($transport, $error, $started);
+        } catch (\Throwable) {
+            throw $this->reported($transport, new ProviderException(), $started);
+        }
+    }
+
+    private function doExchange(
+        ProviderInterface $provider,
+        Transport $transport,
+        #[\SensitiveParameter] array $query,
+    ): Token {
         if ($provider instanceof OAuth2Provider) {
             $state = $this->parameter($query, 'state');
             if (!preg_match('/\A[a-f0-9]{64}\z/D', $state)) {
@@ -111,7 +200,7 @@ final class OAuth
             );
             $this->issuer($query, $transaction->issuer);
             $code = $this->parameter($query, 'code');
-            return (new OAuth2Engine($provider, $this->transport))->exchange($code, $transaction->verifier);
+            return (new OAuth2Engine($provider, $transport))->exchange($code, $transaction->verifier);
         }
         $token = $this->parameter($query, array_key_exists('denied', $query) ? 'denied' : 'oauth_token');
         $transaction = $this->stateStore->consume('oauth1:' . $token);
@@ -127,58 +216,32 @@ final class OAuth
         if (array_key_exists('denied', $query) || !$provider instanceof OAuth1Provider) {
             throw new CallbackException();
         }
-        return (new OAuth1Engine($provider, $this->transport))->exchange(
+        return (new OAuth1Engine($provider, $transport))->exchange(
             $token,
             $transaction->secret,
             $this->parameter($query, 'oauth_verifier'),
         );
     }
 
-    public function refresh(string $name, #[\SensitiveParameter] Token $token): Token
-    {
-        $provider = $this->provider($name);
-        $this->tokenBinding($provider, $token);
-        if (!$provider instanceof OAuth2Provider) {
-            throw new UnsupportedOperationException();
-        }
-        return (new OAuth2Engine($provider, $this->transport))->refresh($token);
-    }
-
-    public function user(string $name, #[\SensitiveParameter] Token $token): Identity
-    {
-        $provider = $this->provider($name);
-        $response = $this->request(
-            $name,
-            $token,
-            new Request('GET', $provider->resourceUrl(), [
-                'Accept' => 'application/json',
-                'User-Agent' => 'EvaOAuth/2.0',
-            ]),
-        );
-        try {
-            return $provider->identity(ResponseData::object($response));
-        } catch (\Throwable) {
-            throw new ProviderException();
-        }
-    }
-
-    public function request(
-        string $name,
+    private function doUser(
+        ProviderInterface $provider,
+        Transport $transport,
         #[\SensitiveParameter] Token $token,
-        #[\SensitiveParameter] RequestInterface $request,
-    ): ResponseInterface {
-        $provider = $this->provider($name);
+    ): Identity {
         $this->tokenBinding($provider, $token);
         if ($token->isExpired()) {
             throw new ProviderException();
         }
-        UrlPolicy::resource($request, $provider->allowedOrigins());
+        $request = new Request('GET', $provider->resourceUrl(), [
+            'Accept' => 'application/json',
+            'User-Agent' => 'EvaOAuth/2.0',
+        ]);
         try {
-            $response = $this->engine($provider)->request($token, $request);
+            $response = $this->engine($provider, $transport)->request($token, $request);
             if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
                 throw new ProviderException();
             }
-            return $response;
+            return $provider->identity(ResponseData::object($response));
         } catch (OAuthException $error) {
             throw $error;
         } catch (\Throwable) {
@@ -191,13 +254,13 @@ final class OAuth
         return $this->providers[$name] ?? throw new ConfigurationException();
     }
 
-    private function engine(ProviderInterface $provider): OAuth2Engine|OAuth1Engine
+    private function engine(ProviderInterface $provider, Transport $transport): OAuth2Engine|OAuth1Engine
     {
         if ($provider instanceof OAuth2Provider) {
-            return new OAuth2Engine($provider, $this->transport);
+            return new OAuth2Engine($provider, $transport);
         }
         if ($provider instanceof OAuth1Provider) {
-            return new OAuth1Engine($provider, $this->transport);
+            return new OAuth1Engine($provider, $transport);
         }
         throw new ConfigurationException();
     }
@@ -249,9 +312,25 @@ final class OAuth
 
     private function tokenBinding(ProviderInterface $provider, #[\SensitiveParameter] Token $token): void
     {
-        if (!hash_equals($provider->binding(), $token->provider) || $provider->protocol() !== $token->protocol) {
+        if (
+            !hash_equals($provider->tokenBinding(), $token->provider)
+            || $provider->protocol() !== $token->protocol
+        ) {
             throw new ConfigurationException();
         }
+    }
+
+    private function reported(Transport $transport, OAuthException $error, float $started): OAuthException
+    {
+        $category = match (true) {
+            $error instanceof CallbackException => 'callback',
+            $error instanceof TransportException => 'transport',
+            $error instanceof UnsupportedOperationException => 'unsupported',
+            $error instanceof ProviderException => 'provider',
+            default => 'configuration',
+        };
+        $transport->report($category, (hrtime(true) - $started) / 1e6);
+        return $error;
     }
 
     public function __debugInfo(): array

@@ -35,7 +35,7 @@ final class OAuth1Test extends TestCase
         $provider = new Flickr('client-id', 'client&secret', 'https://app.example/callback/flickr');
         $http = new MockHttpClient([new Response(200)]);
         $oauth = new OAuth(['flickr' => $provider], new MemoryStateStore(), $http);
-        $token = new Token($provider->binding(), 'oauth1', 'access%2Ftoken', tokenSecret: 'token&secret');
+        $token = new Token($provider->tokenBinding(), 'oauth1', 'access%2Ftoken', tokenSecret: 'token&secret');
         $oauth->request('flickr', $token, new Request(
             'POST',
             'https://api.flickr.com/services/rest/?query=%253D&empty=',
@@ -86,7 +86,7 @@ final class OAuth1Test extends TestCase
         self::assertNull($result->user->avatar);
         self::assertSame('access-token', $result->token->accessToken);
         self::assertSame('access-secret', $result->token->tokenSecret);
-        self::assertSame($provider->binding(), $result->token->provider);
+        self::assertSame($provider->tokenBinding(), $result->token->provider);
         self::assertSame('oauth1', $result->token->protocol);
         self::assertCount(3, $http->requests);
         $nonces = [];
@@ -304,7 +304,8 @@ final class OAuth1Test extends TestCase
         $http = new MockHttpClient();
         $oauth = new OAuth(['flickr' => $provider], new MemoryStateStore(), $http);
         try {
-            $oauth->request('flickr', new Token($provider->binding(), 'oauth1', 't', tokenSecret: 's'), new Request(
+            $token = new Token($provider->tokenBinding(), 'oauth1', 't', tokenSecret: 's');
+            $oauth->request('flickr', $token, new Request(
                 'POST',
                 'https://api.flickr.com/services/rest/' . $query,
                 ['Content-Type' => 'application/x-www-form-urlencoded'],
@@ -407,7 +408,7 @@ final class OAuth1Test extends TestCase
         $provider = new Flickr('id', 'secret', 'https://app.example/callback');
         $http = new MockHttpClient([new Response(200), new Response(200)]);
         $oauth = new OAuth(['flickr' => $provider], new MemoryStateStore(), $http);
-        $token = new Token($provider->binding(), 'oauth1', 'token', tokenSecret: 'token-secret');
+        $token = new Token($provider->tokenBinding(), 'oauth1', 'token', tokenSecret: 'token-secret');
         foreach (['application/json', 'multipart/form-data; boundary=boundary'] as $contentType) {
             $body = '{"oauth_nonce":"not-a-protocol-parameter","a":"one"}';
             $request = new Request(
@@ -433,7 +434,7 @@ final class OAuth1Test extends TestCase
         $provider = new Flickr('id', 'secret', 'https://app.example/callback');
         $http = new MockHttpClient([new Response(200)]);
         $oauth = new OAuth(['flickr' => $provider], new MemoryStateStore(), $http);
-        $token = new Token($provider->binding(), 'oauth1', 'token', tokenSecret: 'token-secret');
+        $token = new Token($provider->tokenBinding(), 'oauth1', 'token', tokenSecret: 'token-secret');
         $request = new Request(
             'PUT',
             'https://api.flickr.com/',
@@ -458,7 +459,7 @@ final class OAuth1Test extends TestCase
         $provider = new Flickr('id', 'secret', 'https://app.example/callback');
         $http = new MockHttpClient();
         $oauth = new OAuth(['flickr' => $provider], new MemoryStateStore(), $http);
-        $token = new Token($provider->binding(), 'oauth1', 'token', tokenSecret: 'token-secret');
+        $token = new Token($provider->tokenBinding(), 'oauth1', 'token', tokenSecret: 'token-secret');
         $request = new Request('POST', 'https://api.flickr.com/', [], 'a=1');
         foreach (
             [

@@ -56,7 +56,7 @@ final class OAuth1Engine
             $server = new OAuth1Server($this->provider, $this->transport);
             $credentials = $server->getTokenCredentials($temporary, $token, $verifier);
             return new Token(
-                $this->provider->binding(),
+                $this->provider->tokenBinding(),
                 'oauth1',
                 $credentials->getIdentifier(),
                 tokenSecret: $credentials->getSecret(),
@@ -75,7 +75,7 @@ final class OAuth1Engine
         try {
             UrlPolicy::resource($request, $this->provider->allowedOrigins());
             if (
-                $token->protocol !== 'oauth1' || !hash_equals($this->provider->binding(), $token->provider)
+                $token->protocol !== 'oauth1' || !hash_equals($this->provider->tokenBinding(), $token->provider)
                 || $token->isExpired()
             ) {
                 throw new ProviderException();

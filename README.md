@@ -60,9 +60,9 @@ After a 2.x release is published:
 composer require evaengine/eva-oauth:^2.0
 ```
 
-For this development checkout: `composer install`. Requires PHP 8.2, 8.3, 8.4 or 8.5, JSON and OpenSSL; no Laravel, Symfony, Google SDK or full framework is required. Composer installs Guzzle and the stable League OAuth1/OAuth2 engines.
+In a checkout of this repository: `composer install`. Requires PHP 8.2, 8.3, 8.4 or 8.5, JSON and OpenSSL; no Laravel, Symfony, Google SDK or full framework is required. Composer installs Guzzle and the stable League OAuth1/OAuth2 engines.
 
-Using a League engine directly is reasonable for a single protocol. EvaOAuth adds browser-bound, one-use authorization transactions, secure defaults, provider/configuration-bound tokens, normalized identity, the same OAuth1/OAuth2 application API, restricted resource origins, fixed exceptions and metadata-only tracing. It does not pretend that OAuth1 token secrets are OAuth2 refresh tokens.
+Using a League engine directly is reasonable for a single protocol. EvaOAuth adds browser-bound, one-use authorization transactions, secure defaults, provider-identity-bound tokens, normalized identity, the same OAuth1/OAuth2 application API, restricted resource origins, fixed exceptions and metadata-only tracing. It does not pretend that OAuth1 token secrets are OAuth2 refresh tokens.
 
 ## Providers and common API
 
@@ -111,7 +111,7 @@ $restored = \Eva\EvaOAuth\Token::fromArray($record);
 
 `toArray()` deliberately exports credentials: encrypt the record at rest, restrict access, and atomically replace the old record after refresh. JSON/debug views redact tokens and are **not** persistence formats; PHP serialization is rejected. `expiresAt` is a nullable Unix timestamp; an absent expiry is unknown, not proof of indefinite validity. A reported `expires_in=0` means immediately expired and must never be normalized to an absent expiry; such a token cannot be used to fetch identity before a successful refresh. Requests do not refresh automatically. A refresh response without a new refresh token preserves the old one; a replacement is retained. Serialize refresh operations per account to avoid rotation races. Missing/revoked/expired refresh credentials require a new authorization, not an endless retry loop.
 
-Google requests `access_type=offline`; that does not guarantee a refresh token on every login. Google normally issues it on the initial grant; re-consent may be needed. For an explicit re-consent workflow configure a generic OAuth2 provider with the same Google endpoints, a `sub` mapper, `issuer: 'https://accounts.google.com'` and `authorizationParameters: ['access_type' => 'offline', 'prompt' => 'consent']`; do not force consent on every routine login. Changed configuration changes token binding, so keep each flow's configuration stable. Google testing-mode grants can expire; consent-screen publication, app verification and granted scopes are application responsibilities.
+Google requests `access_type=offline`; that does not guarantee a refresh token on every login. Google normally issues it on the initial grant; re-consent may be needed. For an explicit re-consent workflow configure a generic OAuth2 provider with the same Google endpoints, a `sub` mapper, `issuer: 'https://accounts.google.com'` and `authorizationParameters: ['access_type' => 'offline', 'prompt' => 'consent']`; do not force consent on every routine login. Keep each login flow's configuration stable while a user is mid-flow: a pending transaction is bound to the full provider configuration. Already issued tokens are bound to provider *identity*, so rotating a client secret or changing scopes, endpoints and options keeps stored refresh tokens working; only a different client id, callback URI, provider class or protocol invalidates them. Google testing-mode grants can expire; consent-screen publication, app verification and granted scopes are application responsibilities.
 
 Endpoints checked against [Google's official web-server guide](https://developers.google.com/identity/protocols/oauth2/web-server) and [discovery metadata](https://accounts.google.com/.well-known/openid-configuration) on 2026-09-17:
 
@@ -210,11 +210,12 @@ An injected client must retain TLS verification, apply finite timeouts and **not
 The logger receives debug-level events with these exact metadata schemas:
 
 ```text
-oauth.http.response {operation: "http", method: "POST", status: 200, duration_ms: 12.5}
-oauth.http.failure  {operation: "http", method: "GET", category: "transport", duration_ms: 15.0}
+oauth.http.response {provider: "google", stage: "token_exchange", method: "POST", status: 200, duration_ms: 12.5}
+oauth.http.failure  {provider: "google", stage: "identity", method: "GET", category: "transport", duration_ms: 15.0}
+oauth.failure       {provider: "google", stage: "token_exchange", category: "provider", duration_ms: 120.4}
 ```
 
-Numbers are illustrative, not a recorded live request. `method` is an allowlisted HTTP verb or `OTHER`; `operation` is currently always `http`, not a provider/grant identifier. HTTP error responses still produce `oauth.http.response` with their status; malformed payloads do not create a separate parse event. Logger failures do not break the flow. There are no URLs, headers, bodies, query values, provider messages or exception chains in these events. Use event order, status and duration to diagnose transport/provider failures; attach your own non-secret correlation ID outside the OAuth request data. Never enable Guzzle `debug`, dump request objects, or include callback URLs in APM/access logs.
+Numbers are illustrative, not a recorded live request. `provider` is your registry name; `stage` is one of `authorize`, `request_token`, `token_exchange`, `token_refresh`, `identity`, `resource_request`, `callback`. `method` is an allowlisted HTTP verb or `OTHER`. HTTP error responses still produce `oauth.http.response` with their status; malformed payloads do not create a separate parse event. `oauth.failure` closes every public call that ends in an `OAuthException`, with `category` one of `callback`, `configuration`, `provider`, `transport`, `unsupported`, so a login failure is attributable to a provider and a stage without any secret. Logger failures do not break the flow. There are no URLs, headers, bodies, query values, provider messages or exception chains in these events. Use event order, status, stage and duration to diagnose transport/provider failures; attach your own non-secret correlation ID outside the OAuth request data. Never enable Guzzle `debug`, dump request objects, or include callback URLs in APM/access logs.
 
 ## Exceptions and security responsibilities
 
@@ -228,12 +229,18 @@ All public OAuth failures derive from `Exception\OAuthException`:
 | `TransportException` | Network/transport failure; apply a bounded application retry policy only where safe |
 | `UnsupportedOperationException` | Do not attempt the operation for this protocol/token |
 
-Messages are fixed and previous exceptions are removed. Do not expose stack traces, local variables or credentials; application validation and PHP errors also need a safe global handler. A callback is consumed before exchange, so retrying the same callback is not supported. Use `exchange()` plus `user()` when identity-fetch recovery is needed without re-exchanging a code.
+Messages are fixed and previous exceptions are removed. Do not expose stack traces, local variables or credentials; application validation and PHP errors also need a safe global handler. A callback is one-shot: its state or request token is consumed before the code is exchanged, so a callback whose identity request failed cannot be retried and asks the user to log in again. When you need a recoverable identity step, exchange and persist first, then fetch identity as often as you like:
+
+```text
+$token = $oauth->exchange('github', $_GET);   // Token, state already consumed
+// persist $token->toArray() in your protected storage
+$user = $oauth->user('github', $token);       // retriable, no second code exchange
+```
 
 - Use HTTPS for endpoints, resources and distinct registered callback URIs per configured provider. Derive neither endpoints nor redirect destinations from user input. Account linking needs explicit user confirmation and local CSRF defenses.
 - Start PHP sessions before creating the default store; secure/HttpOnly/SameSite=Lax cookies and strict mode require HTTPS. Retain the session lock through transaction access. Regenerate the session ID after successful login and enforce application session expiration/logout.
 - Default pending transactions expire after 600 seconds and cap at 10 per browser. `State\SessionStateStore(ttl: ..., capacity: ...)` permits 1–1800 seconds and 1–100 entries. Exceeding capacity evicts oldest attempts. A custom `StateStore` must browser-scope keys and implement atomic one-use `consume`, expiration and bounds across workers. `MemoryStateStore` is for tests, not multi-request production login.
-- State, S256 PKCE, CSPRNG values and OAuth1 temporary secrets are handled by the library. Protect the session backend; never share pending state globally between browsers. Keep provider configuration stable across login/callback/refresh; secret rotation can invalidate existing token bindings.
+- State, S256 PKCE, CSPRNG values and OAuth1 temporary secrets are handled by the library. Protect the session backend; never share pending state globally between browsers. Keep provider configuration stable across one login/callback pair; `Token::provider` holds a provider-identity hash, so credential rotation does not invalidate stored tokens.
 - Encrypt stored token records, protect backups and keys, apply least privilege, delete/revoke grants when appropriate, and manage refresh concurrency. Token/debug redaction does not protect explicit property access, `toArray()`, arbitrary object casts or your own telemetry.
 - Prevent callback query strings appearing in web-server/proxy/APM logs. Serve no third-party resources on callbacks; use `no-store`, `no-referrer` and redirect to a clean local URL. Escape profile data before rendering; treat email as optional and do not infer verification.
 - Maintain trust in configured provider hosts/DNS and transport proxy settings; the origin policy is not a general network sandbox. Provider registration, scope review, rate limits, consent policies and incident response remain yours.
