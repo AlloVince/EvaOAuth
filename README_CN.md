@@ -253,7 +253,7 @@ composer verify
 composer validate --strict
 ```
 
-verify 执行 PHPUnit、PHPStan level 6、PSR-12 PHPCS、严格 Composer 校验和锁定依赖安全审计（含 abandoned）。项目使用原生类型且不写代码注释，仅关闭 `missingType.iterableValue`，没有 baseline 或全局忽略。CI 配置 PHP 8.2–8.5 和最低依赖任务；配置存在不等于远程已执行通过。
+verify 执行 PHPUnit、PHPStan level 6、PSR-12 PHPCS、严格 Composer 校验和锁定依赖安全审计（含 abandoned）。项目使用原生类型且不写代码注释，仅关闭 `missingType.iterableValue`，没有 baseline 或全局忽略。CI 配置 PHP 8.2–8.5 和最低依赖任务，2.0.0 发布候选对应的运行记录见[验收证据](docs/ACCEPTANCE.md)。
 
 两个 README 的所有 PHP fenced snippets 由 `tests/Modern/DocumentationTest.php` 提取并使用 Mock HTTP 执行，协议测试另行验证实际 wire request。无需 Demo 网站或真实凭据。旧 src、示例网站和旧测试已删除，1.x 实现保留在 Git 历史中。测试及开发工具位于源码仓库，不包含在生产包归档中。
 

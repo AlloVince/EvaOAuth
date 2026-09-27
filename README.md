@@ -253,7 +253,7 @@ composer verify
 composer validate --strict
 ```
 
-`verify` runs PHPUnit, PHPStan level 6, PSR-12 PHPCS, strict Composer validation and locked dependency audit (including abandoned packages). Only the `missingType.iterableValue` PHPStan identifier is disabled because this project uses native types without code comments; no baseline or blanket suppression is used. CI declares PHP 8.2–8.5 and a lowest-dependency job. This is not a claim that remote jobs have already run.
+`verify` runs PHPUnit, PHPStan level 6, PSR-12 PHPCS, strict Composer validation and locked dependency audit (including abandoned packages). Only the `missingType.iterableValue` PHPStan identifier is disabled because this project uses native types without code comments; no baseline or blanket suppression is used. CI declares PHP 8.2–8.5 and a lowest-dependency job; the run for the 2.0.0 release candidate is recorded in [acceptance evidence](docs/ACCEPTANCE.md).
 
 All PHP fences in both READMEs are extracted and executed with mocked HTTP by `tests/Modern/DocumentationTest.php`; separate wire-level tests verify protocol details. No demo website or live provider credentials are needed. The obsolete `src/`, example website and old tests have been removed; the 1.x implementation remains available in Git history. Tests and development tooling are available in the source repository, not the production package archive.
 
