@@ -36,8 +36,9 @@ sections describes the released tree `d5e2b89` and is kept as that record. Curre
 CI evidence: runs `36311541677` and `36311765249` (heads `fe6d126`, `681cd41`) failed in
 `DocumentationTest` only, with `Provider\GitHub::__construct(): Argument #1 ($clientId) must be of type
 string, null given`, because the rewritten fences read `$_ENV` while the harness seeded `putenv()`
-only. The rewrite above restores the documented flow; the CI run for the fix is not recorded here
-yet.
+only. Run <https://github.com/AlloVince/EvaOAuth/actions/runs/36313484872> (head SHA
+`72a9652`, started 2026-09-27T10:44:07Z, conclusion `success`) is green for the fix on all five jobs:
+PHP 8.2, 8.3, 8.4, 8.5 locked and PHP 8.2 lowest, each reporting `OK (131 tests, 1067 assertions)`.
 
 ## Observed commands
 
